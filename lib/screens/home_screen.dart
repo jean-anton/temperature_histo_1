@@ -6,6 +6,7 @@ import '../models/weather_forecast_model.dart';
 import '../models/climate_normal_model.dart';
 import '../test_tooltip1.dart';
 import '../widgets/weather_chart_widget.dart';
+import '../widgets/weather_chart_widget2.dart';
 import '../widgets/weather_table_widget.dart';
 import '../widgets/loading_indicator_widget.dart';
 import '../widgets/error_display_widget.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final WeatherService _weatherService = WeatherService();
   final ClimateDataService _climateService = ClimateDataService();
   late List<WeatherData> data;
+
   // String _selectedLocation = '00460_Berus';
   String _selectedLocation = '04336_Saarbrücken-Ensheim';
   String _selectedModel = 'best_match';
@@ -74,12 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Charger les prévisions météo
       final coords = _locationCoordinates[_selectedLocation]!;
-      final WeatherForecast forecast = await _weatherService.getWeatherForecast_stub(
-        latitude: coords['lat']!,
-        longitude: coords['lon']!,
-        model: _selectedModel,
-        locationName: _locations[_selectedLocation]!,
-      );
+      final WeatherForecast forecast = await _weatherService
+          // .getWeatherForecast_stub(
+          .getWeatherForecast(
+            latitude: coords['lat']!,
+            longitude: coords['lon']!,
+            model: _selectedModel,
+            locationName: _locations[_selectedLocation]!,
+          );
       //print("####CJG 566 forecast:\n${forecast.toString()}");
 
       setState(() {
@@ -270,10 +274,12 @@ class _HomeScreenState extends State<HomeScreen> {
             // const SizedBox(height: 16),
             if (_showChart)
               // WeatherChart_stub(tooltip: TooltipBehavior(enable: true), data: data)
-            WeatherChart(
-              forecast: _forecast!,
-              climateNormals: _climateNormals,
-            )
+              // WeatherChart(
+              //   forecast: _forecast!,
+              //   climateNormals: _climateNormals,
+              // )
+              WeatherChart2(forecast: _forecast!)
+              // WeatherChart(forecast: _forecast!)
             else
               WeatherTable(
                 forecast: _forecast!,

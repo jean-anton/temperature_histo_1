@@ -54,12 +54,10 @@ class _ChartData {
 
 class WeatherChart extends StatefulWidget {
   final WeatherForecast forecast;
-  final List<ClimateNormal> climateNormals;
 
   const WeatherChart({
     super.key,
     required this.forecast,
-    required this.climateNormals,
   });
 
   @override
@@ -89,25 +87,25 @@ class _WeatherChartState extends State<WeatherChart> {
   void didUpdateWidget(WeatherChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Reprocess data if the input forecast or normals change.
-    if (widget.forecast != oldWidget.forecast ||
-        widget.climateNormals != oldWidget.climateNormals) {
+    if (widget.forecast != oldWidget.forecast) {
       _prepareChartData();
     }
   }
 
   /// Configures the tooltip behavior for the temperature chart.
   void _initializeTooltip() {
-    _tooltipBehavior = TooltipBehavior(
-      enable: true,
-      activationMode: ActivationMode.singleTap,
-      // **FIX**: Simplified tooltip configuration for better mobile web compatibility
-      color: Colors.black87,
-      elevation: 4,
-      canShowMarker: true,
-      tooltipPosition: TooltipPosition.auto, // Changed from pointer to auto
-      duration: 3000, // Auto-hide after 3 seconds
-      builder: _buildSimplifiedTooltip, // Use simplified builder
-    );
+    // _tooltipBehavior = TooltipBehavior(
+    //   enable: true,
+    //   activationMode: ActivationMode.singleTap,
+    //   // **FIX**: Simplified tooltip configuration for better mobile web compatibility
+    //   color: Colors.black87,
+    //   elevation: 4,
+    //   canShowMarker: true,
+    //   tooltipPosition: TooltipPosition.auto, // Changed from pointer to auto
+    //   duration: 3000, // Auto-hide after 3 seconds
+    //   builder: _buildSimplifiedTooltip, // Use simplified builder
+    // );
+    _tooltipBehavior = TooltipBehavior(enable: true);
   }
 
   /// Transforms forecast and climate data into a format suitable for the charts.
@@ -117,18 +115,9 @@ class _WeatherChartState extends State<WeatherChart> {
 
     for (int i = 0; i < widget.forecast.dailyForecasts.length; i++) {
       final forecast = widget.forecast.dailyForecasts[i];
-      final normal = ClimateNormal.findByDayOfYear(
-        widget.climateNormals,
-        forecast.dayOfYear,
-      );
+
       final weatherIcon = _weatherIconMap[forecast.weatherCode?.toString()];
 
-      final deviation = _climateService.calculateDeviation(
-        forecast.temperatureMax,
-        forecast.temperatureMin,
-        forecast.dayOfYear,
-        widget.climateNormals,
-      );
 
       // Prepare data for the main temperature chart
       newChartData.add(_ChartData(
@@ -136,10 +125,6 @@ class _WeatherChartState extends State<WeatherChart> {
         date: forecast.date,
         maxTemp: forecast.temperatureMax,
         minTemp: forecast.temperatureMin,
-        normalMaxTemp: normal?.temperatureMax,
-        normalMinTemp: normal?.temperatureMin,
-        maxTempDeviation: deviation.maxDeviation,
-        minTempDeviation: deviation.minDeviation,
         iconPath: weatherIcon?.iconPath,
         weatherDescription: weatherIcon?.descriptionFr,
         precipitationSum: forecast.precipitationSum,
