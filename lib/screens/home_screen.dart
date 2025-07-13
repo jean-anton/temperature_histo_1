@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import '../main.dart';
 import '../services/weather_service.dart';
 import '../services/climate_data_service.dart';
 import '../models/weather_forecast_model.dart';
@@ -243,6 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
             //   style: TextStyle(fontWeight: FontWeight.w500),
             // ),
             // const SizedBox(height: 8),
+            Text("version: $VERSION, main: $mainFileName"),
           ],
         ),
       ),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/home_screen.dart';
 
+const VERSION = "1.0.0";
+String mainFileName = "/Users/jg/devel/projects/flutter/temperature_histo_1";
 // This custom scroll behavior enables touch-based scrolling on web platforms,
 // which provides a more natural, app-like experience for mobile web users.
 class AppScrollBehavior extends MaterialScrollBehavior {
@@ -21,7 +23,6 @@ void main() async {
   // Initialize date formatting for the French locale so it's available
   // throughout the app.
   await initializeDateFormatting('fr_FR', null);
-
   runApp(const ClimaDeviationApp());
 }
 
@@ -50,3 +51,4 @@ class ClimaDeviationApp extends StatelessWidget {
     );
   }
 }
+
