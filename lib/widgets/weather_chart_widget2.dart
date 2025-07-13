@@ -8,6 +8,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import '../data/weather_icon_data.dart';
 import '../models/climate_normal_model.dart';
 import '../models/weather_forecast_model.dart';
+import '../models/weather_icon.dart';
 
 class WeatherChart2 extends StatefulWidget {
   final WeatherForecast forecast;
@@ -112,7 +113,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
             return Container(
               padding: const EdgeInsets.all(12),
               constraints: BoxConstraints(
-                maxHeight: 280,
+                maxHeight: 290,
               ), // Limit tooltip height
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -148,6 +149,18 @@ class _WeatherChart2State extends State<WeatherChart2> {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        forecast.weatherCode != null
+                            ? '${getDescriptionFr(forecast.weatherCode!.toString())}'
+                            : "",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
                           color: Colors.white,
                         ),
                       ),
@@ -221,6 +234,20 @@ class _WeatherChart2State extends State<WeatherChart2> {
           },
     );
   }
+  String? getDescriptionFr(String code) {
+    final match = weatherIcons.firstWhere(
+          (icon) => icon.code == code,
+      orElse: () => WeatherIcon(
+        code: '',
+        iconPath: '',
+        descriptionEn: '',
+        descriptionFr: '',
+      ),
+    );
+
+    return match.code.isEmpty ? null : match.descriptionFr;
+  }
+
 
   WeatherDeviation? _getDeviationForDay(DailyForecast dailyForecast) {
     final normal = ClimateNormal.findByDayOfYear(
@@ -423,9 +450,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
                 labelPlacement: LabelPlacement.onTicks,
                 labelRotation: -45,
                 labelStyle: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
                 ),
                 axisLine: AxisLine(color: Colors.grey.shade400, width: 1),
                 majorTickLines: MajorTickLines(
@@ -575,6 +602,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                 ),
                 // MIN TEMPERATURE SERIES
                 LineSeries<DailyForecast, String>(
+                  enableTooltip: false,
                   name: 'Temp. min.',
                   dataSource: widget.forecast.dailyForecasts,
                   xValueMapper: (DailyForecast daily, _) =>
@@ -595,7 +623,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   animationDuration: 150,
                   animationDelay: 0,
                   selectionBehavior: SelectionBehavior(
-                    enable: true,
+                    enable: false,
                     selectedColor: Colors.blue.shade800,
                     unselectedColor: Colors.blue.shade300,
                     selectedBorderColor: Colors.lightBlue,
