@@ -121,12 +121,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ClimaDéviation WebApp'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      // appBar: AppBar(
+      //   title: const Text('ClimaDéviation WebApp'),
+      //   backgroundColor: Theme.of(context).primaryColor,
+      //   foregroundColor: Colors.white,
+      //   elevation: 0,
+      // ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -236,13 +236,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
             ),
-            const SizedBox(height: 16),
-            // --- NEW: Model Selection SegmentedButton ---
-            const Text(
-              'Modèle:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
+            // const SizedBox(height: 16),
+            // // --- NEW: Model Selection SegmentedButton ---
+            // const Text(
+            //   'Modèle:',
+            //   style: TextStyle(fontWeight: FontWeight.w500),
+            // ),
+            // const SizedBox(height: 8),
           ],
         ),
       ),
@@ -278,8 +278,8 @@ class _HomeScreenState extends State<HomeScreen> {
               //   forecast: _forecast!,
               //   climateNormals: _climateNormals,
               // )
-              WeatherChart2(forecast: _forecast!)
-              // WeatherChart(forecast: _forecast!)
+              WeatherChart2(forecast: _forecast!, climateNormals: _climateNormals,)
+              // WeatherChart(forecast: _forecast!,)
             else
               WeatherTable(
                 forecast: _forecast!,
