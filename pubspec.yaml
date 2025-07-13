@@ -56,12 +56,16 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon/weather_iOS_Icon.png"
-#  image_path: "assets/icon/le-rechauffement-climatique.png"
+  image_path_ios: "assets/icon/weather_iOS_Icon.png"
+  image_path_android: "assets/icon/weather_foreground_strong.png"
+  android_adaptive_icon_foreground: "assets/icon/weather_foreground_strong.png"
+  android_adaptive_icon_background: "assets/icon/weather_background.png"
   web:
     generate: true
-#    image_path: "assets/icon/le-rechauffement-climatique.png"
-    image_path: "assets/icon/weather_iOS_Icon.png"
+    image_path: "assets/icon/weather_foreground_strong.png"
+
+
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
