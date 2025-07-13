@@ -5,8 +5,6 @@ import '../services/weather_service.dart';
 import '../services/climate_data_service.dart';
 import '../models/weather_forecast_model.dart';
 import '../models/climate_normal_model.dart';
-import '../test_tooltip1.dart';
-import '../widgets/weather_chart_widget.dart';
 import '../widgets/weather_chart_widget2.dart';
 import '../widgets/weather_table_widget.dart';
 import '../widgets/loading_indicator_widget.dart';
@@ -26,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final WeatherService _weatherService = WeatherService();
   final ClimateDataService _climateService = ClimateDataService();
-  late List<WeatherData> data;
+  // late List<WeatherData> data;
 
   // String _selectedLocation = '00460_Berus';
   String _selectedLocation = '04336_Saarbrücken-Ensheim';
@@ -59,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadData();
-    data = getWeatherData();
+    // data = getWeatherData();
   }
 
   Future<void> _loadData() async {
