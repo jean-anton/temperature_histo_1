@@ -44,148 +44,181 @@ class _WeatherChart2State extends State<WeatherChart2> {
 
     _tooltipBehavior = TooltipBehavior(
       enable: true,
-      tooltipPosition: TooltipPosition.auto, // Auto-adjust position to avoid clipping [[8]]
+      tooltipPosition: TooltipPosition.auto,
+      // Auto-adjust position to avoid clipping [[8]]
       activationMode: ActivationMode.singleTap,
       duration: 4000,
       canShowMarker: true,
       shadowColor: Colors.black26,
       elevation: 8,
-      builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
-          int seriesIndex) {
-        final DailyForecast forecast = data as DailyForecast;
+      builder:
+          (
+            dynamic data,
+            dynamic point,
+            dynamic series,
+            int pointIndex,
+            int seriesIndex,
+          ) {
+            final DailyForecast forecast = data as DailyForecast;
 
-        // Use pre-calculated deviation for better performance
-        final WeatherDeviation? deviation = pointIndex < _deviations.length
-            ? _deviations[pointIndex]
-            : null;
+            // Use pre-calculated deviation for better performance
+            final WeatherDeviation? deviation = pointIndex < _deviations.length
+                ? _deviations[pointIndex]
+                : null;
 
-        final String formattedDate =
-        DateFormat('EEEE, d MMMM', 'fr_FR').format(forecast.date);
+            final String formattedDate = DateFormat(
+              'EEEE, d MMMM',
+              'fr_FR',
+            ).format(forecast.date);
 
-        Widget buildDetailRow(String label, String? value, {Color? valueColor}) {
-          if (value == null || value.isEmpty) {
-            return const SizedBox.shrink();
-          }
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '$label: ',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                ),
-                Flexible(
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      color: valueColor ?? Colors.white,
-                      fontSize: 13,
-                      fontWeight:
-                      valueColor != null ? FontWeight.bold : FontWeight.w500,
+            Widget buildDetailRow(
+              String label,
+              String? value, {
+              Color? valueColor,
+            }) {
+              if (value == null || value.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$label: ',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return Container(
-          padding: const EdgeInsets.all(12),
-          constraints: BoxConstraints(maxHeight: 280), // Limit tooltip height
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.blueGrey.shade800.withOpacity(0.95),
-                Colors.blueGrey.shade900.withOpacity(0.95),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              )
-            ],
-          ),
-          child: SingleChildScrollView(
-            // Make tooltip scrollable if content overflows
-            child: IntrinsicWidth(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    formattedDate,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Colors.white,
+                    Flexible(
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          color: valueColor ?? Colors.white,
+                          fontSize: 13,
+                          fontWeight: valueColor != null
+                              ? FontWeight.bold
+                              : FontWeight.w500,
+                        ),
+                      ),
                     ),
+                  ],
+                ),
+              );
+            }
+
+            return Container(
+              padding: const EdgeInsets.all(12),
+              constraints: BoxConstraints(
+                maxHeight: 280,
+              ), // Limit tooltip height
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.blueGrey.shade800.withOpacity(0.95),
+                    Colors.blueGrey.shade900.withOpacity(0.95),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    height: 1,
-                    color: Colors.white.withOpacity(0.3),
-                  ),
-                  buildDetailRow(
-                    'Temp. max.',
-                    '${forecast.temperatureMax.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.maxDeviationText})' : ''}',
-                    valueColor: (deviation?.maxDeviation ?? 0) > 0
-                        ? Colors.redAccent.shade100
-                        : Colors.lightBlueAccent.shade100,
-                  ),
-                  buildDetailRow(
-                    'Temp. min.',
-                    '${forecast.temperatureMin.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.minDeviationText})' : ''}',
-                    valueColor: (deviation?.minDeviation ?? 0) > 0
-                        ? Colors.redAccent.shade100
-                        : Colors.lightBlueAccent.shade100,
-                  ),
-                  buildDetailRow('Précipitations',
-                      forecast.precipitationSum != null ? '${forecast.precipitationSum} mm' : null),
-                  buildDetailRow('Heures de précip.',
-                      forecast.precipitationHours != null ? '${forecast.precipitationHours} h' : null),
-                  buildDetailRow(
-                      'Chance de précip.',
-                      forecast.precipitationProbabilityMax != null
-                          ? '${forecast.precipitationProbabilityMax}%'
-                          : null),
-                  buildDetailRow(
-                      'Chute de neige',
-                      forecast.snowfallSum != null && forecast.snowfallSum! > 0
-                          ? '${forecast.snowfallSum} cm'
-                          : null),
-                  buildDetailRow('Couverture nuageuse',
-                      forecast.cloudCoverMean != null ? '${forecast.cloudCoverMean}%' : null),
-                  buildDetailRow(
-                      'Vent',
-                      forecast.windSpeedMax != null
-                          ? '${forecast.windSpeedMax?.toStringAsFixed(1)} km/h'
-                          : null),
-                  buildDetailRow(
-                      'Rafales',
-                      forecast.windGustsMax != null
-                          ? '${forecast.windGustsMax?.toStringAsFixed(1)} km/h'
-                          : null),
                 ],
               ),
-            ),
-          ),
-        );
-      },
+              child: SingleChildScrollView(
+                // Make tooltip scrollable if content overflows
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        formattedDate,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        height: 1,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                      buildDetailRow(
+                        'Temp. max.',
+                        '${forecast.temperatureMax.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.maxDeviationText})' : ''}',
+                        valueColor: (deviation?.maxDeviation ?? 0) > 0
+                            ? Colors.redAccent.shade100
+                            : Colors.lightBlueAccent.shade100,
+                      ),
+                      buildDetailRow(
+                        'Temp. min.',
+                        '${forecast.temperatureMin.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.minDeviationText})' : ''}',
+                        valueColor: (deviation?.minDeviation ?? 0) > 0
+                            ? Colors.redAccent.shade100
+                            : Colors.lightBlueAccent.shade100,
+                      ),
+                      buildDetailRow(
+                        'Précipitations',
+                        forecast.precipitationSum != null
+                            ? '${forecast.precipitationSum} mm'
+                            : null,
+                      ),
+                      buildDetailRow(
+                        'Heures de précip.',
+                        forecast.precipitationHours != null
+                            ? '${forecast.precipitationHours} h'
+                            : null,
+                      ),
+                      buildDetailRow(
+                        'Chance de précip.',
+                        forecast.precipitationProbabilityMax != null
+                            ? '${forecast.precipitationProbabilityMax}%'
+                            : null,
+                      ),
+                      buildDetailRow(
+                        'Chute de neige',
+                        forecast.snowfallSum != null &&
+                                forecast.snowfallSum! > 0
+                            ? '${forecast.snowfallSum} cm'
+                            : null,
+                      ),
+                      buildDetailRow(
+                        'Couverture nuageuse',
+                        forecast.cloudCoverMean != null
+                            ? '${forecast.cloudCoverMean}%'
+                            : null,
+                      ),
+                      buildDetailRow(
+                        'Vent',
+                        forecast.windSpeedMax != null
+                            ? '${forecast.windSpeedMax?.toStringAsFixed(1)} km/h'
+                            : null,
+                      ),
+                      buildDetailRow(
+                        'Rafales',
+                        forecast.windGustsMax != null
+                            ? '${forecast.windGustsMax?.toStringAsFixed(1)} km/h'
+                            : null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
     );
   }
 
@@ -200,7 +233,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
     return WeatherDeviation(
       maxDeviation: dailyForecast.temperatureMax - normal.temperatureMax,
       minDeviation: dailyForecast.temperatureMin - normal.temperatureMin,
-      avgDeviation: ((dailyForecast.temperatureMax + dailyForecast.temperatureMin) / 2) -
+      avgDeviation:
+          ((dailyForecast.temperatureMax + dailyForecast.temperatureMin) / 2) -
           ((normal.temperatureMax + normal.temperatureMin) / 2),
       normal: normal,
     );
@@ -209,8 +243,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
   String? _getIconPathForCode(int? code) {
     if (code == null) return null;
     try {
-      final iconData =
-      weatherIcons.firstWhere((icon) => icon.code == code.toString());
+      final iconData = weatherIcons.firstWhere(
+        (icon) => icon.code == code.toString(),
+      );
       return iconData.iconPath;
     } catch (e) {
       return null;
@@ -218,71 +253,85 @@ class _WeatherChart2State extends State<WeatherChart2> {
   }
 
   List<CartesianChartAnnotation> _buildChartAnnotations() {
-    return widget.forecast.dailyForecasts.asMap().entries.map((entry) {
-      final int index = entry.key;
-      final DailyForecast daily = entry.value;
-      final String? iconPath = _getIconPathForCode(daily.weatherCode);
-      final WeatherDeviation? deviation =
-      index < _deviations.length ? _deviations[index] : null;
+    return widget.forecast.dailyForecasts
+        .asMap()
+        .entries
+        .map((entry) {
+          final int index = entry.key;
+          final DailyForecast daily = entry.value;
+          final String? iconPath = _getIconPathForCode(daily.weatherCode);
+          final WeatherDeviation? deviation = index < _deviations.length
+              ? _deviations[index]
+              : null;
 
-      if (iconPath != null) {
-        return CartesianChartAnnotation(
-          widget: Container(
-            width: 45,
-            height: 120,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(iconPath, width: 32, height: 32),
-                const SizedBox(height: 1),
-                Text(
-                  '${daily.temperatureMax.round()}°',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                if (deviation != null)
-                  Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: deviation.maxDeviation > 0
-                          ? Colors.red.shade100
-                          : Colors.blue.shade100,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      deviation.maxDeviationText,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: deviation.maxDeviation > 0
-                            ? Colors.red.shade700
-                            : Colors.blue.shade700,
+          if (iconPath != null) {
+            return CartesianChartAnnotation(
+              widget: Container(
+                width: 45,
+                height: 110,
+                // decoration: BoxDecoration(
+                //   border: Border.all(
+                //     color: Colors.black, // Change to your desired color
+                //     width: 1.0, // 1 pixel
+                //   ),
+                // ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(iconPath, width: 32, height: 32),
+                    const SizedBox(height: 1),
+                    Text(
+                      '${daily.temperatureMax.round()}°',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                        color: Colors.black87,
                       ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-          coordinateUnit: CoordinateUnit.point,
-          x: DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-          y: daily.temperatureMax + 2,
-        );
-      }
-      return null;
-    }).whereType<CartesianChartAnnotation>().toList();
+                    const SizedBox(height: 15),
+                    if (deviation != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: deviation.maxDeviation > 0
+                              ? Colors.red.shade100
+                              : Colors.blue.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          deviation.maxDeviationText,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: deviation.maxDeviation > 0
+                                ? Colors.red.shade900
+                                : Colors.blue.shade900,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              coordinateUnit: CoordinateUnit.point,
+              verticalAlignment: ChartAlignment.center,
+              x: DateFormat('E, d MMM', 'fr_FR').format(daily.date),
+              y: daily.temperatureMax + 1,
+            );
+          }
+          return null;
+        })
+        .whereType<CartesianChartAnnotation>()
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double chartWidth =
-            widget.forecast.dailyForecasts.length * 50.0;
+        final double chartWidth = widget.forecast.dailyForecasts.length * 50.0;
         final double minWidth = constraints.maxWidth;
 
         // Calculate dynamic axis range for both min and max temps
@@ -316,50 +365,57 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   fontWeight: FontWeight.w500,
                 ),
                 legendItemBuilder:
-                    (String name, dynamic series, dynamic point, int seriesIndex) {
-                  return Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: seriesIndex == 0
-                          ? Colors.red.shade50
-                          : Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: seriesIndex == 0
-                            ? Colors.red.shade200
-                            : Colors.blue.shade200,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
+                    (
+                      String name,
+                      dynamic series,
+                      dynamic point,
+                      int seriesIndex,
+                    ) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: seriesIndex == 0
+                              ? Colors.red.shade50
+                              : Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
                             color: seriesIndex == 0
-                                ? Colors.red.shade600
-                                : Colors.blue.shade600,
-                            shape: BoxShape.circle,
+                                ? Colors.red.shade200
+                                : Colors.blue.shade200,
+                            width: 1,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: seriesIndex == 0
-                                ? Colors.red.shade700
-                                : Colors.blue.shade700,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: seriesIndex == 0
+                                    ? Colors.red.shade600
+                                    : Colors.blue.shade600,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: seriesIndex == 0
+                                    ? Colors.red.shade700
+                                    : Colors.blue.shade700,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
+                      );
+                    },
               ),
               tooltipBehavior: _tooltipBehavior,
               annotations: _chartAnnotations,
@@ -371,10 +427,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
                 ),
-                axisLine: AxisLine(
-                  color: Colors.grey.shade400,
-                  width: 1,
-                ),
+                axisLine: AxisLine(color: Colors.grey.shade400, width: 1),
                 majorTickLines: MajorTickLines(
                   color: Colors.grey.shade400,
                   width: 1,
@@ -393,19 +446,16 @@ class _WeatherChart2State extends State<WeatherChart2> {
                     color: Colors.black87,
                   ),
                 ),
-                labelFormat: '{value}°C',
+                labelFormat: '{value}°',
                 labelStyle: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
                   color: Colors.black87,
                 ),
                 interval: 5,
                 minimum: (minTemp - 6).floorToDouble(),
                 maximum: (maxTemp + 6).ceilToDouble(),
-                axisLine: AxisLine(
-                  color: Colors.grey.shade400,
-                  width: 1,
-                ),
+                axisLine: AxisLine(color: Colors.grey.shade400, width: 1),
                 majorTickLines: MajorTickLines(
                   color: Colors.grey.shade400,
                   width: 1,
@@ -432,7 +482,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   xValueMapper: (DailyForecast daily, _) =>
                       DateFormat('E, d MMM', 'fr_FR').format(daily.date),
                   yValueMapper: (DailyForecast daily, _) =>
-                  daily.temperatureMax,
+                      daily.temperatureMax,
                   color: Colors.red.shade600,
                   width: 3,
                   markerSettings: MarkerSettings(
@@ -444,7 +494,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                     borderColor: Colors.white,
                     color: Colors.red.shade600,
                   ),
-                  animationDuration: 1500,
+                  animationDuration: 150,
                   animationDelay: 0,
                   selectionBehavior: SelectionBehavior(
                     enable: true,
@@ -463,54 +513,64 @@ class _WeatherChart2State extends State<WeatherChart2> {
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
-                    builder: (dynamic data, dynamic point, dynamic series,
-                        int pointIndex, int seriesIndex) {
-                      final forecast = data as DailyForecast;
-                      final deviation = pointIndex < _deviations.length
-                          ? _deviations[pointIndex]
-                          : null;
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12),
-                          border:
-                          Border.all(color: Colors.red.shade300, width: 1),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
+                    builder:
+                        (
+                          dynamic data,
+                          dynamic point,
+                          dynamic series,
+                          int pointIndex,
+                          int seriesIndex,
+                        ) {
+                          final forecast = data as DailyForecast;
+                          final deviation = pointIndex < _deviations.length
+                              ? _deviations[pointIndex]
+                              : null;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${forecast.temperatureMax.round()}°',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red.shade700,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.red.shade300,
+                                width: 1,
                               ),
-                            ),
-                            if (deviation != null)
-                              Text(
-                                deviation.maxDeviationText,
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w500,
-                                  color: deviation.maxDeviation > 0
-                                      ? Colors.red.shade600
-                                      : Colors.blue.shade600,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
                                 ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${forecast.temperatureMax.round()}°',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red.shade700,
+                                  ),
+                                ),
+                                if (deviation != null)
+                                  Text(
+                                    deviation.maxDeviationText,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w500,
+                                      color: deviation.maxDeviation > 0
+                                          ? Colors.red.shade600
+                                          : Colors.blue.shade600,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
                   ),
                 ),
                 // MIN TEMPERATURE SERIES
@@ -520,7 +580,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   xValueMapper: (DailyForecast daily, _) =>
                       DateFormat('E, d MMM', 'fr_FR').format(daily.date),
                   yValueMapper: (DailyForecast daily, _) =>
-                  daily.temperatureMin,
+                      daily.temperatureMin,
                   color: Colors.blue.shade600,
                   width: 3,
                   markerSettings: MarkerSettings(
@@ -532,8 +592,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
                     borderColor: Colors.white,
                     color: Colors.blue.shade600,
                   ),
-                  animationDuration: 1500,
-                  animationDelay: 300,
+                  animationDuration: 150,
+                  animationDelay: 0,
                   selectionBehavior: SelectionBehavior(
                     enable: true,
                     selectedColor: Colors.blue.shade800,
@@ -551,42 +611,90 @@ class _WeatherChart2State extends State<WeatherChart2> {
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
-                    builder: (dynamic data, dynamic point, dynamic series,
-                        int pointIndex, int seriesIndex) {
-                      final forecast = data as DailyForecast;
-                      final deviation = pointIndex < _deviations.length
-                          ? _deviations[pointIndex]
-                          : null;
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${forecast.temperatureMin.round()}°',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue.shade700,
-                              ),
+                    builder:
+                        (
+                          dynamic data,
+                          dynamic point,
+                          dynamic series,
+                          int pointIndex,
+                          int seriesIndex,
+                        ) {
+                          final forecast = data as DailyForecast;
+                          final deviation = pointIndex < _deviations.length
+                              ? _deviations[pointIndex]
+                              : null;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
                             ),
-                            if (deviation != null)
-                              Text(
-                                deviation.minDeviationText,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: deviation.minDeviation > 0
-                                      ? Colors.red.shade600
-                                      : Colors.blue.shade600,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${forecast.temperatureMin.round()}°',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade700,
+                                  ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
+                                if (deviation != null)
+                                  Text(
+                                    deviation.minDeviationText,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: deviation.minDeviation > 0
+                                          ? Colors.red.shade600
+                                          : Colors.blue.shade600,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
                   ),
+                ),
+                LineSeries<DailyForecast, String>(
+                  name: 'Normale max.',
+                  dataSource: widget.forecast.dailyForecasts,
+                  xValueMapper: (DailyForecast daily, _) =>
+                      DateFormat('E, d MMM', 'fr_FR').format(daily.date),
+                  yValueMapper: (DailyForecast daily, int index) {
+                    final normal = index < _deviations.length
+                        ? _deviations[index]?.normal
+                        : null;
+                    return normal?.temperatureMax;
+                  },
+                  animationDuration: 150,
+                  animationDelay: 0,
+                  color: Colors.red.shade300,
+                  width: 2,
+                  dashArray: const <double>[5, 5],
+                  // Dotted line
+                  markerSettings: const MarkerSettings(isVisible: false),
+                  enableTooltip: false,
+                ),
+                LineSeries<DailyForecast, String>(
+                  name: 'Normale min.',
+                  dataSource: widget.forecast.dailyForecasts,
+                  xValueMapper: (DailyForecast daily, _) =>
+                      DateFormat('E, d MMM', 'fr_FR').format(daily.date),
+                  yValueMapper: (DailyForecast daily, int index) {
+                    final normal = index < _deviations.length
+                        ? _deviations[index]?.normal
+                        : null;
+                    return normal?.temperatureMin;
+                  },
+                  animationDuration: 150,
+                  animationDelay: 0,
+                  color: Colors.blue.shade300,
+                  width: 2,
+                  dashArray: const <double>[5, 5],
+                  // Dotted line
+                  markerSettings: const MarkerSettings(isVisible: false),
+                  enableTooltip: false,
                 ),
               ],
             ),
