@@ -81637,7 +81637,7 @@ G(){return"ShapeMarkerType."+this.b}}
 A.u6.prototype={}
 A.GX.prototype={
 a5(a){var s=null,r=A.awg(A.f2())
-return new A.yy(B.R7,"ClimaD\xe9viation jg WebApp",A.aqt(s,new A.nC(s,s,s,s,4,s,new A.dA(A.i2(12),B.u)),s,B.iO,s,r),!1,s)}}
+return new A.yy(B.R7,"Temp\xe9rature histo",A.aqt(s,new A.nC(s,s,s,s,4,s,new A.dA(A.i2(12),B.u)),s,B.iO,s,r),!1,s)}}
 A.nK.prototype={}
 A.Yg.prototype={
 $1(a){return a.b===this.a},
