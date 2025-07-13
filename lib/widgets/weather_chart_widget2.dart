@@ -282,7 +282,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double chartWidth =
-            widget.forecast.dailyForecasts.length * 90.0;
+            widget.forecast.dailyForecasts.length * 50.0;
         final double minWidth = constraints.maxWidth;
 
         // Calculate dynamic axis range for both min and max temps

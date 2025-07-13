@@ -22,7 +22,8 @@ cd build/web
 # Check if SSH key is configured
 if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
     echo "✅ SSH authentication configured"
-    REPO_URL="git@github.com:jean-anton/temperature_histo_1.git"
+#    REPO_URL="git@github.com:jean-anton/temperature_histo_1.git"
+    REPO_URL="git@github-gh-pages:jean-anton/temperature_histo_1.git"
 else
     echo "⚠️  SSH not configured, using HTTPS (will prompt for credentials)"
     REPO_URL="https://github.com/jean-anton/temperature_histo_1.git"
@@ -38,6 +39,8 @@ else
     git checkout gh-pages || git checkout -b gh-pages
     # Update remote URL in case it changed
     git remote set-url origin "$REPO_URL"
+#    git remote set-url origin git@github-gh-pages:jean-anton/temperature_histo_1.git
+
 fi
 
 echo "➕ Adding files..."
