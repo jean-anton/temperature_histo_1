@@ -32,7 +32,7 @@ class ClimaDeviationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ClimaDéviation jg WebApp',
+      title: 'Température histo',
 
       // Apply the custom scroll behavior to the entire app.
       // scrollBehavior: AppScrollBehavior(),
