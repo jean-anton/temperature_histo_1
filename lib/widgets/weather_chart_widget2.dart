@@ -305,8 +305,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(iconPath, width: 32, height: 32),
-                    const SizedBox(height: 1),
+                    SvgPicture.asset(iconPath, width: 45, height: 45),
+                    const SizedBox(height: 0),
                     Text(
                       '${daily.temperatureMax.round()}°',
                       style: const TextStyle(
@@ -324,8 +324,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
                         ),
                         decoration: BoxDecoration(
                           color: deviation.maxDeviation > 0
-                              ? Colors.red.shade100
-                              : Colors.blue.shade100,
+                              ? Colors.red.shade50
+                              : Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -345,7 +345,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
               coordinateUnit: CoordinateUnit.point,
               verticalAlignment: ChartAlignment.center,
               x: DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-              y: daily.temperatureMax + 1,
+              y: daily.temperatureMax + 2,
             );
           }
           return null;
@@ -510,8 +510,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
                       DateFormat('E, d MMM', 'fr_FR').format(daily.date),
                   yValueMapper: (DailyForecast daily, _) =>
                       daily.temperatureMax,
-                  color: Colors.red.shade600,
-                  width: 3,
+                  color: Colors.red.shade300,
+                  width: 1,
                   markerSettings: MarkerSettings(
                     isVisible: true,
                     width: 10,
@@ -609,16 +609,16 @@ class _WeatherChart2State extends State<WeatherChart2> {
                       DateFormat('E, d MMM', 'fr_FR').format(daily.date),
                   yValueMapper: (DailyForecast daily, _) =>
                       daily.temperatureMin,
-                  color: Colors.blue.shade600,
-                  width: 3,
+                  color: Colors.blue.shade300,
+                  width: 1,
                   markerSettings: MarkerSettings(
                     isVisible: true,
                     width: 10,
                     height: 10,
                     shape: DataMarkerType.circle,
-                    borderWidth: 3,
+                    borderWidth: 1,
                     borderColor: Colors.white,
-                    color: Colors.blue.shade600,
+                    color: Colors.blue.shade300,
                   ),
                   animationDuration: 150,
                   animationDelay: 0,
