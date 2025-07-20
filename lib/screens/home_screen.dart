@@ -66,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
     '00460_Berus_1961_1990': const ClimateLocationInfo(
       displayName: 'Berus (DE)',
       assetPath: 'assets/data/climatologie_00460_Berus_1961_1990.csv',
-      lat: 49.2656,
-      lon: 6.6942,
+      lat: 49.2641,
+      lon: 6.6868,
       startYear: 1961,
       endYear: 1990,
     ),
@@ -75,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
       displayName: 'Saarbrücken-Ensheim (DE)',
       assetPath:
       'assets/data/climatologie_04336_Saarbrücken-Ensheim_1961_1990.csv',
-      lat: 49.21,
-      lon: 7.11,
+      lat: 49.2128,
+      lon: 7.1077,
       startYear: 1961,
       endYear: 1990,
     ),
@@ -84,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
       displayName: 'Saarbrücken-St. Johann (DE)',
       assetPath:
       'assets/data/climatologie_04339_Saarbrücken-Sankt-Johann_1961_1990.csv',
-      lat: 49.23,
-      lon: 7.0,
+      lat: 49.2231,
+      lon: 7.0168,
       startYear: 1961,
       endYear: 1990,
     ),
@@ -102,8 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
       displayName: 'Saarbrücken-Burbach (DE)',
       assetPath:
       'assets/data/climatologie_06217_Saarbrücken-Burbach_2001_2010.csv',
-      lat: 49.24,
-      lon: 6.95,
+      lat: 49.2406,
+      lon: 6.9351,
       startYear: 2001,
       endYear: 2010,
     ),
