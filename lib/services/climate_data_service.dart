@@ -3,26 +3,20 @@ import 'package:flutter/services.dart';
 import '../models/climate_normal_model.dart';
 
 class ClimateDataService {
-  // static const Map<String, String> _assetPaths = {
-  //   '00460_Berus': 'assets/data/fichier_moyenne_jour_00460_Berus_1961_1990_gemini_pro25.csv',
-  //   '04336_Saarbrücken-Ensheim': 'assets/data/fichier_moyenne_jour_04336_Saarbrücken-Ensheim_1961_1990_gemini_pro25.csv',
-  // };
-  static const Map<String, String> _assetPaths = {
-    '00460_Berus': 'assets/data/climatologie_berus_00460.csv',
-    '04336_Saarbrücken-Ensheim': 'assets/data/climatologie_sarrebruck_04336.csv',
-  };
+  // The hardcoded _assetPaths map has been removed from here.
 
-  Future<List<ClimateNormal>> loadClimateNormals(String locationKey) async {
-    final assetPath = _assetPaths[locationKey];
-    if (assetPath == null) {
-      throw Exception('Fichier de données climatiques non trouvé pour $locationKey');
+  /// Loads climate normal data from the given asset path.
+  Future<List<ClimateNormal>> loadClimateNormals(String assetPath) async {
+    if (assetPath.isEmpty) {
+      throw ArgumentError('Asset path cannot be empty.');
     }
 
     try {
       final csvString = await rootBundle.loadString(assetPath);
       return _parseCsvData(csvString);
     } catch (e) {
-      throw Exception('Erreur lors du chargement des données climatiques: $e');
+      throw Exception(
+          'Erreur lors du chargement du fichier de données climatiques "$assetPath": $e');
     }
   }
 
@@ -40,6 +34,7 @@ class ClimateDataService {
           normals.add(ClimateNormal.fromCsvRow(parts));
         }
       } catch (e) {
+        // Consider using a logger for production apps
         print('Erreur lors du parsing de la ligne $i: $e');
       }
     }
@@ -48,13 +43,13 @@ class ClimateDataService {
   }
 
   WeatherDeviation calculateDeviation(
-    double forecastMax,
-    double forecastMin,
-    int dayOfYear,
-    List<ClimateNormal> normals,
-  ) {
+      double forecastMax,
+      double forecastMin,
+      int dayOfYear,
+      List<ClimateNormal> normals,
+      ) {
     final normal = ClimateNormal.findByDayOfYear(normals, dayOfYear);
-    
+
     if (normal == null) {
       return WeatherDeviation(
         maxDeviation: 0,

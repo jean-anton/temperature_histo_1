@@ -36,10 +36,12 @@ dependencies:
   syncfusion_flutter_charts: ^30.1.39
   #  syncfusion_flutter_charts: ^26.1.38
   # Charts
-  fl_chart: ^0.65.0
+#  fl_chart: ^0.65.0
   flutter_svg: ^2.0.9
   # UI components
   cupertino_icons: ^1.0.2
+  shared_preferences: ^2.5.3
+  latlong2: ^0.9.1
 
 dev_dependencies:
   flutter_test:
@@ -112,8 +114,11 @@ flutter:
   assets:
     #    - assets/data/fichier_moyenne_jour_00460_Berus_1961_1990_gemini_pro25.csv
     #    - assets/data/fichier_moyenne_jour_04336_Saarbrücken-Ensheim_1961_1990_gemini_pro25.csv
-    - assets/data/climatologie_berus_00460.csv
-    - assets/data/climatologie_sarrebruck_04336.csv
+    - assets/data/climatologie_00460_Berus_1961_1990.csv
+    - assets/data/climatologie_04336_Saarbrücken-Ensheim_1961_1990.csv
+    - assets/data/climatologie_04339_Saarbrücken-Sankt-Johann_1961_1990.csv
+    - assets/data/climatologie_05244_Völklingen-Stadt_1961_1982.csv
+    - assets/data/climatologie_06217_Saarbrücken-Burbach_2001_2010.csv
     - assets/google_weather_icons/v4/
 #
 #  fonts:

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/home_screen.dart';
 
-const VERSION = "1.2.0";
+const VERSION = "2.0.1";
 String mainFileName = "/Users/jg/devel/projects/flutter/temperature_histo_1";
 // This custom scroll behavior enables touch-based scrolling on web platforms,
 // which provides a more natural, app-like experience for mobile web users.
