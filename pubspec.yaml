@@ -119,6 +119,7 @@ flutter:
     - assets/data/climatologie_04339_Saarbrücken-Sankt-Johann_1961_1990.csv
     - assets/data/climatologie_05244_Völklingen-Stadt_1961_1982.csv
     - assets/data/climatologie_06217_Saarbrücken-Burbach_2001_2010.csv
+    - assets/data/climatologie_01072_Bad-Dürkheim_1961_1990.csv
     - assets/google_weather_icons/v4/
 #
 #  fonts:

@@ -107,10 +107,18 @@ class _HomeScreenState extends State<HomeScreen> {
       startYear: 2001,
       endYear: 2010,
     ),
+    '01072_Bad-Dürkheim_1961_1990': const ClimateLocationInfo(
+      displayName: 'Bad Dürkheim',
+      assetPath: 'assets/data/climatologie_01072_Bad-Dürkheim_1961_1990.csv',
+      lat: 49.4719,
+      lon: 8.1929,
+      startYear: 1961,
+      endYear: 1990,
+    ),
   };
 
   /// Map for locations for which we want weather forecasts.
-  /// This is initialized in initState to include climate stations automatically.
+  /// This is initialized in initState.
   late final Map<String, WeatherLocationInfo> _weatherLocationData;
 
   /// Map for weather models.
@@ -124,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // State variables with default values. These will be overwritten by saved preferences.
   String _selectedClimateLocation = '04336_Saarbrücken-Ensheim_1961_1990';
-  String _selectedWeatherLocation = '04336_Saarbrücken-Ensheim_1961_1990';
+  String _selectedWeatherLocation = 'rosbruck_fr';
   String _selectedModel = 'best_match';
   WeatherForecast? _forecast;
   List<ClimateNormal> _climateNormals = [];
@@ -145,25 +153,21 @@ class _HomeScreenState extends State<HomeScreen> {
     final weatherLocations = <String, WeatherLocationInfo>{
       // Add new custom locations for France
       'rosbruck_fr': const WeatherLocationInfo(
-        displayName: 'Rosbruck (FR)',
+        displayName: 'Rosbruck',
         lat: 49.15,
         lon: 6.85,
       ),
       'lachambre_fr': const WeatherLocationInfo(
-        displayName: 'Lachambre (FR)',
+        displayName: 'Lachambre',
         lat: 49.13,
         lon: 6.78,
       ),
+      'bad_duerkheim_de': const WeatherLocationInfo(
+        displayName: 'Bad Dürkheim',
+        lat: 49.4719,
+        lon: 8.1929,
+      ),
     };
-
-    // Automatically add all climate stations to the weather forecast list
-    _climateLocationData.forEach((key, climateInfo) {
-      weatherLocations[key] = WeatherLocationInfo(
-        displayName: climateInfo.displayName,
-        lat: climateInfo.lat,
-        lon: climateInfo.lon,
-      );
-    });
 
     _weatherLocationData = weatherLocations;
   }
@@ -255,15 +259,43 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onWeatherLocationChanged(String? newLocation) {
-    if (newLocation != null && newLocation != _selectedWeatherLocation) {
-      setState(() {
-        _selectedWeatherLocation = newLocation;
+  /// --- MODIFICATION START ---
+  /// This method now automatically selects the nearest climate station.
+  void _onWeatherLocationChanged(String? newLocationKey) {
+    if (newLocationKey != null && newLocationKey != _selectedWeatherLocation) {
+      final newWeatherLocationInfo = _weatherLocationData[newLocationKey];
+      if (newWeatherLocationInfo == null) return; // Should not happen
+
+      // Find the nearest climate station to the newly selected weather location.
+      String nearestClimateKey = '';
+      double minDistance = double.infinity;
+      const distance = Distance();
+      final newWeatherLatLng =
+      LatLng(newWeatherLocationInfo.lat, newWeatherLocationInfo.lon);
+
+      _climateLocationData.forEach((key, climateInfo) {
+        final climateLatLng = LatLng(climateInfo.lat, climateInfo.lon);
+        final currentDistance = distance(newWeatherLatLng, climateLatLng);
+        if (currentDistance < minDistance) {
+          minDistance = currentDistance;
+          nearestClimateKey = key;
+        }
       });
-      _savePreferences(); // Save the new selection
+
+      // Update the state for both the weather location and the nearest climate station.
+      setState(() {
+        _selectedWeatherLocation = newLocationKey;
+        if (nearestClimateKey.isNotEmpty) {
+          _selectedClimateLocation = nearestClimateKey;
+        }
+      });
+
+      _savePreferences(); // Save the new selections
       _loadData();
     }
   }
+  /// --- MODIFICATION END ---
+
 
   void _onModelChanged(String? newModel) {
     if (newModel != null && newModel != _selectedModel) {
@@ -368,10 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 contentPadding:
                 EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
-              // --- MODIFICATION START ---
-              // Dynamically build and sort the list of items with distance.
               items: _buildSortedClimateLocationItems(selectedWeatherInfo),
-              // --- MODIFICATION END ---
               onChanged: _onClimateLocationChanged,
             ),
             const SizedBox(height: 16),
