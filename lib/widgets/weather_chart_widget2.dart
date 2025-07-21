@@ -511,7 +511,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   yValueMapper: (DailyForecast daily, _) =>
                       daily.temperatureMax,
                   color: Colors.red.shade300,
-                  width: 1,
+                  width: 3,
                   markerSettings: MarkerSettings(
                     isVisible: true,
                     width: 10,
@@ -610,7 +610,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
                   yValueMapper: (DailyForecast daily, _) =>
                       daily.temperatureMin,
                   color: Colors.blue.shade300,
-                  width: 1,
+                  width: 3,
                   markerSettings: MarkerSettings(
                     isVisible: true,
                     width: 10,
