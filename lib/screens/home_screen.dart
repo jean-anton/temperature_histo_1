@@ -520,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
-                    'Modèle: ${_models[_selectedModel]}',
+                    'ModèleTOTO: ${_models[_selectedModel]}',
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     overflow: TextOverflow.ellipsis,
                   ),
