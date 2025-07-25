@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 // Import your data models and icon data
 import '../data/weather_icon_data.dart';
@@ -25,11 +26,21 @@ class WeatherChart2 extends StatefulWidget {
 }
 
 class _WeatherChart2State extends State<WeatherChart2> {
-  late TooltipBehavior _tooltipBehavior;
-
   // Cache expensive calculations for better performance
   late final List<WeatherDeviation?> _deviations;
-  late final List<CartesianChartAnnotation> _chartAnnotations;
+  late final double _maxTemp;
+  late final double _minTemp;
+  late final List<String> _dateLabels;
+  int? _touchedIndex;
+  OverlayEntry? _overlayEntry;
+
+  // Chart padding constants - these must align with the Padding widget below
+  static const double leftPadding = 10;
+  static const double topPadding = 10;
+  static const double rightPadding = 10;
+  static const double bottomPadding = 10;
+  static const double _widthPerDay = 80.0; // Width allocated for each day
+  Timer? _tooltipTimer;
 
   @override
   void initState() {
@@ -40,106 +51,229 @@ class _WeatherChart2State extends State<WeatherChart2> {
         .map((daily) => _getDeviationForDay(daily))
         .toList();
 
-    // Pre-build all annotations for better performance
-    _chartAnnotations = _buildChartAnnotations();
+    // Calculate temperature range
+    final allTemps = widget.forecast.dailyForecasts
+        .expand((d) => [d.temperatureMax, d.temperatureMin])
+        .toList();
+    _maxTemp = allTemps.isNotEmpty ? allTemps.reduce(max) : 20;
+    _minTemp = allTemps.isNotEmpty ? allTemps.reduce(min) : 0;
 
-    _tooltipBehavior = TooltipBehavior(
-      enable: true,
-      tooltipPosition: TooltipPosition.auto,
-      // Auto-adjust position to avoid clipping [[8]]
-      activationMode: ActivationMode.singleTap,
-      duration: 4000,
-      canShowMarker: true,
-      shadowColor: Colors.black26,
-      elevation: 8,
-      builder:
-          (
-            dynamic data,
-            dynamic point,
-            dynamic series,
-            int pointIndex,
-            int seriesIndex,
-          ) {
-            final DailyForecast forecast = data as DailyForecast;
+    // Pre-calculate date labels
+    _dateLabels = widget.forecast.dailyForecasts
+        .map((daily) => DateFormat('E, d MMM', 'fr_FR').format(daily.date))
+        .toList();
+  }
 
-            // Use pre-calculated deviation for better performance
-            final WeatherDeviation? deviation = pointIndex < _deviations.length
-                ? _deviations[pointIndex]
-                : null;
+  @override
+  void dispose() {
+    _removeTooltip();
+    super.dispose();
+  }
 
-            final String formattedDate = DateFormat(
-              'EEEE, d MMMM',
-              'fr_FR',
-            ).format(forecast.date);
+  String? getDescriptionFr(String code) {
+    final match = weatherIcons.firstWhere(
+      (icon) => icon.code == code,
+      orElse: () => WeatherIcon(
+        code: '',
+        iconPath: '',
+        descriptionEn: '',
+        descriptionFr: '',
+      ),
+    );
 
-            Widget buildDetailRow(
-              String label,
-              String? value, {
-              Color? valueColor,
-            }) {
-              if (value == null || value.isEmpty) {
-                return const SizedBox.shrink();
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$label: ',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          color: valueColor ?? Colors.white,
-                          fontSize: 13,
-                          fontWeight: valueColor != null
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
+    return match.code.isEmpty ? null : match.descriptionFr;
+  }
 
-            return Container(
-              padding: const EdgeInsets.all(12),
-              constraints: BoxConstraints(
-                maxHeight: 290,
-              ), // Limit tooltip height
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.blueGrey.shade800.withOpacity(0.95),
-                    Colors.blueGrey.shade900.withOpacity(0.95),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+  WeatherDeviation? _getDeviationForDay(DailyForecast dailyForecast) {
+    final normal = ClimateNormal.findByDayOfYear(
+      widget.climateNormals,
+      dailyForecast.dayOfYear,
+    );
+    if (normal == null) {
+      return null;
+    }
+    return WeatherDeviation(
+      maxDeviation: dailyForecast.temperatureMax - normal.temperatureMax,
+      minDeviation: dailyForecast.temperatureMin - normal.temperatureMin,
+      avgDeviation:
+          ((dailyForecast.temperatureMax + dailyForecast.temperatureMin) / 2) -
+          ((normal.temperatureMax + normal.temperatureMin) / 2),
+      normal: normal,
+    );
+  }
+
+  String? _getIconPathForCode(int? code) {
+    if (code == null) return null;
+    try {
+      final iconData = weatherIcons.firstWhere(
+        (icon) => icon.code == code.toString(),
+      );
+      return iconData.iconPath;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  List<FlSpot> _getMaxTempSpots() {
+    return widget.forecast.dailyForecasts.asMap().entries.map((entry) {
+      return FlSpot(entry.key.toDouble(), entry.value.temperatureMax);
+    }).toList();
+  }
+
+  List<FlSpot> _getMinTempSpots() {
+    return widget.forecast.dailyForecasts.asMap().entries.map((entry) {
+      return FlSpot(entry.key.toDouble(), entry.value.temperatureMin);
+    }).toList();
+  }
+
+  List<FlSpot> _getNormalMaxSpots() {
+    return widget.forecast.dailyForecasts
+        .asMap()
+        .entries
+        .map((entry) {
+          final normal = entry.key < _deviations.length
+              ? _deviations[entry.key]?.normal
+              : null;
+          return FlSpot(entry.key.toDouble(), normal?.temperatureMax ?? 0);
+        })
+        .where((spot) => spot.y != 0)
+        .toList();
+  }
+
+  List<FlSpot> _getNormalMinSpots() {
+    return widget.forecast.dailyForecasts
+        .asMap()
+        .entries
+        .map((entry) {
+          final normal = entry.key < _deviations.length
+              ? _deviations[entry.key]?.normal
+              : null;
+          return FlSpot(entry.key.toDouble(), normal?.temperatureMin ?? 0);
+        })
+        .where((spot) => spot.y != 0)
+        .toList();
+  }
+
+  void _removeTooltip() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _tooltipTimer?.cancel();
+    setState(() {
+      _touchedIndex = null;
+    });
+  }
+
+  void scheduleTooltipRemoval() {
+    _tooltipTimer = Timer(const Duration(seconds: 10), () {
+      _removeTooltip();
+    });
+  }
+
+  void cancelTooltipRemoval() {
+    _tooltipTimer?.cancel();
+  }
+
+  void _showTooltip(BuildContext context, int touchedIndex, Offset position) {
+    _removeTooltip();
+
+    if (touchedIndex < 0 ||
+        touchedIndex >= widget.forecast.dailyForecasts.length) {
+      return;
+    }
+
+    final forecast = widget.forecast.dailyForecasts[touchedIndex];
+    final deviation = touchedIndex < _deviations.length
+        ? _deviations[touchedIndex]
+        : null;
+
+    final String formattedDate = DateFormat(
+      'EEEE, d MMMM',
+      'fr_FR',
+    ).format(forecast.date);
+
+    Widget buildDetailRow(String label, String? value, {Color? valueColor}) {
+      if (value == null || value.isEmpty) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$label: ',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
-              child: SingleChildScrollView(
-                // Make tooltip scrollable if content overflows
-                child: IntrinsicWidth(
+            ),
+            Flexible(
+              child: Text(
+                value,
+                style: TextStyle(
+                  color: valueColor ?? Colors.white,
+                  fontSize: 13,
+                  fontWeight: valueColor != null
+                      ? FontWeight.bold
+                      : FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final screenSize = MediaQuery.of(context).size;
+    double tooltipLeft = position.dx - 150;
+    double tooltipTop = position.dy - 320;
+
+    if (tooltipLeft < 10) {
+      tooltipLeft = 10;
+    } else if (tooltipLeft + 300 > screenSize.width - 10) {
+      tooltipLeft = screenSize.width - 310;
+    }
+
+    if (tooltipTop < 10) {
+      tooltipTop = position.dy + 20;
+    }
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: tooltipLeft,
+        top: tooltipTop,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 300,
+            padding: const EdgeInsets.all(12),
+            constraints: const BoxConstraints(maxHeight: 290),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blueGrey.shade800.withOpacity(0.95),
+                  Colors.blueGrey.shade900.withOpacity(0.95),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,502 +363,441 @@ class _WeatherChart2State extends State<WeatherChart2> {
                     ],
                   ),
                 ),
-              ),
-            );
-          },
-    );
-  }
-  String? getDescriptionFr(String code) {
-    final match = weatherIcons.firstWhere(
-          (icon) => icon.code == code,
-      orElse: () => WeatherIcon(
-        code: '',
-        iconPath: '',
-        descriptionEn: '',
-        descriptionFr: '',
+                Positioned(
+                  //CJG1
+                  right: 8,
+                  top: 8,
+                  child: GestureDetector(
+                    onTap: _removeTooltip,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
 
-    return match.code.isEmpty ? null : match.descriptionFr;
+    Overlay.of(context).insert(_overlayEntry!);
+    scheduleTooltipRemoval();
+    // Future.delayed(const Duration(seconds: 10), () {
+    //   _removeTooltip();
+    // });
   }
 
+  Offset _calculateScreenPosition(
+    double chartX,
+    double chartY,
+    Size containerSize,
+  ) {
+    // These constants MUST match the `reservedSize` properties in `FlTitlesData`.
+    const double leftTitleReservedSize = 40;
+    const double bottomTitleReservedSize = 80;
 
-  WeatherDeviation? _getDeviationForDay(DailyForecast dailyForecast) {
-    final normal = ClimateNormal.findByDayOfYear(
-      widget.climateNormals,
-      dailyForecast.dayOfYear,
-    );
-    if (normal == null) {
+    // The chart's grid area (drawable area for lines) starts after the external padding AND internal title reservations.
+    final double gridLeft = leftPadding + leftTitleReservedSize;
+    final double gridTop =
+        topPadding; // Top titles are disabled, so no reserved space.
+
+    // Calculate the width and height of the actual grid area.
+    // Right titles are disabled, so no reserved space on the right.
+    final double gridWidth =
+        containerSize.width -
+        leftPadding -
+        rightPadding -
+        leftTitleReservedSize;
+    final double gridHeight =
+        containerSize.height -
+        topPadding -
+        bottomPadding -
+        bottomTitleReservedSize;
+
+    // Get the min/max values from the chart data.
+    final double minX = 0;
+    final double maxX = (widget.forecast.dailyForecasts.length - 1).toDouble();
+    final double minY = (_minTemp - 6).floorToDouble();
+    final double maxY = (_maxTemp + 6).ceilToDouble();
+
+    // Avoid division by zero if there's only one data point.
+    final double normalizedX = (maxX > minX)
+        ? (chartX - minX) / (maxX - minX)
+        : 0.0;
+    final double normalizedY = (maxY > minY)
+        ? (chartY - minY) / (maxY - minY)
+        : 0.0;
+
+    // Calculate screen coordinates relative to the container.
+    // X position = grid's starting X + position within the grid.
+    final double screenX = gridLeft + (normalizedX * gridWidth);
+    // Y position = grid's starting Y + position within the grid (inverted for screen coordinates).
+    final double screenY = gridTop + ((1.0 - normalizedY) * gridHeight);
+
+    return Offset(screenX, screenY);
+  }
+
+  /// **FIXED:** Detects which data point index was tapped.
+  /// This new version uses the correct grid boundaries, accounting for all padding
+  /// and reserved title space, ensuring the correct tooltip is shown on tap.
+  int? _getTappedIndex(Offset localPosition, Size containerSize) {
+    // These constants MUST match the `reservedSize` properties in `FlTitlesData`.
+    const double leftTitleReservedSize = 40;
+    const double bottomTitleReservedSize = 80;
+
+    // Define the bounding box of the chart's grid area.
+    final double gridLeft = leftPadding + leftTitleReservedSize;
+    final double gridTop = topPadding;
+    final double gridRight = containerSize.width - rightPadding;
+    final double gridBottom =
+        containerSize.height - bottomPadding - bottomTitleReservedSize;
+    final double gridWidth = gridRight - gridLeft;
+
+    // Check if the tap occurred within the horizontal and vertical bounds of the grid.
+    if (localPosition.dx < gridLeft ||
+        localPosition.dx > gridRight ||
+        localPosition.dy < gridTop ||
+        localPosition.dy > gridBottom) {
       return null;
     }
-    return WeatherDeviation(
-      maxDeviation: dailyForecast.temperatureMax - normal.temperatureMax,
-      minDeviation: dailyForecast.temperatureMin - normal.temperatureMin,
-      avgDeviation:
-          ((dailyForecast.temperatureMax + dailyForecast.temperatureMin) / 2) -
-          ((normal.temperatureMax + normal.temperatureMin) / 2),
-      normal: normal,
-    );
-  }
 
-  String? _getIconPathForCode(int? code) {
-    if (code == null) return null;
-    try {
-      final iconData = weatherIcons.firstWhere(
-        (icon) => icon.code == code.toString(),
-      );
-      return iconData.iconPath;
-    } catch (e) {
-      return null;
-    }
-  }
+    // Calculate the relative horizontal position of the tap within the grid.
+    final double relativeX = localPosition.dx - gridLeft;
 
-  List<CartesianChartAnnotation> _buildChartAnnotations() {
-    return widget.forecast.dailyForecasts
-        .asMap()
-        .entries
-        .map((entry) {
-          final int index = entry.key;
-          final DailyForecast daily = entry.value;
-          final String? iconPath = _getIconPathForCode(daily.weatherCode);
-          final WeatherDeviation? deviation = index < _deviations.length
-              ? _deviations[index]
-              : null;
+    // Avoid division by zero if grid width is zero.
+    if (gridWidth <= 0) return null;
+    final double normalizedX = relativeX / gridWidth;
 
-          if (iconPath != null) {
-            return CartesianChartAnnotation(
-              widget: Container(
-                width: 45,
-                height: 110,
-                // decoration: BoxDecoration(
-                //   border: Border.all(
-                //     color: Colors.black, // Change to your desired color
-                //     width: 1.0, // 1 pixel
-                //   ),
-                // ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(iconPath, width: 45, height: 45),
-                    const SizedBox(height: 0),
-                    Text(
-                      '${daily.temperatureMax.round()}°',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    if (deviation != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 1,
-                        ),
-                        decoration: BoxDecoration(
-                          color: deviation.maxDeviation > 0
-                              ? Colors.red.shade50
-                              : Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          deviation.maxDeviationText,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: deviation.maxDeviation > 0
-                                ? Colors.red.shade900
-                                : Colors.blue.shade900,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              coordinateUnit: CoordinateUnit.point,
-              verticalAlignment: ChartAlignment.center,
-              x: DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-              y: daily.temperatureMax + 2,
-            );
-          }
-          return null;
-        })
-        .whereType<CartesianChartAnnotation>()
-        .toList();
+    // Convert the normalized position to a data point index and clamp it to be safe.
+    final int maxIndex = widget.forecast.dailyForecasts.length - 1;
+    if (maxIndex < 0) return null; // No data points
+    final int index = (normalizedX * maxIndex).round().clamp(0, maxIndex);
+
+    return index;
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double chartWidth = widget.forecast.dailyForecasts.length * 50.0;
         final double minWidth = constraints.maxWidth;
-
-        // Calculate dynamic axis range for both min and max temps
-        final allTemps = widget.forecast.dailyForecasts
-            .expand((d) => [d.temperatureMax, d.temperatureMin])
-            .toList();
-        final double maxTemp = allTemps.reduce(max);
-        final double minTemp = allTemps.reduce(min);
+        final double chartWidth =
+            widget.forecast.dailyForecasts.length * _widthPerDay;
+        final double finalWidth = chartWidth > minWidth ? chartWidth : minWidth;
+        final double finalHeight =
+            500; // Increased height to provide more tooltip space
+        final Size containerSize = Size(finalWidth, finalHeight);
 
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SizedBox(
-            width: chartWidth > minWidth ? chartWidth : minWidth,
-            height: 500, // Increased height to provide more tooltip space
-            child: SfCartesianChart(
-              // title: ChartTitle(
-              //   text: 'Prévisions de température quotidiennes',
-              //   textStyle: const TextStyle(
-              //     fontSize: 18,
-              //     fontWeight: FontWeight.bold,
-              //     color: Colors.black87,
-              //   ),
-              // ),
-              legend: Legend(
-                isVisible: false,
-                position: LegendPosition.top,
-                alignment: ChartAlignment.center,
-                itemPadding: 20,
-                textStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-                legendItemBuilder:
-                    (
-                      String name,
-                      dynamic series,
-                      dynamic point,
-                      int seriesIndex,
-                    ) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+            width: finalWidth,
+            height: finalHeight,
+            child: GestureDetector(
+              onTapDown: (TapDownDetails details) {
+                final Offset localPosition = details.localPosition;
+                final int? tappedIndex = _getTappedIndex(
+                  localPosition,
+                  containerSize,
+                );
+                if (tappedIndex != null) {
+                  setState(() {
+                    _touchedIndex = tappedIndex;
+                  });
+                  _showTooltip(context, tappedIndex, details.globalPosition);
+                }
+              },
+              child: Stack(
+                children: [
+                  // Main chart
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      leftPadding,
+                      topPadding,
+                      rightPadding,
+                      bottomPadding,
+                    ),
+                    child: LineChart(
+                      LineChartData(
+                        minX: 0,
+                        maxX: (widget.forecast.dailyForecasts.length - 1)
+                            .toDouble(),
+                        minY: (_minTemp - 6).floorToDouble(),
+                        maxY: (_maxTemp + 6).ceilToDouble(),
+                        lineBarsData: [
+                          // Max temperature line
+                          LineChartBarData(
+                            spots: _getMaxTempSpots(),
+                            isCurved: true,
+                            color: Colors.red.shade300,
+                            barWidth: 3,
+                            isStrokeCapRound: true,
+                            dotData: FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, barData, index) =>
+                                  FlDotCirclePainter(
+                                    radius: 5,
+                                    color: Colors.red.shade600,
+                                    strokeWidth: 3,
+                                    strokeColor: Colors.white,
+                                  ),
+                            ),
+                            belowBarData: BarAreaData(show: false),
+                          ),
+                          // Min temperature line
+                          LineChartBarData(
+                            spots: _getMinTempSpots(),
+                            isCurved: true,
+                            color: Colors.blue.shade300,
+                            barWidth: 3,
+                            isStrokeCapRound: true,
+                            dotData: FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, barData, index) =>
+                                  FlDotCirclePainter(
+                                    radius: 5,
+                                    color: Colors.blue.shade600,
+                                    strokeWidth: 1,
+                                    strokeColor: Colors.white,
+                                  ),
+                            ),
+                            belowBarData: BarAreaData(show: false),
+                          ),
+                          // Normal max temperature (dashed)
+                          LineChartBarData(
+                            spots: _getNormalMaxSpots(),
+                            isCurved: true,
+                            color: Colors.red.shade300,
+                            barWidth: 2,
+                            dashArray: [5, 5],
+                            dotData: const FlDotData(show: false),
+                            belowBarData: BarAreaData(show: false),
+                          ),
+                          // Normal min temperature (dashed)
+                          LineChartBarData(
+                            spots: _getNormalMinSpots(),
+                            isCurved: true,
+                            color: Colors.blue.shade300,
+                            barWidth: 2,
+                            dashArray: [5, 5],
+                            dotData: const FlDotData(show: false),
+                            belowBarData: BarAreaData(show: false),
+                          ),
+                        ],
+                        titlesData: FlTitlesData(
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize:
+                                  80, // MUST match constant in calculation functions
+                              interval:
+                                  1, // Draw a title for every 1 unit (each day)
+                              getTitlesWidget: (value, meta) {
+                                final index = value.toInt();
+                                if (index < 0 || index >= _dateLabels.length) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Transform.rotate(
+                                  angle: -0.785, // -45 degrees
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 20.0),
+                                    child: Text(
+                                      _dateLabels[index],
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          leftTitles: AxisTitles(
+                            axisNameWidget: const Text(
+                              'Température (°C)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize:
+                                  40, // MUST match constant in calculation functions
+                              interval: 5,
+                              getTitlesWidget: (value, meta) {
+                                return Text(
+                                  '${value.round()}°',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.black87,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: seriesIndex == 0
-                              ? Colors.red.shade50
-                              : Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(16),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          horizontalInterval: 5,
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              color: Colors.grey.shade200,
+                              strokeWidth: 1,
+                            );
+                          },
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
                           border: Border.all(
-                            color: seriesIndex == 0
-                                ? Colors.red.shade200
-                                : Colors.blue.shade200,
+                            color: Colors.grey.shade300,
                             width: 1,
                           ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: seriesIndex == 0
-                                    ? Colors.red.shade600
-                                    : Colors.blue.shade600,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: seriesIndex == 0
-                                    ? Colors.red.shade700
-                                    : Colors.blue.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-              ),
-              tooltipBehavior: _tooltipBehavior,
-              annotations: _chartAnnotations,
-              primaryXAxis: CategoryAxis(
-                labelPlacement: LabelPlacement.onTicks,
-                labelRotation: -45,
-                labelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.black,
-                ),
-                axisLine: AxisLine(color: Colors.grey.shade400, width: 1),
-                majorTickLines: MajorTickLines(
-                  color: Colors.grey.shade400,
-                  width: 1,
-                ),
-                majorGridLines: MajorGridLines(
-                  color: Colors.grey.shade200,
-                  width: 1,
-                ),
-              ),
-              primaryYAxis: NumericAxis(
-                title: AxisTitle(
-                  text: 'Température (°C)',
-                  textStyle: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                labelFormat: '{value}°',
-                labelStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black87,
-                ),
-                interval: 5,
-                minimum: (minTemp - 6).floorToDouble(),
-                maximum: (maxTemp + 6).ceilToDouble(),
-                axisLine: AxisLine(color: Colors.grey.shade400, width: 1),
-                majorTickLines: MajorTickLines(
-                  color: Colors.grey.shade400,
-                  width: 1,
-                ),
-                majorGridLines: MajorGridLines(
-                  color: Colors.grey.shade200,
-                  width: 1,
-                ),
-                minorGridLines: MinorGridLines(
-                  color: Colors.grey.shade100,
-                  width: 0.5,
-                ),
-              ),
-              plotAreaBorderColor: Colors.grey.shade300,
-              plotAreaBorderWidth: 1,
-              backgroundColor: Colors.grey.shade50,
-              enableAxisAnimation: true,
-              enableSideBySideSeriesPlacement: false,
-              series: <CartesianSeries<DailyForecast, String>>[
-                // MAX TEMPERATURE SERIES
-                LineSeries<DailyForecast, String>(
-                  name: 'Temp. max.',
-                  dataSource: widget.forecast.dailyForecasts,
-                  xValueMapper: (DailyForecast daily, _) =>
-                      DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-                  yValueMapper: (DailyForecast daily, _) =>
-                      daily.temperatureMax,
-                  color: Colors.red.shade300,
-                  width: 3,
-                  markerSettings: MarkerSettings(
-                    isVisible: true,
-                    width: 10,
-                    height: 10,
-                    shape: DataMarkerType.circle,
-                    borderWidth: 3,
-                    borderColor: Colors.white,
-                    color: Colors.red.shade600,
-                  ),
-                  animationDuration: 150,
-                  animationDelay: 0,
-                  selectionBehavior: SelectionBehavior(
-                    enable: true,
-                    selectedColor: Colors.red.shade800,
-                    unselectedColor: Colors.red.shade300,
-                    selectedBorderColor: Colors.orange,
-                    selectedBorderWidth: 2,
-                  ),
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: false,
-                    labelPosition: ChartDataLabelPosition.outside,
-                    labelAlignment: ChartDataLabelAlignment.top,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    textStyle: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                        backgroundColor: Colors.grey.shade50,
+                        lineTouchData: LineTouchData(enabled: false),
+                      ),
                     ),
-                    builder:
-                        (
-                          dynamic data,
-                          dynamic point,
-                          dynamic series,
-                          int pointIndex,
-                          int seriesIndex,
-                        ) {
-                          final forecast = data as DailyForecast;
-                          final deviation = pointIndex < _deviations.length
-                              ? _deviations[pointIndex]
-                              : null;
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.red.shade300,
-                                width: 1,
+                  ),
+                  // Weather icons positioned correctly above max temp points
+                  ...widget.forecast.dailyForecasts.asMap().entries.map((
+                    entry,
+                  ) {
+                    final int index = entry.key;
+                    final DailyForecast daily = entry.value;
+                    final String? iconPath = _getIconPathForCode(
+                      daily.weatherCode,
+                    );
+                    final WeatherDeviation? deviation =
+                        index < _deviations.length ? _deviations[index] : null;
+
+                    if (iconPath == null) return const SizedBox.shrink();
+
+                    // Calculate correct position using the new, accurate function
+                    final screenPos = _calculateScreenPosition(
+                      index.toDouble(),
+                      daily.temperatureMax,
+                      containerSize,
+                    );
+
+                    return Positioned(
+                      left: screenPos.dx - 22.5, // Center the 45px wide icon
+                      top: screenPos.dy - 65, // Position above the point
+                      child: SizedBox(
+                        width: 45,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(iconPath, width: 45, height: 45),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${daily.temperatureMax.round()}°',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                                color: Colors.black87,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 3,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '${forecast.temperatureMax.round()}°',
+                            if (deviation != null)
+                              Container(
+                                margin: const EdgeInsets.only(top: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 1,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: deviation.maxDeviation > 0
+                                      ? Colors.red.shade50
+                                      : Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  deviation.maxDeviationText,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red.shade700,
+                                    fontWeight: FontWeight.w600,
+                                    color: deviation.maxDeviation > 0
+                                        ? Colors.red.shade900
+                                        : Colors.blue.shade900,
                                   ),
                                 ),
-                                if (deviation != null)
-                                  Text(
-                                    deviation.maxDeviationText,
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w500,
-                                      color: deviation.maxDeviation > 0
-                                          ? Colors.red.shade600
-                                          : Colors.blue.shade600,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          );
-                        },
-                  ),
-                ),
-                // MIN TEMPERATURE SERIES
-                LineSeries<DailyForecast, String>(
-                  enableTooltip: false,
-                  name: 'Temp. min.',
-                  dataSource: widget.forecast.dailyForecasts,
-                  xValueMapper: (DailyForecast daily, _) =>
-                      DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-                  yValueMapper: (DailyForecast daily, _) =>
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                  // Min temperature labels positioned correctly below min temp points
+                  ...widget.forecast.dailyForecasts.asMap().entries.map((
+                    entry,
+                  ) {
+                    final int index = entry.key;
+                    final DailyForecast daily = entry.value;
+                    final WeatherDeviation? deviation =
+                        index < _deviations.length ? _deviations[index] : null;
+
+                    // Calculate correct position using the new, accurate function
+                    final screenPos = _calculateScreenPosition(
+                      index.toDouble(),
                       daily.temperatureMin,
-                  color: Colors.blue.shade300,
-                  width: 3,
-                  markerSettings: MarkerSettings(
-                    isVisible: true,
-                    width: 10,
-                    height: 10,
-                    shape: DataMarkerType.circle,
-                    borderWidth: 1,
-                    borderColor: Colors.white,
-                    color: Colors.blue.shade300,
-                  ),
-                  animationDuration: 150,
-                  animationDelay: 0,
-                  selectionBehavior: SelectionBehavior(
-                    enable: false,
-                    selectedColor: Colors.blue.shade800,
-                    unselectedColor: Colors.blue.shade300,
-                    selectedBorderColor: Colors.lightBlue,
-                    selectedBorderWidth: 2,
-                  ),
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: true,
-                    labelPosition: ChartDataLabelPosition.outside,
-                    labelAlignment: ChartDataLabelAlignment.bottom,
-                    margin: const EdgeInsets.only(top: 1),
-                    textStyle: const TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                    builder:
-                        (
-                          dynamic data,
-                          dynamic point,
-                          dynamic series,
-                          int pointIndex,
-                          int seriesIndex,
-                        ) {
-                          final forecast = data as DailyForecast;
-                          final deviation = pointIndex < _deviations.length
-                              ? _deviations[pointIndex]
-                              : null;
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
+                      containerSize,
+                    );
+
+                    return Positioned(
+                      left: screenPos.dx - 25, // Center the label
+                      top: screenPos.dy + 15, // Position below the point
+                      child: SizedBox(
+                        width: 50,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${daily.temperatureMin.round()}°',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue.shade700,
+                              ),
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '${forecast.temperatureMin.round()}°',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade700,
-                                  ),
+                            if (deviation != null)
+                              Text(
+                                deviation.minDeviationText,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: deviation.minDeviation > 0
+                                      ? Colors.red.shade600
+                                      : Colors.blue.shade600,
                                 ),
-                                if (deviation != null)
-                                  Text(
-                                    deviation.minDeviationText,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: deviation.minDeviation > 0
-                                          ? Colors.red.shade600
-                                          : Colors.blue.shade600,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          );
-                        },
-                  ),
-                ),
-                LineSeries<DailyForecast, String>(
-                  name: 'Normale max.',
-                  dataSource: widget.forecast.dailyForecasts,
-                  xValueMapper: (DailyForecast daily, _) =>
-                      DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-                  yValueMapper: (DailyForecast daily, int index) {
-                    final normal = index < _deviations.length
-                        ? _deviations[index]?.normal
-                        : null;
-                    return normal?.temperatureMax;
-                  },
-                  animationDuration: 150,
-                  animationDelay: 0,
-                  color: Colors.red.shade300,
-                  width: 2,
-                  dashArray: const <double>[5, 5],
-                  // Dotted line
-                  markerSettings: const MarkerSettings(isVisible: false),
-                  enableTooltip: false,
-                ),
-                LineSeries<DailyForecast, String>(
-                  name: 'Normale min.',
-                  dataSource: widget.forecast.dailyForecasts,
-                  xValueMapper: (DailyForecast daily, _) =>
-                      DateFormat('E, d MMM', 'fr_FR').format(daily.date),
-                  yValueMapper: (DailyForecast daily, int index) {
-                    final normal = index < _deviations.length
-                        ? _deviations[index]?.normal
-                        : null;
-                    return normal?.temperatureMin;
-                  },
-                  animationDuration: 150,
-                  animationDelay: 0,
-                  color: Colors.blue.shade300,
-                  width: 2,
-                  dashArray: const <double>[5, 5],
-                  // Dotted line
-                  markerSettings: const MarkerSettings(isVisible: false),
-                  enableTooltip: false,
-                ),
-              ],
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
         );
