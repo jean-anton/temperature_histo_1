@@ -77,6 +77,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
     _maxTemp = allTemps.isNotEmpty ? allTemps.reduce(max) : 20;
     _minTemp = allTemps.isNotEmpty ? allTemps.reduce(min) : 0;
 
+
     // _hourLabels = widget.dailyWeather!.hourlyForecasts
     //     .map((hourly) => hourly.formattedTime)
     //     .toList();
