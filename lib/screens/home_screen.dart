@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:latlong2/latlong.dart'; // Import the new package
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
@@ -13,7 +13,6 @@ import '../widgets/loading_indicator_widget.dart';
 import '../widgets/weather_chart_widget2.dart';
 import '../widgets/weather_table_widget.dart';
 
-/// A data class to hold all information about a specific location with climate data.
 class ClimateLocationInfo {
   final String displayName;
   final String assetPath;
@@ -32,7 +31,6 @@ class ClimateLocationInfo {
   });
 }
 
-/// A data class to hold information for a weather forecast location.
 class WeatherLocationInfo {
   final String displayName;
   final double lat;
@@ -56,12 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final WeatherService _weatherService = WeatherService();
   final ClimateDataService _climateService = ClimateDataService();
 
-  // Keys for SharedPreferences to ensure consistency.
   static const String _kSelectedClimateLocationKey = 'selectedClimateLocation';
   static const String _kSelectedWeatherLocationKey = 'selectedWeatherLocation';
   static const String _kSelectedModelKey = 'selectedModel';
+  static const String _kDisplayModeKey = 'displayMode';
 
-  /// Map for locations with historical climate data.
   final Map<String, ClimateLocationInfo> _climateLocationData = {
     '00460_Berus_1961_1990': const ClimateLocationInfo(
       displayName: 'Berus (DE)',
@@ -117,11 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   };
 
-  /// Map for locations for which we want weather forecasts.
-  /// This is initialized in initState.
   late final Map<String, WeatherLocationInfo> _weatherLocationData;
-
-  /// Map for weather models.
   final Map<String, String> _models = {
     'best_match': 'Best Match',
     'ecmwf_ifs025': 'ECMWF IFS',
@@ -130,11 +123,13 @@ class _HomeScreenState extends State<HomeScreen> {
     'icon_seamless': 'ICON/DWD',
   };
 
-  // State variables with default values. These will be overwritten by saved preferences.
+  // Display mode: 'daily' or 'hourly'
+  String _displayMode = 'daily';
   String _selectedClimateLocation = '04336_Saarbrücken-Ensheim_1961_1990';
   String _selectedWeatherLocation = 'rosbruck_fr';
   String _selectedModel = 'best_match';
   WeatherForecast? _forecast;
+  DailyWeather? _hourlyForecast;
   List<ClimateNormal> _climateNormals = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -144,14 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _initializeLocations();
-    // Load saved user preferences and then fetch the corresponding data.
     _loadPreferencesAndData();
   }
 
-  /// Populates the weather locations map dynamically.
   void _initializeLocations() {
     final weatherLocations = <String, WeatherLocationInfo>{
-      // Add new custom locations for France
       'rosbruck_fr': const WeatherLocationInfo(
         displayName: 'Rosbruck',
         lat: 49.15,
@@ -172,17 +164,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _weatherLocationData = weatherLocations;
   }
 
-  /// Loads saved preferences from disk and then triggers a data load.
   Future<void> _loadPreferencesAndData() async {
     await _loadPreferences();
     await _loadData();
   }
 
-  /// Retrieves user selections from SharedPreferences.
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      // Retrieve saved values, or use the defaults if none are found.
+      _displayMode = prefs.getString(_kDisplayModeKey) ?? 'daily';
       _selectedClimateLocation =
           prefs.getString(_kSelectedClimateLocationKey) ??
               _selectedClimateLocation;
@@ -191,7 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
               _selectedWeatherLocation;
       _selectedModel = prefs.getString(_kSelectedModelKey) ?? _selectedModel;
 
-      // Fallback if the saved location is no longer available
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {
         _selectedClimateLocation = _climateLocationData.keys.first;
       }
@@ -201,9 +190,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  /// Saves the current user selections to SharedPreferences.
   Future<void> _savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kDisplayModeKey, _displayMode);
     await prefs.setString(
         _kSelectedClimateLocationKey, _selectedClimateLocation);
     await prefs.setString(
@@ -212,7 +201,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
-    // Ensure the loading indicator is shown if we are not on the initial load.
     if (!_isLoading) {
       setState(() {
         _isLoading = true;
@@ -224,22 +212,40 @@ class _HomeScreenState extends State<HomeScreen> {
       final climateInfo = _climateLocationData[_selectedClimateLocation]!;
       final weatherInfo = _weatherLocationData[_selectedWeatherLocation]!;
 
-      // Fetch climate and weather data in parallel for better performance
-      final results = await Future.wait([
-        _climateService.loadClimateNormals(climateInfo.assetPath),
-        _weatherService.getWeatherForecast(
-          latitude: weatherInfo.lat,
-          longitude: weatherInfo.lon,
-          model: _selectedModel,
-          locationName: weatherInfo.displayName,
-        ),
-      ]);
+      if (_displayMode == 'hourly') {
+        final results = await Future.wait([
+          _climateService.loadClimateNormals(climateInfo.assetPath),
+          _weatherService.getDailyWeatherForecast(
+            latitude: weatherInfo.lat,
+            longitude: weatherInfo.lon,
+            locationName: weatherInfo.displayName,
+          ),
+        ]);
 
-      setState(() {
-        _climateNormals = results[0] as List<ClimateNormal>;
-        _forecast = results[1] as WeatherForecast;
-        _isLoading = false;
-      });
+        setState(() {
+          _climateNormals = results[0] as List<ClimateNormal>;
+          _hourlyForecast = results[1] as DailyWeather;
+          _forecast = null;
+          _isLoading = false;
+        });
+      } else {
+        final results = await Future.wait([
+          _climateService.loadClimateNormals(climateInfo.assetPath),
+          _weatherService.getWeatherForecast(
+            latitude: weatherInfo.lat,
+            longitude: weatherInfo.lon,
+            model: _selectedModel,
+            locationName: weatherInfo.displayName,
+          ),
+        ]);
+
+        setState(() {
+          _climateNormals = results[0] as List<ClimateNormal>;
+          _forecast = results[1] as WeatherForecast;
+          _hourlyForecast = null;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _errorMessage =
@@ -254,19 +260,16 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _selectedClimateLocation = newLocation;
       });
-      _savePreferences(); // Save the new selection
+      _savePreferences();
       _loadData();
     }
   }
 
-  /// --- MODIFICATION START ---
-  /// This method now automatically selects the nearest climate station.
   void _onWeatherLocationChanged(String? newLocationKey) {
     if (newLocationKey != null && newLocationKey != _selectedWeatherLocation) {
       final newWeatherLocationInfo = _weatherLocationData[newLocationKey];
-      if (newWeatherLocationInfo == null) return; // Should not happen
+      if (newWeatherLocationInfo == null) return;
 
-      // Find the nearest climate station to the newly selected weather location.
       String nearestClimateKey = '';
       double minDistance = double.infinity;
       const distance = Distance();
@@ -282,7 +285,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
 
-      // Update the state for both the weather location and the nearest climate station.
       setState(() {
         _selectedWeatherLocation = newLocationKey;
         if (nearestClimateKey.isNotEmpty) {
@@ -290,19 +292,27 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
 
-      _savePreferences(); // Save the new selections
+      _savePreferences();
       _loadData();
     }
   }
-  /// --- MODIFICATION END ---
-
 
   void _onModelChanged(String? newModel) {
     if (newModel != null && newModel != _selectedModel) {
       setState(() {
         _selectedModel = newModel;
       });
-      _savePreferences(); // Save the new selection
+      _savePreferences();
+      _loadData();
+    }
+  }
+
+  void _onDisplayModeChanged(String mode) {
+    if (mode != _displayMode) {
+      setState(() {
+        _displayMode = mode;
+      });
+      _savePreferences();
       _loadData();
     }
   }
@@ -330,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const LoadingIndicator()
               else if (_errorMessage != null)
                 ErrorDisplay(message: _errorMessage!)
-              else if (_forecast != null)
+              else if (_forecast != null || _hourlyForecast != null)
                   _buildWeatherDisplay(),
               _buildControlPanel(),
             ],
@@ -341,7 +351,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildControlPanel() {
-    // Get the full info for the currently selected weather location.
     final selectedWeatherInfo = _weatherLocationData[_selectedWeatherLocation];
 
     return Card(
@@ -369,6 +378,26 @@ class _HomeScreenState extends State<HomeScreen> {
             const Text(
               'Paramètres',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text('Mode d\'affichage:',
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            SegmentedButton<String>(
+              segments: const [
+                ButtonSegment<String>(
+                  value: 'daily',
+                  label: Text('Journalier'),
+                ),
+                ButtonSegment<String>(
+                  value: 'hourly',
+                  label: Text('Horaire'),
+                ),
+              ],
+              selected: {_displayMode},
+              onSelectionChanged: (Set<String> selection) {
+                _onDisplayModeChanged(selection.first);
+              },
             ),
             const SizedBox(height: 16),
             const Text('Lieu (Prévisions météo):',
@@ -433,12 +462,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Builds a sorted list of DropdownMenuItems for climate locations.
-  ///
-  /// The list is sorted by the distance from the [selectedWeatherInfo].
   List<DropdownMenuItem<String>> _buildSortedClimateLocationItems(
       WeatherLocationInfo? selectedWeatherInfo) {
-    // If there's no selected weather location, we can't sort by distance.
     if (selectedWeatherInfo == null) {
       return _climateLocationData.entries.map((entry) {
         final info = entry.value;
@@ -454,7 +479,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final weatherLatLng =
     LatLng(selectedWeatherInfo.lat, selectedWeatherInfo.lon);
 
-    // 1. Create a list of records containing the key, info, and distance.
     var climateItemsWithDistance = _climateLocationData.entries.map((entry) {
       final climateLatLng = LatLng(entry.value.lat, entry.value.lon);
       final distanceInMeters = distance(weatherLatLng, climateLatLng);
@@ -465,10 +489,8 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }).toList();
 
-    // 2. Sort the list based on the calculated distance.
     climateItemsWithDistance.sort((a, b) => a.distance.compareTo(b.distance));
 
-    // 3. Map the sorted list to DropdownMenuItem widgets.
     return climateItemsWithDistance.map((item) {
       final distanceInKm = (item.distance / 1000).toStringAsFixed(1);
       final distanceText = ' • $distanceInKm km';
@@ -484,22 +506,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildWeatherDisplay() {
-    // Get the full info objects for both selected locations.
     final weatherInfo = _weatherLocationData[_selectedWeatherLocation];
     final climateInfo = _climateLocationData[_selectedClimateLocation];
 
-    // A guard clause to prevent errors if data is somehow missing.
     if (weatherInfo == null || climateInfo == null) {
       return const ErrorDisplay(message: "Location information is missing.");
     }
 
-    // --- Calculate the distance ---
     const distance = Distance();
     final meters = distance(
       LatLng(weatherInfo.lat, weatherInfo.lon),
       LatLng(climateInfo.lat, climateInfo.lon),
     );
-    // Convert to kilometers and format to one decimal place.
     final distanceInKm = (meters / 1000).toStringAsFixed(1);
 
     return Card(
@@ -520,7 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
-                    'Modèle: ${_models[_selectedModel]}',
+                    'Mode: ${_displayMode == 'daily' ? _models[_selectedModel] : 'Horaire'}',
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -537,14 +555,19 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             if (_showChart)
               WeatherChart2(
-                forecast: _forecast!,
+                forecast: _forecast,
+                dailyWeather: _hourlyForecast,
                 climateNormals: _climateNormals,
+                displayMode: _displayMode,
               )
             else
-              WeatherTable(
-                forecast: _forecast!,
-                climateNormals: _climateNormals,
-              ),
+              // TODO: Implement hourly table view
+              _displayMode == 'daily'
+                  ? WeatherTable(
+                      forecast: _forecast!,
+                      climateNormals: _climateNormals,
+                    )
+                  : const Center(child: Text('Tableau horaire non implémenté')),
           ],
         ),
       ),

@@ -165,9 +165,171 @@ class DailyForecast {
   }
 }
 
+
+
+// Add to weather_forecast_model.dart
+class DailyWeather {
+  final String locationName;
+  final double latitude;
+  final double longitude;
+  final String timezone;
+  final List<HourlyForecast> hourlyForecasts;
+
+  DailyWeather({
+    required this.locationName,
+    required this.latitude,
+    required this.longitude,
+    required this.timezone,
+    required this.hourlyForecasts,
+  });
+
+  factory DailyWeather.fromJson(Map<String, dynamic> json) {
+    final hourlyData = json['hourly'] as Map<String, dynamic>? ?? {};
+
+    final timeList = hourlyData['time'] as List?;
+    final temperatureList = hourlyData['temperature_2m'] as List?;
+    final weatherCodeList = hourlyData['weather_code'] as List?;
+    final apparentTemperatureList = hourlyData['apparent_temperature'] as List?;
+    final precipitationProbabilityList = 
+        hourlyData['precipitation_probability'] as List?;
+    final precipitationList = hourlyData['precipitation'] as List?;
+    final rainList = hourlyData['rain'] as List?;
+    final cloudCoverList = hourlyData['cloud_cover'] as List?;
+    final windSpeedList = hourlyData['wind_speed_10m'] as List?;
+    final windGustsList = hourlyData['windgusts_10m'] as List?;
+
+    final forecasts = <HourlyForecast>[];
+    
+    if (timeList != null) {
+      for (int i = 0; i < timeList.length; i++) {
+        forecasts.add(HourlyForecast(
+          time: DateTime.parse(timeList[i] as String),
+          temperature: (temperatureList?[i] as num?)?.toDouble(),
+          weatherCode: (weatherCodeList?[i] as num?)?.toInt(),
+          apparentTemperature: 
+              (apparentTemperatureList?[i] as num?)?.toDouble(),
+          precipitationProbability: 
+              (precipitationProbabilityList?[i] as num?)?.toInt(),
+          precipitation: (precipitationList?[i] as num?)?.toDouble(),
+          rain: (rainList?[i] as num?)?.toDouble(),
+          cloudCover: (cloudCoverList?[i] as num?)?.toInt(),
+          windSpeed: (windSpeedList?[i] as num?)?.toDouble(),
+          windGusts: (windGustsList?[i] as num?)?.toDouble(),
+        ));
+      }
+    }
+
+    return DailyWeather(
+      locationName: '',
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      timezone: json['timezone'] as String,
+      hourlyForecasts: forecasts,
+    );
+  }
+
+  DailyWeather copyWith({String? locationName}) {
+    return DailyWeather(
+      locationName: locationName ?? this.locationName,
+      latitude: latitude,
+      longitude: longitude,
+      timezone: timezone,
+      hourlyForecasts: hourlyForecasts,
+    );
+  }
+
+  @override
+  String toString() {
+    final hourlyString = hourlyForecasts.map((h) => '  - $h').join('\n');
+    return '''
+DailyWeather(
+  locationName: '$locationName',
+  latitude: $latitude, longitude: $longitude,
+  hourlyForecasts: [
+$hourlyString
+  ]
+)''';
+  }
+}
+
+class HourlyForecast {
+  final DateTime time;
+  final double? temperature;
+  final int? weatherCode;
+  final double? apparentTemperature;
+  final int? precipitationProbability;
+  final double? precipitation;
+  final double? rain;
+  final int? cloudCover;
+  final double? windSpeed;
+  final double? windGusts;
+
+  HourlyForecast({
+    required this.time,
+    this.temperature,
+    this.weatherCode,
+    this.apparentTemperature,
+    this.precipitationProbability,
+    this.precipitation,
+    this.rain,
+    this.cloudCover,
+    this.windSpeed,
+    this.windGusts,
+  });
+
+  String get formattedTime => DateFormat('HH:mm').format(time);
+
+  @override
+  String toString() {
+    return 'HourlyForecast(time: $formattedTime, temp: $temperature°C, feels: $apparentTemperature°C, rainProb: $precipitationProbability%, rain: $rain mm, clouds: $cloudCover%, wind: $windSpeed km/h, gusts: $windGusts km/h)';
+  }
+}
+
+// Add to the bottom of weather_forecast_model.dart
+void testDailyWeather() async {
+  await initializeDateFormatting('fr_FR', null);
+  
+  final weatherService = WeatherService();
+  const locationName = 'Metz';
+  const lat = 49.0812;
+  const lon = 6.7453;
+
+  print("--- Testing getDailyWeatherForecast for '$locationName' ---");
+
+  try {
+    final dailyWeather = await weatherService.getDailyWeatherForecast(
+      latitude: lat,
+      longitude: lon,
+      locationName: locationName,
+    );
+
+    print("#### Daily Weather Result:\n${dailyWeather.toString()}");
+    print("\nTotal hours: ${dailyWeather.hourlyForecasts.length}");
+
+    if (dailyWeather.hourlyForecasts.isNotEmpty) {
+      final firstHour = dailyWeather.hourlyForecasts.first;
+      print("\n--- First hour data ---");
+      print("Time: ${firstHour.formattedTime}");
+      print("Temperature: ${firstHour.temperature}°C");
+      print("Feels like: ${firstHour.apparentTemperature}°C");
+      print("Rain probability: ${firstHour.precipitationProbability}%");
+    }
+  } catch (e) {
+    print("An error occurred: $e");
+  }
+}
+
+// Update main function to call testDailyWeather
+void main() async {
+  // ... existing test code ...
+  
+  // Add call to new test
+  testDailyWeather();
+}
+
 /// A self-contained main function to test the model and service together.
 /// You can run this file directly from your IDE to verify the logic.
-void main() async {
+void main2() async {
   // FIX: Initialize date formatting for the 'fr_FR' locale.
   // This must be done before any locale-specific date formatting is used.
   await initializeDateFormatting('fr_FR', null);

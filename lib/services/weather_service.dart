@@ -51,93 +51,42 @@ class WeatherService {
     }
   }
 
-  /// **NEW STUB FUNCTION**
-  ///
-  /// Returns a mock WeatherForecast with 10 days of sample data without an HTTP call.
-  /// Useful for UI development and testing without network dependency.
-  Future<WeatherForecast> getWeatherForecast_stub({
-    required double latitude,
-    required double longitude,
-    required String model,
-    required String locationName,
-  }) async {
-    final random = Random();
-    final dailyForecasts = <DailyForecast>[];
-    final startDate = DateTime.now();
+  // Add to weather_service.dart
+Future<DailyWeather> getDailyWeatherForecast({
+  required double latitude,
+  required double longitude,
+  required String locationName,
+}) async {
+  const hourlyParameters = 
+      'temperature_2m,weather_code,apparent_temperature,'
+      'precipitation_probability,precipitation,rain,'
+      'cloud_cover,wind_speed_10m,windgusts_10m';
 
-    // A list of common weather codes to randomly choose from.
-    final weatherCodes = [0, 1, 2, 3, 45, 61, 80, 95];
+  final url = Uri.parse(_baseUrl).replace(queryParameters: {
+    'latitude': latitude.toString(),
+    'longitude': longitude.toString(),
+    'hourly': hourlyParameters,
+    'timezone': 'auto',
+    'forecast_days': '3', // Only fetch today's data
+  });
 
-    // Generate 10 days of sample forecast data.
-    for (int i = 0; i < 10; i++) {
-      final date = startDate.add(Duration(days: i));
-      // Generate a plausible max temperature (e.g., between 15°C and 25°C).
-      final maxTemp = 15.0 + random.nextDouble() * 10;
-      // Ensure min temperature is realistically lower than max.
-      final minTemp = maxTemp - (5.0 + random.nextDouble() * 5);
+  try {
+    final response = await http.get(url).timeout(const Duration(seconds: 15));
 
-      dailyForecasts.add(DailyForecast(
-        date: date,
-        temperatureMax: double.parse(maxTemp.toStringAsFixed(1)),
-        temperatureMin: double.parse(minTemp.toStringAsFixed(1)),
-        precipitationSum: random.nextDouble() * 15, // 0-15mm
-        precipitationHours: random.nextDouble() * 10, // 0-10 hours
-        snowfallSum: 0.0, // Assuming no snow for this stub
-        precipitationProbabilityMax: random.nextInt(101), // 0-100%
-        weatherCode: weatherCodes[random.nextInt(weatherCodes.length)],
-        cloudCoverMean: random.nextInt(101), // 0-100%
-        windSpeedMax: random.nextDouble() * 40, // 0-40 km/h
-        windGustsMax: random.nextDouble() * 60, // 0-60 km/h
-      ));
-    }
-
-    // Create the final WeatherForecast object with the generated data.
-    final forecast = WeatherForecast(
-      latitude: latitude,
-      longitude: longitude,
-      locationName: locationName,
-      model: '$model (Stub)', // Suffix helps identify stub data in the UI
-      timezone: 'Europe/Berlin',
-      dailyForecasts: dailyForecasts,
-    );
-
-    // Simulate a short network delay to mimic a real API call.
-    return Future.delayed(const Duration(milliseconds: 400), () => forecast);
-  }
-
-  /// Fetches forecasts from multiple models in PARALLEL for much faster execution.
-  Future<Map<String, WeatherForecast>> getMultiModelForecast({
-    required double latitude,
-    required double longitude,
-    required String locationName,
-    required List<String> models,
-    bool useStub = false, // Add a flag to easily switch to the stub
-  }) async {
-    // Decide which function to call based on the `useStub` flag.
-    final fetchFunction = useStub ? getWeatherForecast_stub : getWeatherForecast;
-
-    final futures = models.map((model) {
-      return fetchFunction(
-        latitude: latitude,
-        longitude: longitude,
-        model: model,
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return DailyWeather.fromJson(jsonData).copyWith(
         locationName: locationName,
-      ).catchError((e) {
-        print('Failed to fetch forecast for model $model  $e  $WeatherService');
-        return null;
-      });
-    }).toList();
-
-    final results = await Future.wait(futures);
-
-    final forecasts = <String, WeatherForecast>{};
-    for (int i = 0; i < models.length; i++) {
-      final forecast = results[i];
-      if (forecast != null) {
-        forecasts[models[i]] = forecast;
-      }
+      );
+    } else {
+      throw Exception(
+          'API Error: ${response.statusCode} ${response.reasonPhrase}');
     }
-
-    return forecasts;
+  } on TimeoutException {
+    throw Exception('Request timed out.');
+  } catch (e) {
+    throw Exception('Failed to get daily weather: $e');
   }
 }
+
+ }
