@@ -219,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
             latitude: weatherInfo.lat,
             longitude: weatherInfo.lon,
             locationName: weatherInfo.displayName,
+            model: _selectedModel,
           ),
         ]);
 

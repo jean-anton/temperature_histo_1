@@ -21,28 +21,30 @@ class WeatherService {
     required String model,
     required String locationName,
   }) async {
-    final url = Uri.parse(_baseUrl).replace(queryParameters: {
-      'latitude': latitude.toString(),
-      'longitude': longitude.toString(),
-      'daily': _dailyParameters,
-      'timezone': 'auto',
-      'forecast_days': '16',
-      'models': model,
-    });
+    final url = Uri.parse(_baseUrl).replace(
+      queryParameters: {
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+        'daily': _dailyParameters,
+        'timezone': 'auto',
+        'forecast_days': '16',
+        'models': model,
+      },
+    );
 
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        final forecast = WeatherForecast.fromJson(jsonData).copyWith(
-          locationName: locationName,
-          model: model,
-        );
+        final forecast = WeatherForecast.fromJson(
+          jsonData,
+        ).copyWith(locationName: locationName, model: model);
         return forecast;
       } else {
         throw Exception(
-            'API Error for model $model: ${response.statusCode} ${response.reasonPhrase}');
+          'API Error for model $model: ${response.statusCode} ${response.reasonPhrase}',
+        );
       }
     } on TimeoutException {
       throw Exception('Request for model $model timed out.');
@@ -52,41 +54,51 @@ class WeatherService {
   }
 
   // Add to weather_service.dart
-Future<DailyWeather> getDailyWeatherForecast({
-  required double latitude,
-  required double longitude,
-  required String locationName,
-}) async {
-  const hourlyParameters = 
-      'temperature_2m,weather_code,apparent_temperature,'
-      'precipitation_probability,precipitation,rain,'
-      'cloud_cover,wind_speed_10m,windgusts_10m';
+  Future<DailyWeather> getDailyWeatherForecast({
+    required double latitude,
+    required double longitude,
+    required String model,
+    required String locationName,
+  }) async {
+    const hourlyParameters =
+        'temperature_2m,weather_code,apparent_temperature,'
+        'precipitation_probability,precipitation,rain,'
+        'cloud_cover,wind_speed_10m,windgusts_10m';
 
-  final url = Uri.parse(_baseUrl).replace(queryParameters: {
-    'latitude': latitude.toString(),
-    'longitude': longitude.toString(),
-    'hourly': hourlyParameters,
-    'timezone': 'auto',
-    'forecast_days': '3', // Only fetch today's data
-  });
+    print("### CJG 192: hourlyParameters: $hourlyParameters");
+    print("### CJG 192: latitude: $latitude longitude: $longitude");
+    print("### CJG 192: locationName: $locationName");
+    print("### CJG 192: model: $model");
 
-  try {
-    final response = await http.get(url).timeout(const Duration(seconds: 15));
 
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      return DailyWeather.fromJson(jsonData).copyWith(
-        locationName: locationName,
-      );
-    } else {
-      throw Exception(
-          'API Error: ${response.statusCode} ${response.reasonPhrase}');
+    final url = Uri.parse(_baseUrl).replace(
+      queryParameters: {
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
+        'hourly': hourlyParameters,
+        'timezone': 'auto',
+        'forecast_days': '3', 
+        'models': model, // Only fetch today's data
+      },
+    );
+
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return DailyWeather.fromJson(
+          jsonData,
+        ).copyWith(locationName: locationName);
+      } else {
+        throw Exception(
+          'API Error: ${response.statusCode} ${response.reasonPhrase}',
+        );
+      }
+    } on TimeoutException {
+      throw Exception('Request timed out.');
+    } catch (e) {
+      throw Exception('Failed to get daily weather: $e');
     }
-  } on TimeoutException {
-    throw Exception('Request timed out.');
-  } catch (e) {
-    throw Exception('Failed to get daily weather: $e');
   }
 }
-
- }

@@ -301,6 +301,7 @@ void testDailyWeather() async {
       latitude: lat,
       longitude: lon,
       locationName: locationName,
+      model: 'best_match',
     );
 
     print("#### Daily Weather Result:\n${dailyWeather.toString()}");
