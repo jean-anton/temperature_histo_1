@@ -10,7 +10,7 @@ import '../services/climate_data_service.dart';
 import '../services/weather_service.dart';
 import '../widgets/error_display_widget.dart';
 import '../widgets/loading_indicator_widget.dart';
-import '../widgets/weather_chart_widget_refactored.dart';
+import '../widgets/weather_chart_widget.dart';
 import '../widgets/weather_table_widget.dart';
 
 class ClimateLocationInfo {
