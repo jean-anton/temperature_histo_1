@@ -144,6 +144,30 @@ class ChartHelpers {
     return Offset(screenX, screenY);
   }
 
+  /// Calculate screen X position for a given chart X coordinate (for vertical alignment)
+  static double calculateScreenXPosition(
+    double chartX,
+    Size containerSize,
+    int maxIndex,
+  ) {
+    // Calculate the grid dimensions
+    final double gridLeft = ChartConstants.leftPadding + 
+        ChartConstants.leftTitleReservedSize;
+    final double gridWidth = containerSize.width -
+        ChartConstants.leftPadding -
+        ChartConstants.rightPadding -
+        ChartConstants.leftTitleReservedSize;
+
+    // If there's only one data point, center it
+    if (maxIndex <= 0) {
+      return gridLeft + gridWidth / 2;
+    }
+
+    // Calculate position proportionally
+    final double step = gridWidth / maxIndex;
+    return gridLeft + (chartX * step);
+  }
+
   /// Get tapped index from local position
   static int? getTappedIndex(
     Offset localPosition,

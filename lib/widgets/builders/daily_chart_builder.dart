@@ -152,8 +152,12 @@ class DailyChartBuilder {
               ),
               gridData: FlGridData(
                 show: true,
-                drawVerticalLine: false,
+                drawVerticalLine: true,
+                verticalInterval: 1,
                 horizontalInterval: 5,
+                getDrawingVerticalLine: (value) {
+                  return FlLine(color: Colors.grey.shade300, strokeWidth: 1);
+                },
                 getDrawingHorizontalLine: (value) {
                   return FlLine(color: Colors.grey.shade200, strokeWidth: 1);
                 },
@@ -263,7 +267,7 @@ class DailyChartBuilder {
       final WeatherDeviation? deviation = index < deviations.length
           ? deviations[index]
           : null;
-
+      //print("#### CJG index: $index");
       final screenPos = ChartHelpers.calculateScreenPosition(
         index.toDouble(),
         daily.temperatureMin,

@@ -133,13 +133,12 @@ class HourlyChartBuilder {
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: true,
-                verticalInterval: 3,
+                verticalInterval: 1,
                 horizontalInterval: 2,
                 getDrawingVerticalLine: (value) {
                   return FlLine(
-                    color: Colors.grey.shade200,
+                    color: Colors.grey.shade300,
                     strokeWidth: 1,
-                    dashArray: [2, 4],
                   );
                 },
                 getDrawingHorizontalLine: (value) {
