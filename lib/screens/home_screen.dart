@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import '../main.dart';
 import '../models/climate_normal_model.dart';
@@ -38,6 +41,18 @@ class WeatherLocationInfo {
 
   const WeatherLocationInfo({
     required this.displayName,
+    required this.lat,
+    required this.lon,
+  });
+}
+
+class LocationSuggestion {
+  final String name;
+  final double lat;
+  final double lon;
+
+  LocationSuggestion({
+    required this.name,
     required this.lat,
     required this.lon,
   });
@@ -114,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   };
 
-  late final Map<String, WeatherLocationInfo> _weatherLocationData;
+  Map<String, WeatherLocationInfo> _weatherLocationData = {};
   final Map<String, String> _models = {
     'best_match': 'Best Match',
     'ecmwf_ifs025': 'ECMWF IFS',
@@ -143,6 +158,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _initializeLocations() {
+    // Load locations asynchronously
+    _loadLocationsFromPreferences();
+  }
+
+  Future<void> _loadLocationsFromPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Start with hard-coded locations
     final weatherLocations = <String, WeatherLocationInfo>{
       'rosbruck_fr': const WeatherLocationInfo(
         displayName: 'Rosbruck',
@@ -161,7 +184,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     };
 
-    _weatherLocationData = weatherLocations;
+    // Load custom cities from shared_preferences
+    final customCitiesJson = prefs.getStringList('custom_weather_cities') ?? [];
+    for (final cityJson in customCitiesJson) {
+      try {
+        final cityData = jsonDecode(cityJson);
+        final key = cityData['key'] as String;
+        weatherLocations[key] = WeatherLocationInfo(
+          displayName: cityData['displayName'] as String,
+          lat: cityData['lat'] as double,
+          lon: cityData['lon'] as double,
+        );
+      } catch (e) {
+        // Skip invalid entries
+        continue;
+      }
+    }
+
+    setState(() {
+      _weatherLocationData = weatherLocations;
+    });
   }
 
   Future<void> _loadPreferencesAndData() async {
@@ -318,6 +360,101 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<List<LocationSuggestion>> fetchSuggestions(String query) async {
+    const String apiKey = '4195cd5c8bc54697a4a2bba4e9f2aa36'; // Geoapify API key
+    const double lat = 48.821; // Bischwiller latitude
+    const double lon = 7.951;  // Bischwiller longitude
+
+    final url = Uri.parse(
+      'https://api.geoapify.com/v1/geocode/autocomplete'
+      '?text=$query'
+      '&bias=proximity:$lon,$lat'
+      '&limit=5'
+      '&apiKey=$apiKey',
+    );
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final features = data['features'] as List;
+      return features.map((item) {
+        final props = item['properties'];
+        return LocationSuggestion(
+          name: props['formatted'],
+          lat: props['lat'],
+          lon: props['lon'],
+        );
+      }).toList();
+    } else {
+      throw Exception('Failed to fetch suggestions: ${response.statusCode}');
+    }
+  }
+
+  Future<void> _addCity(LocationSuggestion suggestion) async {
+    final prefs = await SharedPreferences.getInstance();
+    final customCitiesJson = prefs.getStringList('custom_weather_cities') ?? [];
+
+    // Generate a unique key for the city
+    final key = 'custom_${DateTime.now().millisecondsSinceEpoch}';
+
+    final cityData = {
+      'key': key,
+      'displayName': suggestion.name,
+      'lat': suggestion.lat,
+      'lon': suggestion.lon,
+    };
+
+    customCitiesJson.add(jsonEncode(cityData));
+    await prefs.setStringList('custom_weather_cities', customCitiesJson);
+
+    // Reload locations
+    await _loadLocationsFromPreferences();
+
+    // If this is the first custom city, select it
+    if (_weatherLocationData.length == 4) { // 3 hard-coded + 1 new
+      setState(() {
+        _selectedWeatherLocation = key;
+      });
+      _savePreferences();
+      _loadData();
+    }
+  }
+
+  Future<void> _deleteCity(String cityKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    final customCitiesJson = prefs.getStringList('custom_weather_cities') ?? [];
+
+    customCitiesJson.removeWhere((cityJson) {
+      try {
+        final cityData = jsonDecode(cityJson);
+        return cityData['key'] == cityKey;
+      } catch (e) {
+        return false;
+      }
+    });
+
+    await prefs.setStringList('custom_weather_cities', customCitiesJson);
+
+    // Reload locations
+    await _loadLocationsFromPreferences();
+
+    // If the deleted city was selected, switch to the first available city
+    if (_selectedWeatherLocation == cityKey && _weatherLocationData.isNotEmpty) {
+      final firstKey = _weatherLocationData.keys.first;
+      setState(() {
+        _selectedWeatherLocation = firstKey;
+      });
+      _savePreferences();
+      _loadData();
+    }
+  }
+
+  bool _isCustomCity(String cityKey) {
+    // Hard-coded cities are not custom
+    return !['rosbruck_fr', 'lachambre_fr', 'bad_duerkheim_de'].contains(cityKey);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -420,6 +557,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onChanged: _onWeatherLocationChanged,
             ),
             const SizedBox(height: 16),
+            const Text('Gestion des villes:',
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            _buildCityManagementSection(),
+            const SizedBox(height: 16),
             const Text('Station de référence (Données climatiques):',
                 style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
@@ -504,6 +646,73 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }).toList();
+  }
+
+  Widget _buildCityManagementSection() {
+    return Column(
+      children: [
+        // Add new city section
+        TypeAheadField<LocationSuggestion>(
+          textFieldConfiguration: TextFieldConfiguration(
+            decoration: const InputDecoration(
+              labelText: 'Ajouter une ville',
+              hintText: 'Tapez le nom d\'une ville...',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              prefixIcon: Icon(Icons.search),
+            ),
+          ),
+          suggestionsCallback: (pattern) async {
+            if (pattern.isEmpty) return [];
+            try {
+              return await fetchSuggestions(pattern);
+            } catch (e) {
+              return [];
+            }
+          },
+          itemBuilder: (context, suggestion) {
+            return ListTile(
+              title: Text(suggestion.name),
+              subtitle: Text(
+                  'Lat: ${suggestion.lat.toStringAsFixed(4)}, Lon: ${suggestion.lon.toStringAsFixed(4)}'),
+            );
+          },
+          onSuggestionSelected: (suggestion) {
+            _addCity(suggestion);
+          },
+        ),
+        const SizedBox(height: 8),
+        // List of cities with delete buttons
+        Container(
+          constraints: const BoxConstraints(maxHeight: 200),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: _weatherLocationData.length,
+            itemBuilder: (context, index) {
+              final cityKey = _weatherLocationData.keys.elementAt(index);
+              final cityInfo = _weatherLocationData[cityKey]!;
+              final isCustom = _isCustomCity(cityKey);
+
+              return ListTile(
+                title: Text(cityInfo.displayName),
+                subtitle: Text(
+                  'Lat: ${cityInfo.lat.toStringAsFixed(4)}, Lon: ${cityInfo.lon.toStringAsFixed(4)}',
+                ),
+                trailing: isCustom
+                    ? IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _deleteCity(cityKey),
+                      )
+                    : null, // No delete button for hard-coded cities
+                tileColor: _selectedWeatherLocation == cityKey
+                    ? Theme.of(context).primaryColor.withOpacity(0.1)
+                    : null,
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildWeatherDisplay() {

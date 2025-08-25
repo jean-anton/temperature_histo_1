@@ -43,6 +43,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   shared_preferences: ^2.5.3
   latlong2: ^0.9.1
+  flutter_typeahead: ^4.6.1
 
 dev_dependencies:
   flutter_test:
