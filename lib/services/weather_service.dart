@@ -81,7 +81,7 @@ class WeatherService {
         'models': model, // Only fetch today's data
       },
     );
-
+    print("### CJG getDailyWeatherForecast: URL: $url");
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 15));
 

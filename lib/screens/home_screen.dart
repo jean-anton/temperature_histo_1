@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../main.dart';
+import '../api_keys.dart';
 import '../models/climate_normal_model.dart';
 import '../models/weather_forecast_model.dart';
 import '../services/climate_data_service.dart';
@@ -153,13 +154,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeLocations();
-    _loadPreferencesAndData();
+    _initializeApp();
   }
 
-  void _initializeLocations() {
-    // Load locations asynchronously
-    _loadLocationsFromPreferences();
+  Future<void> _initializeApp() async {
+    // First load locations, then preferences and data
+    await _loadLocationsFromPreferences();
+    await _loadPreferencesAndData();
   }
 
   Future<void> _loadLocationsFromPreferences() async {
@@ -226,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {
         _selectedClimateLocation = _climateLocationData.keys.first;
       }
-      if (!_weatherLocationData.containsKey(_selectedWeatherLocation)) {
+      if (_weatherLocationData.isNotEmpty && !_weatherLocationData.containsKey(_selectedWeatherLocation)) {
         _selectedWeatherLocation = _weatherLocationData.keys.first;
       }
     });
@@ -251,8 +252,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     try {
-      final climateInfo = _climateLocationData[_selectedClimateLocation]!;
-      final weatherInfo = _weatherLocationData[_selectedWeatherLocation]!;
+      // Check if location data is available
+      final climateInfo = _climateLocationData[_selectedClimateLocation];
+      final weatherInfo = _weatherLocationData[_selectedWeatherLocation];
+
+      if (climateInfo == null) {
+        throw Exception('Climate location data not found for key: $_selectedClimateLocation');
+      }
+
+      if (weatherInfo == null) {
+        throw Exception('Weather location data not found for key: $_selectedWeatherLocation');
+      }
 
       if (_displayMode == 'hourly') {
         final results = await Future.wait([
@@ -291,6 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       setState(() {
+        print("### CJG 361: Error loading data: $e");
         _errorMessage =
         'Erreur lors du chargement des données: ${e.toString()}';
         _isLoading = false;
@@ -361,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List<LocationSuggestion>> fetchSuggestions(String query) async {
-    const String apiKey = '4195cd5c8bc54697a4a2bba4e9f2aa36'; // Geoapify API key
+    const String apiKey = geoapifyApiKey;
     const double lat = 48.821; // Bischwiller latitude
     const double lon = 7.951;  // Bischwiller longitude
 

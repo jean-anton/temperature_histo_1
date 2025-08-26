@@ -231,7 +231,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
   Map<String, double> _calculateChartDimensions(double minWidth) {
     late double chartWidth;
     late double finalHeight;
-    print("####CJG MinWidth: $minWidth");
+    //print("####CJG MinWidth: $minWidth");
     if (widget.displayMode == 'daily' && widget.forecast != null) {
       chartWidth =
           widget.forecast!.dailyForecasts.length * ChartConstants.widthPerDay;
