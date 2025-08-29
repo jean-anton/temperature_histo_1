@@ -21,6 +21,8 @@ class DailyChartBuilder {
   }) {
     return Stack(
       children: [
+        // Background rectangles for weekend days
+        ..._buildWeekendBackgroundRectangles(forecast, containerSize),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             ChartConstants.leftPadding,
@@ -166,7 +168,7 @@ class DailyChartBuilder {
                 show: true,
                 border: Border.all(color: Colors.grey.shade300, width: 1),
               ),
-              backgroundColor: Colors.grey.shade50,
+              backgroundColor: Colors.transparent, // Make background transparent so our rectangles show through
               lineTouchData: LineTouchData(enabled: false),
             ),
           ),
@@ -175,6 +177,51 @@ class DailyChartBuilder {
         ..._buildMinTempLabels(forecast, deviations, minTemp, maxTemp, containerSize),
       ],
     );
+  }
+
+  /// Build background rectangles for weekend days (Saturday and Sunday)
+  static List<Widget> _buildWeekendBackgroundRectangles(
+    DailyWeather forecast,
+    Size containerSize,
+  ) {
+    final List<Widget> rectangles = [];
+
+    // Calculate the width of each day column
+    final double chartWidth = containerSize.width -
+        ChartConstants.leftPadding -
+        ChartConstants.rightPadding -
+        ChartConstants.leftTitleReservedSize;
+    final double dayWidth = chartWidth / forecast.dailyForecasts.length;
+
+    // Calculate the height of the chart area
+    final double chartHeight = containerSize.height -
+        ChartConstants.topPadding -
+        ChartConstants.bottomPadding -
+        ChartConstants.bottomTitleReservedSize;
+
+    for (int i = 0; i < forecast.dailyForecasts.length; i++) {
+      final daily = forecast.dailyForecasts[i];
+      final bool isWeekend = daily.date.weekday == DateTime.saturday ||
+                             daily.date.weekday == DateTime.sunday;
+
+      if (isWeekend) {
+        rectangles.add(
+          Positioned(
+            left: ChartConstants.leftPadding +
+                ChartConstants.leftTitleReservedSize +
+                (i * dayWidth),
+            top: ChartConstants.topPadding,
+            child: Container(
+              width: dayWidth,
+              height: chartHeight,
+              color: Colors.lightBlue.shade300.withOpacity(0.3), // Light blue background for weekends
+            ),
+          ),
+        );
+      }
+    }
+
+    return rectangles;
   }
 
   /// Build weather icons and max temperature labels

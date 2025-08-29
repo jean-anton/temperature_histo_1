@@ -19,6 +19,8 @@ class HourlyChartBuilder {
   }) {
     return Stack(
       children: [
+        // Background rectangles for day/night hours
+        ..._buildBackgroundRectangles(dailyWeather, containerSize),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             ChartConstants.leftPadding,
@@ -146,7 +148,7 @@ class HourlyChartBuilder {
                 show: true,
                 border: Border.all(color: Colors.grey.shade300, width: 1),
               ),
-              backgroundColor: Colors.grey.shade50,
+              backgroundColor: Colors.transparent, // Make background transparent so our rectangles show through
               lineTouchData: LineTouchData(enabled: false),
             ),
           ),
@@ -167,6 +169,53 @@ class HourlyChartBuilder {
         _buildCurrentTimeLine(dailyWeather, minTemp, maxTemp, containerSize),
       ],
     );
+  }
+
+  /// Build background rectangles for day/night hours
+  static List<Widget> _buildBackgroundRectangles(
+    HourlyWeather dailyWeather,
+    Size containerSize,
+  ) {
+    final List<Widget> rectangles = [];
+
+    // Calculate the width of each hour column
+    final double chartWidth = containerSize.width -
+        ChartConstants.leftPadding -
+        ChartConstants.rightPadding -
+        ChartConstants.leftTitleReservedSize;
+    final double hourWidth = chartWidth / dailyWeather.hourlyForecasts.length;
+
+    // Calculate the height of the chart area
+    final double chartHeight = containerSize.height -
+        ChartConstants.topPadding -
+        ChartConstants.bottomPadding -
+        ChartConstants.bottomTitleReservedSize;
+
+    for (int i = 0; i < dailyWeather.hourlyForecasts.length; i++) {
+      final hourly = dailyWeather.hourlyForecasts[i];
+      final bool isNight = hourly.isDay == 0;
+
+      // Choose background color based on day/night
+      final Color backgroundColor = isNight
+          ? const Color.fromARGB(255, 104, 147, 168).withOpacity(0.3) // Light blue-grey for night
+          : Colors.grey.shade50.withOpacity(0.5); // Light grey for day
+
+      rectangles.add(
+        Positioned(
+          left: ChartConstants.leftPadding +
+              ChartConstants.leftTitleReservedSize +
+              (i * hourWidth),
+          top: ChartConstants.topPadding,
+          child: Container(
+            width: hourWidth,
+            height: chartHeight,
+            color: backgroundColor,
+          ),
+        ),
+      );
+    }
+
+    return rectangles;
   }
 
   /// Build a vertical line marking the current time
