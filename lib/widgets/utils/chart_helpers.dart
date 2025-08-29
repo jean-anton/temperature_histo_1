@@ -28,16 +28,48 @@ class ChartHelpers {
   }
 
   /// Get weather icon path for a given weather code
-  static String? getIconPathForCode(int? code) {
+  static String? getIconPathForCode(int? code, {int? isDay}) {
     if (code == null) return null;
     try {
       final iconData = weatherIcons.firstWhere(
         (icon) => icon.code == code.toString(),
       );
-      return iconData.iconPath;
+      return getIconPathForCodeWithDayNight(iconData.iconPath, isDay);
     } catch (e) {
       return null;
     }
+  }
+
+  /// Get weather icon path considering day/night variants
+  static String? getIconPathForCodeWithDayNight(String baseIconPath, int? isDay) {
+    if (isDay == null) return baseIconPath;
+
+    // If it's night (isDay == 0), try to find night variant
+    if (isDay == 0) {
+      final nightIconPath = baseIconPath.replaceAll('_day.svg', '_night.svg');
+      // Check if night variant exists by trying to load it
+      // For now, we'll assume the file exists if it's a known day/night pair
+      if (_hasNightVariant(baseIconPath)) {
+        return nightIconPath;
+      }
+    }
+
+    // Return the base icon path (day variant or non-day/night specific)
+    return baseIconPath;
+  }
+
+  /// Check if an icon has a night variant available
+  static bool _hasNightVariant(String iconPath) {
+    final dayNightIcons = [
+      'clear_day.svg',
+      'mostly_clear_day.svg',
+      'partly_cloudy_day.svg',
+      'scattered_showers_day.svg',
+      'scattered_snow_showers_day.svg',
+      'isolated_scattered_thunderstorms_day.svg',
+    ];
+
+    return dayNightIcons.any((icon) => iconPath.contains(icon));
   }
 
   /// Calculate weather deviation for a daily forecast
@@ -63,7 +95,7 @@ class ChartHelpers {
   }
 
   /// Generate hour labels for hourly chart
-  static List<String> generateHourLabels(DailyWeather? dailyWeather) {
+  static List<String> generateHourLabels(HourlyWeather? dailyWeather) {
     if (dailyWeather != null && dailyWeather.hourlyForecasts.isNotEmpty) {
       return dailyWeather.hourlyForecasts.map((hourly) {
         return DateFormat('HH:mm EEE', 'fr_FR').format(hourly.time);
@@ -74,7 +106,7 @@ class ChartHelpers {
   }
 
   /// Generate date labels for daily chart
-  static List<String> generateDateLabels(WeatherForecast? forecast) {
+  static List<String> generateDateLabels(DailyWeather? forecast) {
     if (forecast == null) return [];
     return forecast.dailyForecasts
         .map((daily) => DateFormat('E, d MMM', 'fr_FR').format(daily.date))
@@ -83,8 +115,8 @@ class ChartHelpers {
 
   /// Calculate temperature range for chart
   static Map<String, double> calculateTempRange(
-    WeatherForecast? forecast,
-    DailyWeather? dailyWeather,
+    DailyWeather? forecast,
+    HourlyWeather? dailyWeather,
     String displayMode,
   ) {
     late List<double> allTemps;

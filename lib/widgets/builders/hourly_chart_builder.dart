@@ -11,7 +11,7 @@ import '../utils/chart_data_provider.dart';
 class HourlyChartBuilder {
   /// Build the hourly chart widget
   static Widget build({
-    required DailyWeather dailyWeather,
+    required HourlyWeather dailyWeather,
     required double minTemp,
     required double maxTemp,
     required List<String> hourLabels,
@@ -136,10 +136,7 @@ class HourlyChartBuilder {
                 verticalInterval: 1,
                 horizontalInterval: 2,
                 getDrawingVerticalLine: (value) {
-                  return FlLine(
-                    color: Colors.grey.shade300,
-                    strokeWidth: 1,
-                  );
+                  return FlLine(color: Colors.grey.shade300, strokeWidth: 1);
                 },
                 getDrawingHorizontalLine: (value) {
                   return FlLine(color: Colors.grey.shade200, strokeWidth: 1);
@@ -155,8 +152,18 @@ class HourlyChartBuilder {
           ),
         ),
         ..._buildWeatherIcons(dailyWeather, minTemp, maxTemp, containerSize),
-        ..._buildTemperatureLabels(dailyWeather, minTemp, maxTemp, containerSize),
-        ..._buildApparentTempLabels(dailyWeather, minTemp, maxTemp, containerSize),
+        ..._buildTemperatureLabels(
+          dailyWeather,
+          minTemp,
+          maxTemp,
+          containerSize,
+        ),
+        ..._buildApparentTempLabels(
+          dailyWeather,
+          minTemp,
+          maxTemp,
+          containerSize,
+        ),
         _buildCurrentTimeLine(dailyWeather, minTemp, maxTemp, containerSize),
       ],
     );
@@ -164,7 +171,7 @@ class HourlyChartBuilder {
 
   /// Build a vertical line marking the current time
   static Widget _buildCurrentTimeLine(
-    DailyWeather dailyWeather,
+    HourlyWeather dailyWeather,
     double minTemp,
     double maxTemp,
     Size containerSize,
@@ -173,22 +180,22 @@ class HourlyChartBuilder {
     final now = DateTime.now();
     int currentIndex = -1;
     Duration smallestDifference = Duration(days: 1);
-    
+
     for (int i = 0; i < dailyWeather.hourlyForecasts.length; i++) {
       final forecastTime = dailyWeather.hourlyForecasts[i].time;
       final difference = forecastTime.difference(now).abs();
-      
+
       if (difference < smallestDifference) {
         smallestDifference = difference;
         currentIndex = i;
       }
     }
-    
+
     // If we couldn't find a current time index, don't show the line
     if (currentIndex == -1) {
       return const SizedBox.shrink();
     }
-    
+
     // Calculate the position of the vertical line
     final screenPos = ChartHelpers.calculateScreenPosition(
       currentIndex.toDouble(),
@@ -198,14 +205,15 @@ class HourlyChartBuilder {
       maxTemp,
       dailyWeather.hourlyForecasts.length - 1,
     );
-    
+
     return Positioned(
       left: screenPos.dx,
       top: ChartConstants.topPadding,
       child: Container(
         width: 2,
-        height: containerSize.height - 
-            ChartConstants.topPadding - 
+        height:
+            containerSize.height -
+            ChartConstants.topPadding -
             ChartConstants.bottomPadding,
         color: Colors.red.withOpacity(0.7),
       ),
@@ -214,7 +222,7 @@ class HourlyChartBuilder {
 
   /// Build weather icons for hourly chart
   static List<Widget> _buildWeatherIcons(
-    DailyWeather dailyWeather,
+    HourlyWeather dailyWeather,
     double minTemp,
     double maxTemp,
     Size containerSize,
@@ -222,7 +230,10 @@ class HourlyChartBuilder {
     return dailyWeather.hourlyForecasts.asMap().entries.map((entry) {
       final int index = entry.key;
       final HourlyForecast hourly = entry.value;
-      final String? iconPath = ChartHelpers.getIconPathForCode(hourly.weatherCode);
+      final String? iconPath = ChartHelpers.getIconPathForCode(
+        hourly.weatherCode,
+        isDay: hourly.isDay,
+      );
 
       if (iconPath == null) return const SizedBox.shrink();
 
@@ -234,6 +245,7 @@ class HourlyChartBuilder {
         maxTemp,
         dailyWeather.hourlyForecasts.length - 1,
       );
+      print("### CJG 291: iconPath: $iconPath, isDay: ${hourly.isDay}");
 
       return Positioned(
         left: screenPos.dx - 15,
@@ -245,7 +257,7 @@ class HourlyChartBuilder {
 
   /// Build actual temperature labels
   static List<Widget> _buildTemperatureLabels(
-    DailyWeather dailyWeather,
+    HourlyWeather dailyWeather,
     double minTemp,
     double maxTemp,
     Size containerSize,
@@ -286,7 +298,7 @@ class HourlyChartBuilder {
 
   /// Build apparent temperature labels
   static List<Widget> _buildApparentTempLabels(
-    DailyWeather dailyWeather,
+    HourlyWeather dailyWeather,
     double minTemp,
     double maxTemp,
     Size containerSize,

@@ -7,14 +7,14 @@ import '../../models/weather_forecast_model.dart';
 /// Provides chart data for different chart types
 class ChartDataProvider {
   /// Get maximum temperature spots for daily chart
-  static List<FlSpot> getMaxTempSpots(WeatherForecast forecast) {
+  static List<FlSpot> getMaxTempSpots(DailyWeather forecast) {
     return forecast.dailyForecasts.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), entry.value.temperatureMax);
     }).toList();
   }
 
   /// Get minimum temperature spots for daily chart
-  static List<FlSpot> getMinTempSpots(WeatherForecast forecast) {
+  static List<FlSpot> getMinTempSpots(DailyWeather forecast) {
     return forecast.dailyForecasts.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), entry.value.temperatureMin);
     }).toList();
@@ -22,7 +22,7 @@ class ChartDataProvider {
 
   /// Get normal maximum temperature spots for daily chart
   static List<FlSpot> getNormalMaxSpots(
-    WeatherForecast forecast,
+    DailyWeather forecast,
     List<WeatherDeviation?> deviations,
   ) {
     return forecast.dailyForecasts
@@ -40,7 +40,7 @@ class ChartDataProvider {
 
   /// Get normal minimum temperature spots for daily chart
   static List<FlSpot> getNormalMinSpots(
-    WeatherForecast forecast,
+    DailyWeather forecast,
     List<WeatherDeviation?> deviations,
   ) {
     return forecast.dailyForecasts
@@ -57,14 +57,14 @@ class ChartDataProvider {
   }
 
   /// Get hourly temperature spots for hourly chart
-  static List<FlSpot> getHourlyTempSpots(DailyWeather dailyWeather) {
+  static List<FlSpot> getHourlyTempSpots(HourlyWeather dailyWeather) {
     return dailyWeather.hourlyForecasts.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), entry.value.temperature ?? 0);
     }).toList();
   }
 
   /// Get apparent temperature spots for hourly chart
-  static List<FlSpot> getApparentTempSpots(DailyWeather dailyWeather) {
+  static List<FlSpot> getApparentTempSpots(HourlyWeather dailyWeather) {
     return dailyWeather.hourlyForecasts.asMap().entries.map((entry) {
       return FlSpot(entry.key.toDouble(), entry.value.apparentTemperature ?? 0);
     }).toList();

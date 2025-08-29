@@ -144,8 +144,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedClimateLocation = '04336_Saarbrücken-Ensheim_1961_1990';
   String _selectedWeatherLocation = 'rosbruck_fr';
   String _selectedModel = 'best_match';
-  WeatherForecast? _forecast;
-  DailyWeather? _hourlyForecast;
+  DailyWeather? _forecast;
+  HourlyWeather? _hourlyForecast;
   List<ClimateNormal> _climateNormals = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_displayMode == 'hourly') {
         final results = await Future.wait([
           _climateService.loadClimateNormals(climateInfo.assetPath),
-          _weatherService.getDailyWeatherForecast(
+          _weatherService.getHourlyWeatherForecast(
             latitude: weatherInfo.lat,
             longitude: weatherInfo.lon,
             locationName: weatherInfo.displayName,
@@ -277,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         setState(() {
           _climateNormals = results[0] as List<ClimateNormal>;
-          _hourlyForecast = results[1] as DailyWeather;
+          _hourlyForecast = results[1] as HourlyWeather;
           _forecast = null;
           _isLoading = false;
         });
@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         setState(() {
           _climateNormals = results[0] as List<ClimateNormal>;
-          _forecast = results[1] as WeatherForecast;
+          _forecast = results[1] as DailyWeather;
           _hourlyForecast = null;
           _isLoading = false;
         });

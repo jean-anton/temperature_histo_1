@@ -17,7 +17,7 @@ class WeatherTooltip {
     BuildContext context,
     int touchedIndex,
     Offset position,
-    WeatherForecast forecast,
+    DailyWeather forecast,
     List<WeatherDeviation?> deviations,
   ) {
     if (touchedIndex < 0 || touchedIndex >= forecast.dailyForecasts.length) {
@@ -42,7 +42,7 @@ class WeatherTooltip {
     BuildContext context,
     int touchedIndex,
     Offset position,
-    DailyWeather dailyWeather,
+    HourlyWeather dailyWeather,
   ) {
     if (touchedIndex < 0 || touchedIndex >= dailyWeather.hourlyForecasts.length) {
       return;

@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../services/weather_service.dart';
 
-class WeatherForecast {
+class DailyWeather {
   final String locationName;
   final String model;
   final List<DailyForecast> dailyForecasts;
@@ -11,7 +11,7 @@ class WeatherForecast {
   final double longitude;
   final String timezone;
 
-  WeatherForecast({
+  DailyWeather({
     required this.locationName,
     required this.model,
     required this.dailyForecasts,
@@ -25,7 +25,7 @@ class WeatherForecast {
   /// This factory is robust against `null` or missing values in the API response.
   /// It initializes `locationName` and `model` with empty strings, as they are not
   /// present in the JSON. Use the `copyWith` method to add them later.
-  factory WeatherForecast.fromJson(Map<String, dynamic> json) {
+  factory DailyWeather.fromJson(Map<String, dynamic> json) {
     final dailyData = json['daily'] as Map<String, dynamic>? ?? {};
 
     // Extract all data lists from the API response.
@@ -44,7 +44,7 @@ class WeatherForecast {
 
     // If essential time data is missing, we cannot proceed.
     if (timeList == null) {
-      return WeatherForecast(
+      return DailyWeather(
         locationName: '',
         model: '',
         dailyForecasts: [],
@@ -80,7 +80,7 @@ class WeatherForecast {
       ));
     }
 
-    return WeatherForecast(
+    return DailyWeather(
       locationName: '', // To be set via copyWith
       model: '', // To be set via copyWith
       latitude: (json['latitude'] as num).toDouble(),
@@ -91,11 +91,11 @@ class WeatherForecast {
   }
 
   /// Creates a copy of this WeatherForecast but with the given fields replaced with the new values.
-  WeatherForecast copyWith({
+  DailyWeather copyWith({
     String? locationName,
     String? model,
   }) {
-    return WeatherForecast(
+    return DailyWeather(
       locationName: locationName ?? this.locationName,
       model: model ?? this.model,
       dailyForecasts: dailyForecasts,
@@ -168,14 +168,14 @@ class DailyForecast {
 
 
 // Add to weather_forecast_model.dart
-class DailyWeather {
+class HourlyWeather {
   final String locationName;
   final double latitude;
   final double longitude;
   final String timezone;
   final List<HourlyForecast> hourlyForecasts;
 
-  DailyWeather({
+  HourlyWeather({
     required this.locationName,
     required this.latitude,
     required this.longitude,
@@ -183,43 +183,49 @@ class DailyWeather {
     required this.hourlyForecasts,
   });
 
-  factory DailyWeather.fromJson(Map<String, dynamic> json) {
+  factory HourlyWeather.fromJson(Map<String, dynamic> json) {
     final hourlyData = json['hourly'] as Map<String, dynamic>? ?? {};
 
     final timeList = hourlyData['time'] as List?;
     final temperatureList = hourlyData['temperature_2m'] as List?;
     final weatherCodeList = hourlyData['weather_code'] as List?;
     final apparentTemperatureList = hourlyData['apparent_temperature'] as List?;
-    final precipitationProbabilityList = 
+    final precipitationProbabilityList =
         hourlyData['precipitation_probability'] as List?;
     final precipitationList = hourlyData['precipitation'] as List?;
     final rainList = hourlyData['rain'] as List?;
     final cloudCoverList = hourlyData['cloud_cover'] as List?;
     final windSpeedList = hourlyData['wind_speed_10m'] as List?;
     final windGustsList = hourlyData['windgusts_10m'] as List?;
+    final isDayList = hourlyData['is_day'] as List?;
+    final sunshineDurationList = hourlyData['sunshine_duration'] as List?;
+    final windDirectionList = hourlyData['wind_direction_10m'] as List?;
 
     final forecasts = <HourlyForecast>[];
-    
+
     if (timeList != null) {
       for (int i = 0; i < timeList.length; i++) {
         forecasts.add(HourlyForecast(
           time: DateTime.parse(timeList[i] as String),
           temperature: (temperatureList?[i] as num?)?.toDouble(),
           weatherCode: (weatherCodeList?[i] as num?)?.toInt(),
-          apparentTemperature: 
+          apparentTemperature:
               (apparentTemperatureList?[i] as num?)?.toDouble(),
-          precipitationProbability: 
+          precipitationProbability:
               (precipitationProbabilityList?[i] as num?)?.toInt(),
           precipitation: (precipitationList?[i] as num?)?.toDouble(),
           rain: (rainList?[i] as num?)?.toDouble(),
           cloudCover: (cloudCoverList?[i] as num?)?.toInt(),
           windSpeed: (windSpeedList?[i] as num?)?.toDouble(),
           windGusts: (windGustsList?[i] as num?)?.toDouble(),
+          isDay: (isDayList?[i] as num?)?.toInt(),
+          sunshineDuration: (sunshineDurationList?[i] as num?)?.toDouble(),
+          windDirection10m: (windDirectionList?[i] as num?)?.toInt(),
         ));
       }
     }
 
-    return DailyWeather(
+    return HourlyWeather(
       locationName: '',
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
@@ -228,8 +234,8 @@ class DailyWeather {
     );
   }
 
-  DailyWeather copyWith({String? locationName}) {
-    return DailyWeather(
+  HourlyWeather copyWith({String? locationName}) {
+    return HourlyWeather(
       locationName: locationName ?? this.locationName,
       latitude: latitude,
       longitude: longitude,
@@ -263,6 +269,9 @@ class HourlyForecast {
   final int? cloudCover;
   final double? windSpeed;
   final double? windGusts;
+  final int? isDay;
+  final double? sunshineDuration;
+  final int? windDirection10m;
 
   HourlyForecast({
     required this.time,
@@ -275,13 +284,16 @@ class HourlyForecast {
     this.cloudCover,
     this.windSpeed,
     this.windGusts,
+    this.isDay,
+    this.sunshineDuration,
+    this.windDirection10m,
   });
 
   String get formattedTime => DateFormat('HH:mm').format(time);
 
   @override
   String toString() {
-    return 'HourlyForecast(time: $formattedTime, temp: $temperature°C, feels: $apparentTemperature°C, rainProb: $precipitationProbability%, rain: $rain mm, clouds: $cloudCover%, wind: $windSpeed km/h, gusts: $windGusts km/h)';
+    return 'HourlyForecast(time: $formattedTime, temp: $temperature°C, feels: $apparentTemperature°C, rainProb: $precipitationProbability%, rain: $rain mm, clouds: $cloudCover%, wind: $windSpeed km/h, gusts: $windGusts km/h, isDay: $isDay, sunshine: $sunshineDuration s, windDir: $windDirection10m°)';
   }
 }
 
@@ -297,7 +309,7 @@ void testDailyWeather() async {
   print("--- Testing getDailyWeatherForecast for '$locationName' ---");
 
   try {
-    final dailyWeather = await weatherService.getDailyWeatherForecast(
+    final dailyWeather = await weatherService.getHourlyWeatherForecast(
       latitude: lat,
       longitude: lon,
       locationName: locationName,
@@ -349,7 +361,7 @@ void main2() async {
 
   try {
     // 1. Fetch the forecast using the service.
-    final WeatherForecast forecast = await weatherService.getWeatherForecast(
+    final DailyWeather forecast = await weatherService.getWeatherForecast(
       latitude: lat,
       longitude: lon,
       model: selectedModel,

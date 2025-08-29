@@ -15,7 +15,7 @@ class WeatherService {
       'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max';
 
   /// Fetches a weather forecast for a single model from the Open-Meteo API.
-  Future<WeatherForecast> getWeatherForecast({
+  Future<DailyWeather> getWeatherForecast({
     required double latitude,
     required double longitude,
     required String model,
@@ -37,7 +37,7 @@ class WeatherService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        final forecast = WeatherForecast.fromJson(
+        final forecast = DailyWeather.fromJson(
           jsonData,
         ).copyWith(locationName: locationName, model: model);
         return forecast;
@@ -54,7 +54,7 @@ class WeatherService {
   }
 
   // Add to weather_service.dart
-  Future<DailyWeather> getDailyWeatherForecast({
+  Future<HourlyWeather> getHourlyWeatherForecast({
     required double latitude,
     required double longitude,
     required String model,
@@ -63,7 +63,8 @@ class WeatherService {
     const hourlyParameters =
         'temperature_2m,weather_code,apparent_temperature,'
         'precipitation_probability,precipitation,rain,'
-        'cloud_cover,wind_speed_10m,windgusts_10m';
+        'cloud_cover,wind_speed_10m,windgusts_10m,'
+        'is_day,sunshine_duration,wind_direction_10m';
 
     print("### CJG 192: hourlyParameters: $hourlyParameters");
     print("### CJG 192: latitude: $latitude longitude: $longitude");
@@ -87,7 +88,7 @@ class WeatherService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        return DailyWeather.fromJson(
+        return HourlyWeather.fromJson(
           jsonData,
         ).copyWith(locationName: locationName);
       } else {

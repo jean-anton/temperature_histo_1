@@ -11,8 +11,8 @@ import 'builders/daily_chart_builder.dart';
 import 'builders/hourly_chart_builder.dart';
 
 class WeatherChart2 extends StatefulWidget {
-  final WeatherForecast? forecast;
-  final DailyWeather? dailyWeather;
+  final DailyWeather? forecast;
+  final HourlyWeather? dailyWeather;
   final List<ClimateNormal> climateNormals;
   final String displayMode; // 'daily' or 'hourly'
 

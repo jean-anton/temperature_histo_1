@@ -12,7 +12,7 @@ import '../utils/chart_data_provider.dart';
 class DailyChartBuilder {
   /// Build the daily chart widget
   static Widget build({
-    required WeatherForecast forecast,
+    required DailyWeather forecast,
     required List<WeatherDeviation?> deviations,
     required double minTemp,
     required double maxTemp,
@@ -179,7 +179,7 @@ class DailyChartBuilder {
 
   /// Build weather icons and max temperature labels
   static List<Widget> _buildWeatherIcons(
-    WeatherForecast forecast,
+    DailyWeather forecast,
     List<WeatherDeviation?> deviations,
     double minTemp,
     double maxTemp,
@@ -255,7 +255,7 @@ class DailyChartBuilder {
 
   /// Build minimum temperature labels
   static List<Widget> _buildMinTempLabels(
-    WeatherForecast forecast,
+    DailyWeather forecast,
     List<WeatherDeviation?> deviations,
     double minTemp,
     double maxTemp,

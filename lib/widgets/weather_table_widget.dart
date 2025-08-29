@@ -4,7 +4,7 @@ import '../models/climate_normal_model.dart';
 import '../services/climate_data_service.dart';
 
 class WeatherTable extends StatelessWidget {
-  final WeatherForecast forecast;
+  final DailyWeather forecast;
   final List<ClimateNormal> climateNormals;
 
   const WeatherTable({
