@@ -3,61 +3,19 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 import '../main.dart';
 import '../api_keys.dart';
 import '../models/climate_normal_model.dart';
 import '../models/weather_forecast_model.dart';
+import '../models/location_models.dart';
 import '../services/climate_data_service.dart';
 import '../services/weather_service.dart';
+import '../services/location_service.dart';
 import '../widgets/error_display_widget.dart';
 import '../widgets/loading_indicator_widget.dart';
 import '../widgets/weather_chart_widget.dart';
 import '../widgets/weather_table_widget.dart';
-
-class ClimateLocationInfo {
-  final String displayName;
-  final String assetPath;
-  final double lat;
-  final double lon;
-  final int startYear;
-  final int endYear;
-
-  const ClimateLocationInfo({
-    required this.displayName,
-    required this.assetPath,
-    required this.lat,
-    required this.lon,
-    required this.startYear,
-    required this.endYear,
-  });
-}
-
-class WeatherLocationInfo {
-  final String displayName;
-  final double lat;
-  final double lon;
-
-  const WeatherLocationInfo({
-    required this.displayName,
-    required this.lat,
-    required this.lon,
-  });
-}
-
-class LocationSuggestion {
-  final String name;
-  final double lat;
-  final double lon;
-
-  LocationSuggestion({
-    required this.name,
-    required this.lat,
-    required this.lon,
-  });
-}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -69,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final WeatherService _weatherService = WeatherService();
   final ClimateDataService _climateService = ClimateDataService();
+  final LocationService _locationService = LocationService();
 
   static const String _kSelectedClimateLocationKey = 'selectedClimateLocation';
   static const String _kSelectedWeatherLocationKey = 'selectedWeatherLocation';
@@ -159,53 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _initializeApp() async {
     // First load locations, then preferences and data
-    await _loadLocationsFromPreferences();
-    await _loadPreferencesAndData();
-  }
-
-  Future<void> _loadLocationsFromPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Start with hard-coded locations
-    final weatherLocations = <String, WeatherLocationInfo>{
-      'rosbruck_fr': const WeatherLocationInfo(
-        displayName: 'Rosbruck',
-        lat: 49.15,
-        lon: 6.85,
-      ),
-      'lachambre_fr': const WeatherLocationInfo(
-        displayName: 'Lachambre',
-        lat: 49.13,
-        lon: 6.78,
-      ),
-      'bad_duerkheim_de': const WeatherLocationInfo(
-        displayName: 'Bad Dürkheim',
-        lat: 49.4719,
-        lon: 8.1929,
-      ),
-    };
-
-    // Load custom cities from shared_preferences
-    final customCitiesJson = prefs.getStringList('custom_weather_cities') ?? [];
-    for (final cityJson in customCitiesJson) {
-      try {
-        final cityData = jsonDecode(cityJson);
-        final key = cityData['key'] as String;
-        weatherLocations[key] = WeatherLocationInfo(
-          displayName: cityData['displayName'] as String,
-          lat: cityData['lat'] as double,
-          lon: cityData['lon'] as double,
-        );
-      } catch (e) {
-        // Skip invalid entries
-        continue;
-      }
-    }
-
+    final weatherLocations = await _locationService.loadWeatherLocations();
     setState(() {
       _weatherLocationData = weatherLocations;
     });
+    await _loadPreferencesAndData();
   }
+
+
 
   Future<void> _loadPreferencesAndData() async {
     await _loadPreferences();
@@ -371,61 +291,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<List<LocationSuggestion>> fetchSuggestions(String query) async {
-    const String apiKey = geoapifyApiKey;
-    const double lat = 48.821; // Bischwiller latitude
-    const double lon = 7.951;  // Bischwiller longitude
 
-    final url = Uri.parse(
-      'https://api.geoapify.com/v1/geocode/autocomplete'
-      '?text=$query'
-      '&bias=proximity:$lon,$lat'
-      '&limit=5'
-      '&apiKey=$apiKey',
-    );
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final features = data['features'] as List;
-      return features.map((item) {
-        final props = item['properties'];
-        return LocationSuggestion(
-          name: props['formatted'],
-          lat: props['lat'],
-          lon: props['lon'],
-        );
-      }).toList();
-    } else {
-      throw Exception('Failed to fetch suggestions: ${response.statusCode}');
-    }
-  }
 
   Future<void> _addCity(LocationSuggestion suggestion) async {
-    final prefs = await SharedPreferences.getInstance();
-    final customCitiesJson = prefs.getStringList('custom_weather_cities') ?? [];
-
-    // Generate a unique key for the city
-    final key = 'custom_${DateTime.now().millisecondsSinceEpoch}';
-
-    final cityData = {
-      'key': key,
-      'displayName': suggestion.name,
-      'lat': suggestion.lat,
-      'lon': suggestion.lon,
-    };
-
-    customCitiesJson.add(jsonEncode(cityData));
-    await prefs.setStringList('custom_weather_cities', customCitiesJson);
+    await _locationService.addCity(suggestion);
 
     // Reload locations
-    await _loadLocationsFromPreferences();
+    final weatherLocations = await _locationService.loadWeatherLocations();
+    setState(() {
+      _weatherLocationData = weatherLocations;
+    });
 
     // If this is the first custom city, select it
     if (_weatherLocationData.length == 4) { // 3 hard-coded + 1 new
+      final newKey = _weatherLocationData.keys.last;
       setState(() {
-        _selectedWeatherLocation = key;
+        _selectedWeatherLocation = newKey;
       });
       _savePreferences();
       _loadData();
@@ -433,22 +314,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _deleteCity(String cityKey) async {
-    final prefs = await SharedPreferences.getInstance();
-    final customCitiesJson = prefs.getStringList('custom_weather_cities') ?? [];
-
-    customCitiesJson.removeWhere((cityJson) {
-      try {
-        final cityData = jsonDecode(cityJson);
-        return cityData['key'] == cityKey;
-      } catch (e) {
-        return false;
-      }
-    });
-
-    await prefs.setStringList('custom_weather_cities', customCitiesJson);
+    await _locationService.deleteCity(cityKey);
 
     // Reload locations
-    await _loadLocationsFromPreferences();
+    final weatherLocations = await _locationService.loadWeatherLocations();
+    setState(() {
+      _weatherLocationData = weatherLocations;
+    });
 
     // If the deleted city was selected, switch to the first available city
     if (_selectedWeatherLocation == cityKey && _weatherLocationData.isNotEmpty) {
@@ -462,8 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool _isCustomCity(String cityKey) {
-    // Hard-coded cities are not custom
-    return !['rosbruck_fr', 'lachambre_fr', 'bad_duerkheim_de'].contains(cityKey);
+    return _locationService.isCustomCity(cityKey);
   }
 
   @override
@@ -676,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
           suggestionsCallback: (pattern) async {
             if (pattern.isEmpty) return [];
             try {
-              return await fetchSuggestions(pattern);
+              return await _locationService.fetchSuggestions(pattern);
             } catch (e) {
               return [];
             }
