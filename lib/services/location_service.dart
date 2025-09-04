@@ -3,8 +3,12 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/location_models.dart';
 import '../api_keys.dart';
+import 'geolocation_service.dart';
 
 class LocationService {
+  final GeolocationService _geolocationService;
+
+  LocationService(this._geolocationService);
   static const String _kCustomCitiesKey = 'custom_weather_cities';
 
   // Hard-coded climate locations
@@ -64,21 +68,25 @@ class LocationService {
   };
 
   // Hard-coded weather locations
+  // ROSBRUCK 49.159634, 6.850805
   static const Map<String, WeatherLocationInfo> _hardcodedWeatherLocations = {
     'rosbruck_fr': WeatherLocationInfo(
       displayName: 'Rosbruck',
-      lat: 49.15,
-      lon: 6.85,
+      lat: 49.159634,
+      lon: 6.850805,
+      country: 'France',
     ),
     'lachambre_fr': WeatherLocationInfo(
       displayName: 'Lachambre',
       lat: 49.13,
       lon: 6.78,
+      country: 'France',
     ),
     'bad_duerkheim_de': WeatherLocationInfo(
       displayName: 'Bad Dürkheim',
       lat: 49.4719,
       lon: 8.1929,
+      country: 'Germany',
     ),
   };
 
@@ -98,6 +106,9 @@ class LocationService {
           displayName: cityData['displayName'] as String,
           lat: cityData['lat'] as double,
           lon: cityData['lon'] as double,
+          country: cityData['country'] as String?,
+          state: cityData['state'] as String?,
+          county: cityData['county'] as String?,
         );
       } catch (e) {
         // Skip invalid entries
@@ -109,34 +120,10 @@ class LocationService {
   }
 
   Future<List<LocationSuggestion>> fetchSuggestions(String query) async {
-    const String apiKey = geoapifyApiKey;
     const double lat = 48.821; // Bischwiller latitude
     const double lon = 7.951;  // Bischwiller longitude
 
-    final url = Uri.parse(
-      'https://api.geoapify.com/v1/geocode/autocomplete'
-      '?text=$query'
-      '&bias=proximity:$lon,$lat'
-      '&limit=5'
-      '&apiKey=$apiKey',
-    );
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final features = data['features'] as List;
-      return features.map((item) {
-        final props = item['properties'];
-        return LocationSuggestion(
-          name: props['formatted'],
-          lat: props['lat'],
-          lon: props['lon'],
-        );
-      }).toList();
-    } else {
-      throw Exception('Failed to fetch suggestions: ${response.statusCode}');
-    }
+    return await _geolocationService.fetchSuggestions(query, lat: lat, lon: lon);
   }
 
   Future<void> addCity(LocationSuggestion suggestion) async {
@@ -151,6 +138,9 @@ class LocationService {
       'displayName': suggestion.name,
       'lat': suggestion.lat,
       'lon': suggestion.lon,
+      'country': suggestion.country,
+      'state': suggestion.state,
+      'county': suggestion.county,
     };
 
     customCitiesJson.add(jsonEncode(cityData));

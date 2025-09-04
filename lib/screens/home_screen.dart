@@ -12,6 +12,7 @@ import '../models/location_models.dart';
 import '../services/climate_data_service.dart';
 import '../services/weather_service.dart';
 import '../services/location_service.dart';
+import '../services/geolocation_service.dart';
 import '../widgets/error_display_widget.dart';
 import '../widgets/loading_indicator_widget.dart';
 import '../widgets/weather_chart_widget.dart';
@@ -27,7 +28,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final WeatherService _weatherService = WeatherService();
   final ClimateDataService _climateService = ClimateDataService();
-  final LocationService _locationService = LocationService();
+  //late final GeolocationService _geolocationService = GeoapifyGeolocationService(geoapifyApiKey);
+  late final GeolocationService _geolocationService = PhotonGeolocationService();
+  late final LocationService _locationService = LocationService(_geolocationService);
 
   static const String _kSelectedClimateLocationKey = 'selectedClimateLocation';
   static const String _kSelectedWeatherLocationKey = 'selectedWeatherLocation';
@@ -433,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
               items: _weatherLocationData.entries.map((entry) {
                 return DropdownMenuItem<String>(
                   value: entry.key,
-                  child: Text(entry.value.displayName),
+                  child: Text(entry.value.formattedLocation),
                 );
               }).toList(),
               onChanged: _onWeatherLocationChanged,
@@ -555,8 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (context, suggestion) {
             return ListTile(
               title: Text(suggestion.name),
-              subtitle: Text(
-                  'Lat: ${suggestion.lat.toStringAsFixed(4)}, Lon: ${suggestion.lon.toStringAsFixed(4)}'),
+              subtitle: Text(suggestion.formattedLocation),
             );
           },
           onSuggestionSelected: (suggestion) {
@@ -576,7 +578,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final isCustom = _isCustomCity(cityKey);
 
               return ListTile(
-                title: Text(cityInfo.displayName),
+                title: Text(cityInfo.formattedLocation),
                 subtitle: Text(
                   'Lat: ${cityInfo.lat.toStringAsFixed(4)}, Lon: ${cityInfo.lon.toStringAsFixed(4)}',
                 ),
@@ -623,7 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  weatherInfo.displayName,
+                  weatherInfo.formattedLocation,
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
