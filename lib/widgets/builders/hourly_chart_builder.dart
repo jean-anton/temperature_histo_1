@@ -397,8 +397,8 @@ class HourlyChartBuilder {
                 angle: (135 + windDirectionDegrees) * (3.14159 / 180), // Convert degrees to radians
                 child: SvgPicture.asset(
                   windIconPath,
-                  width: 50 * hourly.windGusts! / 20, // Scale size by wind speed (max 20 m/s)
-                  height: 50 * hourly.windGusts! / 20,
+                  width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
+                  height: 50 * (hourly.windGusts ?? 0.0) / 20,
                   colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
                 ),
               ),
