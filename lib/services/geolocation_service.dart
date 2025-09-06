@@ -6,43 +6,45 @@ abstract class GeolocationService {
   Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon});
 }
 
-class GeoapifyGeolocationService implements GeolocationService {
-  final String apiKey;
+// class GeoapifyGeolocationService implements GeolocationService {
+//   final String apiKey;
 
-  GeoapifyGeolocationService(this.apiKey);
+//   GeoapifyGeolocationService(this.apiKey);
 
-  @override
-  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
-    final bias = lat != null && lon != null ? '&bias=proximity:$lon,$lat' : '';
-    final url = Uri.parse(
-      'https://api.geoapify.com/v1/geocode/autocomplete'
-      '?text=$query'
-      '$bias'
-      '&limit=5'
-      '&apiKey=$apiKey',
-    );
+//   @override
+//   Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
+//     final bias = lat != null && lon != null ? '&bias=proximity:$lon,$lat' : '';
+//     final url = Uri.parse(
+//       'https://api.geoapify.com/v1/geocode/autocomplete'
+//       '?text=$query'
+//       '$bias'
+//       '&limit=5'
+//       '&apiKey=$apiKey',
+//     );
 
-    final response = await http.get(url);
+//     final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final features = data['features'] as List;
-      return features.map((item) {
-        final props = item['properties'];
-        return LocationSuggestion(
-          name: props['formatted'],
-          lat: props['lat'],
-          lon: props['lon'],
-          country: props['country'],
-          state: props['state'],
-          county: props['county'] ?? props['region'],
-        );
-      }).toList();
-    } else {
-      throw Exception('Failed to fetch suggestions: ${response.statusCode}');
-    }
-  }
-}
+//     if (response.statusCode == 200) {
+//       final data = jsonDecode(response.body);
+//       final features = data['features'] as List;
+//       return features.map((item) {
+//         final props = item['properties'];
+//         return LocationSuggestion(
+//           name: props['formatted'],
+//           lat: props['lat'],
+//           lon: props['lon'],
+//           country: props['country'],
+//           state: props['state'],
+//           county: props['county'] ?? props['region'],
+//         );
+//       }).toList();
+//     } else {
+//       throw Exception('Failed to fetch suggestions: ${response.statusCode}');
+//     }
+//   }
+// }
+
+
 
 class PhotonGeolocationService implements GeolocationService {
   @override
@@ -76,17 +78,41 @@ class PhotonGeolocationService implements GeolocationService {
 }
 
 enum GeolocationProvider {
-  geoapify,
+  //geoapify,
   photon,
 }
 
 class GeolocationServiceFactory {
   static GeolocationService create(GeolocationProvider provider, String apiKey) {
     switch (provider) {
-      case GeolocationProvider.geoapify:
-        return GeoapifyGeolocationService(apiKey);
+      // case GeolocationProvider.geoapify:
+      //   return PhotonGeolocationService();
+       // return GeoapifyGeolocationService(apiKey);
       case GeolocationProvider.photon:
         return PhotonGeolocationService();
     }
+  }
+}
+
+class FallbackGeolocationService implements GeolocationService {
+  final List<GeolocationService> _services;
+
+  FallbackGeolocationService(this._services);
+
+  @override
+  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
+    for (final service in _services) {
+      try {
+        final suggestions = await service.fetchSuggestions(query, lat: lat, lon: lon);
+        if (suggestions.isNotEmpty) {
+          return suggestions;
+        }
+      } catch (e) {
+        // Continue to next service if this one fails
+        continue;
+      }
+    }
+    // If all services fail, return empty list
+    return [];
   }
 }

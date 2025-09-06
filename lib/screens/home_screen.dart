@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
+
 
 import '../main.dart';
 import '../api_keys.dart';
@@ -17,6 +17,7 @@ import '../widgets/error_display_widget.dart';
 import '../widgets/loading_indicator_widget.dart';
 import '../widgets/weather_chart_widget.dart';
 import '../widgets/weather_table_widget.dart';
+import '../widgets/city_management_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,7 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final WeatherService _weatherService = WeatherService();
   final ClimateDataService _climateService = ClimateDataService();
   //late final GeolocationService _geolocationService = GeoapifyGeolocationService(geoapifyApiKey);
-  late final GeolocationService _geolocationService = PhotonGeolocationService();
+  late final GeolocationService _geolocationService = FallbackGeolocationService([
+   // GeoapifyGeolocationService(geoapifyApiKey),
+    PhotonGeolocationService(),
+  ]);
   late final LocationService _locationService = LocationService(_geolocationService);
 
   static const String _kSelectedClimateLocationKey = 'selectedClimateLocation';
@@ -296,52 +300,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-  Future<void> _addCity(LocationSuggestion suggestion) async {
-    await _locationService.addCity(suggestion);
 
-    // Reload locations
-    final weatherLocations = await _locationService.loadWeatherLocations();
-    setState(() {
-      _weatherLocationData = weatherLocations;
-    });
-
-    // If this is the first custom city, select it
-    if (_weatherLocationData.length == 4) { // 3 hard-coded + 1 new
-      final newKey = _weatherLocationData.keys.last;
-      setState(() {
-        _selectedWeatherLocation = newKey;
-      });
-      _savePreferences();
-      _loadData();
-    }
-  }
-
-  Future<void> _deleteCity(String cityKey) async {
-    await _locationService.deleteCity(cityKey);
-
-    // Reload locations
-    final weatherLocations = await _locationService.loadWeatherLocations();
-    setState(() {
-      _weatherLocationData = weatherLocations;
-    });
-
-    // If the deleted city was selected, switch to the first available city
-    if (_selectedWeatherLocation == cityKey && _weatherLocationData.isNotEmpty) {
-      final firstKey = _weatherLocationData.keys.first;
-      setState(() {
-        _selectedWeatherLocation = firstKey;
-      });
-      _savePreferences();
-      _loadData();
-    }
-  }
-
-  bool _isCustomCity(String cityKey) {
-    return _locationService.isCustomCity(cityKey);
-  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -376,6 +339,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildControlPanel() {
     final selectedWeatherInfo = _weatherLocationData[_selectedWeatherLocation];
 
+    const isRunningWithWasm = bool.fromEnvironment('dart.tool.dart2wasm');
+    print('Running with Wasm: $isRunningWithWasm');
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -445,7 +410,29 @@ class _HomeScreenState extends State<HomeScreen> {
             const Text('Gestion des villes:',
                 style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 8),
-            _buildCityManagementSection(),
+            ElevatedButton.icon(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CityManagementDialog(
+                      weatherLocations: _weatherLocationData,
+                      locationService: _locationService,
+                      selectedWeatherLocation: _selectedWeatherLocation,
+                      onLocationChanged: _onWeatherLocationChanged,
+                      onLocationsUpdated: () async {
+                        final weatherLocations = await _locationService.loadWeatherLocations();
+                        setState(() {
+                          _weatherLocationData = weatherLocations;
+                        });
+                      },
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.location_city),
+              label: const Text('Gérer les villes'),
+            ),
             const SizedBox(height: 16),
             const Text('Station de référence (Données climatiques):',
                 style: TextStyle(fontWeight: FontWeight.w500)),
@@ -483,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             const SizedBox(height: 16),
-            Text("version: $VERSION, main: $mainFileName"),
+            Text("version: $VERSION, main: $mainFileName\n Running with Wasm: $isRunningWithWasm"),
           ],
         ),
       ),
@@ -533,71 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
   }
 
-  Widget _buildCityManagementSection() {
-    return Column(
-      children: [
-        // Add new city section
-        TypeAheadField<LocationSuggestion>(
-          textFieldConfiguration: TextFieldConfiguration(
-            decoration: const InputDecoration(
-              labelText: 'Ajouter une ville',
-              hintText: 'Tapez le nom d\'une ville...',
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              prefixIcon: Icon(Icons.search),
-            ),
-          ),
-          suggestionsCallback: (pattern) async {
-            if (pattern.isEmpty) return [];
-            try {
-              return await _locationService.fetchSuggestions(pattern);
-            } catch (e) {
-              return [];
-            }
-          },
-          itemBuilder: (context, suggestion) {
-            return ListTile(
-              title: Text(suggestion.name),
-              subtitle: Text(suggestion.formattedLocation),
-            );
-          },
-          onSuggestionSelected: (suggestion) {
-            _addCity(suggestion);
-          },
-        ),
-        const SizedBox(height: 8),
-        // List of cities with delete buttons
-        Container(
-          constraints: const BoxConstraints(maxHeight: 200),
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: _weatherLocationData.length,
-            itemBuilder: (context, index) {
-              final cityKey = _weatherLocationData.keys.elementAt(index);
-              final cityInfo = _weatherLocationData[cityKey]!;
-              final isCustom = _isCustomCity(cityKey);
 
-              return ListTile(
-                title: Text(cityInfo.formattedLocation),
-                subtitle: Text(
-                  'Lat: ${cityInfo.lat.toStringAsFixed(4)}, Lon: ${cityInfo.lon.toStringAsFixed(4)}',
-                ),
-                trailing: isCustom
-                    ? IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteCity(cityKey),
-                      )
-                    : null, // No delete button for hard-coded cities
-                tileColor: _selectedWeatherLocation == cityKey
-                    ? Theme.of(context).primaryColor.withOpacity(0.1)
-                    : null,
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildWeatherDisplay() {
     final weatherInfo = _weatherLocationData[_selectedWeatherLocation];

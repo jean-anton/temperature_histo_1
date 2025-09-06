@@ -17,6 +17,7 @@ class HourlyChartBuilder {
     required List<String> hourLabels,
     required Size containerSize,
   }) {
+    
     return Stack(
       children: [
         // Background rectangles for day/night hours
@@ -45,16 +46,13 @@ class HourlyChartBuilder {
                     show: true,
                     getDotPainter: (spot, percent, barData, index) =>
                         FlDotCirclePainter(
-                          radius: 4,
+                          radius: 5,
                           color: Colors.blue.shade900,
-                          strokeWidth: 2,
+                          strokeWidth: 3,
                           strokeColor: Colors.white,
                         ),
                   ),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    color: Colors.blue.shade50,
-                  ),
+                  belowBarData: BarAreaData(show: false),
                 ),
                 LineChartBarData(
                   spots: ChartDataProvider.getApparentTempSpots(dailyWeather),
@@ -62,14 +60,7 @@ class HourlyChartBuilder {
                   color: Colors.purple.shade400,
                   barWidth: 2,
                   dashArray: [5, 5],
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, barData, index) =>
-                        FlDotCirclePainter(
-                          radius: 3,
-                          color: Colors.purple.shade800,
-                        ),
-                  ),
+                  dotData: const FlDotData(show: false),
                 ),
               ],
               titlesData: FlTitlesData(
@@ -90,8 +81,8 @@ class HourlyChartBuilder {
                           child: Text(
                             hourLabels[index],
                             style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
                               color: Colors.black,
                             ),
                           ),
@@ -117,8 +108,8 @@ class HourlyChartBuilder {
                       return Text(
                         '${value.round()}°',
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
                           color: Colors.black87,
                         ),
                       );
@@ -154,12 +145,6 @@ class HourlyChartBuilder {
           ),
         ),
         ..._buildWeatherIcons(dailyWeather, minTemp, maxTemp, containerSize),
-        ..._buildTemperatureLabels(
-          dailyWeather,
-          minTemp,
-          maxTemp,
-          containerSize,
-        ),
         ..._buildApparentTempLabels(
           dailyWeather,
           minTemp,
@@ -253,6 +238,7 @@ class HourlyChartBuilder {
       minTemp,
       maxTemp,
       dailyWeather.hourlyForecasts.length - 1,
+      'hourly',
     );
 
     return Positioned(
@@ -293,57 +279,36 @@ class HourlyChartBuilder {
         minTemp,
         maxTemp,
         dailyWeather.hourlyForecasts.length - 1,
+        'hourly',
       );
-      print("### CJG 291: iconPath: $iconPath, isDay: ${hourly.isDay}");
+      //print("### CJG 291: iconPath: $iconPath, isDay: ${hourly.isDay}");
 
       return Positioned(
-        left: screenPos.dx - 15,
-        top: screenPos.dy - 45,
-        child: SvgPicture.asset(iconPath, width: 30, height: 30),
-      );
-    }).toList();
-  }
-
-  /// Build actual temperature labels
-  static List<Widget> _buildTemperatureLabels(
-    HourlyWeather dailyWeather,
-    double minTemp,
-    double maxTemp,
-    Size containerSize,
-  ) {
-    return dailyWeather.hourlyForecasts.asMap().entries.map((entry) {
-      final int index = entry.key;
-      final HourlyForecast hourly = entry.value;
-
-      if (hourly.temperature == null) return const SizedBox.shrink();
-
-      final screenPos = ChartHelpers.calculateScreenPosition(
-        index.toDouble(),
-        hourly.temperature!,
-        containerSize,
-        minTemp,
-        maxTemp,
-        dailyWeather.hourlyForecasts.length - 1,
-      );
-
-      return Positioned(
-        left: screenPos.dx - 15,
-        top: screenPos.dy - 25,
+        left: screenPos.dx - 22.5,
+        top: screenPos.dy - 65,
         child: SizedBox(
-          width: 30,
-          child: Text(
-            '${hourly.temperature!.round()}°',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
+          width: 45,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(iconPath, width: 45, height: 45),
+              const SizedBox(height: 4),
+              Text(
+                '${hourly.temperature!.round()}°',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
           ),
         ),
       );
     }).toList();
   }
+
+
 
   /// Build apparent temperature labels
   static List<Widget> _buildApparentTempLabels(
@@ -365,19 +330,20 @@ class HourlyChartBuilder {
         minTemp,
         maxTemp,
         dailyWeather.hourlyForecasts.length - 1,
+        'hourly',
       );
 
       return Positioned(
-        left: screenPos.dx - 15,
-        top: screenPos.dy + 5,
+        left: screenPos.dx - 25,
+        top: screenPos.dy + 15,
         child: SizedBox(
-          width: 30,
+          width: 50,
           child: Text(
             '${hourly.apparentTemperature!.round()}°',
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.normal,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
               color: Colors.purple,
             ),
           ),

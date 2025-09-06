@@ -249,18 +249,19 @@ class DailyChartBuilder {
         minTemp,
         maxTemp,
         forecast.dailyForecasts.length - 1,
+        'daily',
       );
 
       return Positioned(
         left: screenPos.dx - 22.5,
-        top: screenPos.dy - 65,
+        top: screenPos.dy - 85,
         child: SizedBox(
           width: 45,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(iconPath, width: 45, height: 45),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
                 '${daily.temperatureMax.round()}°',
                 style: const TextStyle(
@@ -271,10 +272,10 @@ class DailyChartBuilder {
               ),
               if (deviation != null)
                 Container(
-                  margin: const EdgeInsets.only(top: 2),
+                  margin: const EdgeInsets.only(top: 4),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 4,
-                    vertical: 1,
+                    vertical: 2,
                   ),
                   decoration: BoxDecoration(
                     color: deviation.maxDeviation > 0
@@ -322,6 +323,7 @@ class DailyChartBuilder {
         minTemp,
         maxTemp,
         forecast.dailyForecasts.length - 1,
+        'daily',
       );
 
       return Positioned(

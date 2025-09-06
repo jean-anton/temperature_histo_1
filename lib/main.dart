@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/home_screen.dart';
 
-const VERSION = "V2.5.0";
+const VERSION = "V2.10.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/temperature_histo_1";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
@@ -24,6 +24,9 @@ void main() async {
   // Initialize date formatting for the French locale so it's available
   // throughout the app.
   await initializeDateFormatting('fr_FR', null);
+  const isRunningWithWasm = bool.fromEnvironment('dart.tool.dart2wasm');
+  print('###### CJG Running with Wasm: $isRunningWithWasm');
+
   runApp(const ClimaDeviationApp());
 }
 

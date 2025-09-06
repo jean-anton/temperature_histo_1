@@ -148,8 +148,9 @@ class ChartHelpers {
     double minTemp,
     double maxTemp,
     int maxIndex,
+    String displayMode,
   ) {
-    final double gridLeft = ChartConstants.leftPadding + 
+    final double gridLeft = ChartConstants.leftPadding +
         ChartConstants.leftTitleReservedSize;
     final double gridTop = ChartConstants.topPadding;
 
@@ -164,8 +165,14 @@ class ChartHelpers {
 
     final double minX = 0;
     final double maxX = maxIndex.toDouble();
-    final double minY = (minTemp - 6).floorToDouble();
-    final double maxY = (maxTemp + 6).ceilToDouble();
+
+    // Use different Y-axis ranges based on display mode
+    final double minY = displayMode == 'daily'
+        ? (minTemp - 6).floorToDouble()
+        : (minTemp - 2).floorToDouble();
+    final double maxY = displayMode == 'daily'
+        ? (maxTemp + 6).ceilToDouble()
+        : (maxTemp + 2).ceilToDouble();
 
     final double normalizedX = (maxX > minX) ? (chartX - minX) / (maxX - minX) : 0.0;
     final double normalizedY = (maxY > minY) ? (chartY - minY) / (maxY - minY) : 0.0;
