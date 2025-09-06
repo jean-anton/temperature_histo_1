@@ -16,6 +16,7 @@ class HourlyChartBuilder {
     required double maxTemp,
     required List<String> hourLabels,
     required Size containerSize,
+    bool showWindInfo = true,
   }) {
     
     return Stack(
@@ -151,6 +152,7 @@ class HourlyChartBuilder {
           maxTemp,
           containerSize,
         ),
+        if (showWindInfo) ..._buildWindInfo(dailyWeather, minTemp, maxTemp, containerSize),
         _buildCurrentTimeLine(dailyWeather, minTemp, maxTemp, containerSize),
       ],
     );
@@ -346,6 +348,61 @@ class HourlyChartBuilder {
               fontWeight: FontWeight.w600,
               color: Colors.purple,
             ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  /// Build wind direction icons and speed/gusts labels for hourly chart
+  static List<Widget> _buildWindInfo(
+    HourlyWeather dailyWeather,
+    double minTemp,
+    double maxTemp,
+    Size containerSize,
+  ) {
+    return dailyWeather.hourlyForecasts.asMap().entries.map((entry) {
+      final int index = entry.key;
+      final HourlyForecast hourly = entry.value;
+
+      if (hourly.windSpeed == null) return const SizedBox.shrink();
+
+      final screenPos = ChartHelpers.calculateScreenPosition(
+        index.toDouble(),
+        hourly.temperature ?? 0,
+        containerSize,
+        minTemp,
+        maxTemp,
+        dailyWeather.hourlyForecasts.length - 1,
+        'hourly',
+      );
+
+      //final windIconPath = ChartHelpers.getWindDirectionIconPath(hourly.windDirection10m);
+      final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+      //final windIconPath = "assets/google_weather_icons/v3/arrow_centered_jg.svg";
+      final windDirectionDegrees = hourly.windDirection10m ?? 0;
+
+      return Positioned(
+        left: screenPos.dx - 30,
+        top: screenPos.dy + 45, // Position below temperature
+        child: SizedBox(
+          width: 60,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Wind direction icon with rotation
+              // Arrow SVG points east (90°) by default, so rotate relative to that
+              Transform.rotate(
+                //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+                angle: (135 + windDirectionDegrees) * (3.14159 / 180), // Convert degrees to radians
+                child: SvgPicture.asset(
+                  windIconPath,
+                  width: 50 * hourly.windGusts! / 20, // Scale size by wind speed (max 20 m/s)
+                  height: 50 * hourly.windGusts! / 20,
+                  colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                ),
+              ),
+            ],
           ),
         ),
       );

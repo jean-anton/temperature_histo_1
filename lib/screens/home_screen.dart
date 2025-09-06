@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String _kSelectedWeatherLocationKey = 'selectedWeatherLocation';
   static const String _kSelectedModelKey = 'selectedModel';
   static const String _kDisplayModeKey = 'displayMode';
+  static const String _kShowWindInfoKey = 'showWindInfo';
 
   final Map<String, ClimateLocationInfo> _climateLocationData = {
     '00460_Berus_1961_1990': const ClimateLocationInfo(
@@ -116,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   bool _showChart = true;
+  bool _showWindInfo = true;
 
   @override
   void initState() {
@@ -150,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           prefs.getString(_kSelectedWeatherLocationKey) ??
               _selectedWeatherLocation;
       _selectedModel = prefs.getString(_kSelectedModelKey) ?? _selectedModel;
+      _showWindInfo = prefs.getBool(_kShowWindInfoKey) ?? true;
 
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {
         _selectedClimateLocation = _climateLocationData.keys.first;
@@ -168,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setString(
         _kSelectedWeatherLocationKey, _selectedWeatherLocation);
     await prefs.setString(_kSelectedModelKey, _selectedModel);
+    await prefs.setBool(_kShowWindInfoKey, _showWindInfo);
   }
 
   Future<void> _loadData() async {
@@ -470,6 +474,29 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             const SizedBox(height: 16),
+            const Text('Informations vent:',
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            const SizedBox(height: 8),
+            SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment<bool>(
+                    value: true,
+                    label: Text('Afficher'),
+                    icon: Icon(Icons.air)),
+                ButtonSegment<bool>(
+                    value: false,
+                    label: Text('Masquer'),
+                    icon: Icon(Icons.air_outlined)),
+              ],
+              selected: {_showWindInfo},
+              onSelectionChanged: (Set<bool> selection) {
+                setState(() {
+                  _showWindInfo = selection.first;
+                  _savePreferences();
+                });
+              },
+            ),
+            const SizedBox(height: 16),
             Text("version: $VERSION, main: $mainFileName\n Running with Wasm: $isRunningWithWasm"),
           ],
         ),
@@ -576,6 +603,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 dailyWeather: _hourlyForecast,
                 climateNormals: _climateNormals,
                 displayMode: _displayMode,
+                showWindInfo: _showWindInfo,
               )
             else
               // TODO: Implement hourly table view

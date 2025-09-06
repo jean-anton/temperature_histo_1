@@ -12,7 +12,7 @@ class WeatherService {
   static const String _baseUrl = 'https://api.open-meteo.com/v1/forecast';
 
   static const String _dailyParameters =
-      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max';
+      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max,wind_direction_10m_dominant';
 
   /// Fetches a weather forecast for a single model from the Open-Meteo API.
   Future<DailyWeather> getWeatherForecast({

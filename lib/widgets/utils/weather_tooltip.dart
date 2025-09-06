@@ -290,6 +290,19 @@ class WeatherTooltip {
                                   : null
                             : null,
                       ),
+                      // Wind Direction
+                      buildDetailRow(
+                        'Direction vent',
+                        data is DailyForecast
+                            ? data.windDirection10mDominant != null
+                                  ? ChartHelpers.getWindDirectionAbbrev(data.windDirection10mDominant)
+                                  : null
+                            : data is HourlyForecast
+                            ? data.windDirection10m != null
+                                  ? ChartHelpers.getWindDirectionAbbrev(data.windDirection10m) + ' (${data.windDirection10m}°)'
+                                  : null
+                            : null,
+                      ),
                     ],
                   ),
                 ),

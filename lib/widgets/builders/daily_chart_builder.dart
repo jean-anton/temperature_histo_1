@@ -18,6 +18,7 @@ class DailyChartBuilder {
     required double maxTemp,
     required List<String> dateLabels,
     required Size containerSize,
+    bool showWindInfo = true,
   }) {
     return Stack(
       children: [
@@ -175,6 +176,7 @@ class DailyChartBuilder {
         ),
         ..._buildWeatherIcons(forecast, deviations, minTemp, maxTemp, containerSize),
         ..._buildMinTempLabels(forecast, deviations, minTemp, maxTemp, containerSize),
+        if (showWindInfo) ..._buildWindInfo(forecast, minTemp, maxTemp, containerSize),
       ],
     );
   }
@@ -353,6 +355,65 @@ class DailyChartBuilder {
                         : Colors.blue.shade600,
                   ),
                 ),
+            ],
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  /// Build wind direction icons and speed/gusts labels for daily chart
+  static List<Widget> _buildWindInfo(
+    DailyWeather forecast,
+    double minTemp,
+    double maxTemp,
+    Size containerSize,
+  ) {
+    return forecast.dailyForecasts.asMap().entries.map((entry) {
+      final int index = entry.key;
+      final DailyForecast daily = entry.value;
+
+      if (daily.windSpeedMax == null) return const SizedBox.shrink();
+
+      final screenPos = ChartHelpers.calculateScreenPosition(
+        index.toDouble(),
+        daily.temperatureMax,
+        containerSize,
+        minTemp,
+        maxTemp,
+        forecast.dailyForecasts.length - 1,
+        'daily',
+      );
+      final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+      //final windIconPath = "assets/google_weather_icons/v3/arrow_centered_jg.svg";
+      final windDirectionDegrees = daily.windDirection10mDominant ?? 0;
+      //print("### CJG daily.windGustsMax!: ${daily.windGustsMax!}");
+      print("### CJG windDirectionDegrees: $windDirectionDegrees");
+
+
+      return Positioned(
+        left: screenPos.dx - 100,
+        top: screenPos.dy + 5, // Position below temperature
+        child: SizedBox(
+          width: 200,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Wind direction icon with rotation
+              // Arrow SVG points east (90°) by default, so rotate relative to that
+              Transform.rotate(
+                //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+                angle: (135 + windDirectionDegrees) * (3.14159 / 180), // Convert degrees to radians
+                //angle: (0) * (3.14159 / 180), // Convert degrees to radians
+                child: SvgPicture.asset(
+                  windIconPath,
+                  // width: 50 * daily.windGustsMax! / 20, // Scale size by wind speed (max 20 m/s)
+                  // height: 50 * daily.windGustsMax! / 20,
+                  width: daily.windGustsMax! *2, // Scale size by wind speed (max 20 m/s)
+                  height: daily.windGustsMax! *2,
+                  colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
+                ),
+              ),
             ],
           ),
         ),

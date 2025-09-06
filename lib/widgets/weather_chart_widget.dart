@@ -15,6 +15,7 @@ class WeatherChart2 extends StatefulWidget {
   final HourlyWeather? dailyWeather;
   final List<ClimateNormal> climateNormals;
   final String displayMode; // 'daily' or 'hourly'
+  final bool showWindInfo;
 
   const WeatherChart2({
     super.key,
@@ -22,6 +23,7 @@ class WeatherChart2 extends StatefulWidget {
     this.dailyWeather,
     required this.climateNormals,
     required this.displayMode,
+    this.showWindInfo = true,
   });
 
   @override
@@ -269,6 +271,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         maxTemp: _maxTemp,
         dateLabels: _labels,
         containerSize: containerSize,
+        showWindInfo: widget.showWindInfo,
       );
     } else if (widget.displayMode == 'hourly' && widget.dailyWeather != null) {
       return HourlyChartBuilder.build(
@@ -277,6 +280,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         maxTemp: _maxTemp,
         hourLabels: _labels,
         containerSize: containerSize,
+        showWindInfo: widget.showWindInfo,
       );
     }
 

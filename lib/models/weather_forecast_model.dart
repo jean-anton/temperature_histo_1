@@ -41,6 +41,7 @@ class DailyWeather {
     final cloudCoverMeanList = dailyData['cloudcover_mean'] as List?;
     final windSpeedMaxList = dailyData['windspeed_10m_max'] as List?;
     final windGustsMaxList = dailyData['windgusts_10m_max'] as List?;
+    final windDirection10mDominantList = dailyData['wind_direction_10m_dominant'] as List?;
 
     // If essential time data is missing, we cannot proceed.
     if (timeList == null) {
@@ -77,6 +78,7 @@ class DailyWeather {
         cloudCoverMean: (cloudCoverMeanList?[i] as num?)?.toInt(),
         windSpeedMax: (windSpeedMaxList?[i] as num?)?.toDouble(),
         windGustsMax: (windGustsMaxList?[i] as num?)?.toDouble(),
+        windDirection10mDominant: (windDirection10mDominantList?[i] as num?)?.toInt(),
       ));
     }
 
@@ -132,6 +134,7 @@ class DailyForecast {
   final int? cloudCoverMean;
   final double? windSpeedMax;
   final double? windGustsMax;
+  final int? windDirection10mDominant;
 
   DailyForecast({
     required this.date,
@@ -146,6 +149,7 @@ class DailyForecast {
     this.cloudCoverMean,
     this.windSpeedMax,
     this.windGustsMax,
+    this.windDirection10mDominant,
   });
 
   // Convenience getters for use in UI
