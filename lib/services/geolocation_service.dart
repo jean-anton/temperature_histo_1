@@ -55,7 +55,7 @@ class PhotonGeolocationService implements GeolocationService {
     );
 
     final response = await http.get(url);
-
+    print("####### CJG PhotonGeolocationService: URL: $url, Status: ${response.statusCode}");
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final features = data['features'] as List;
@@ -77,11 +77,37 @@ class PhotonGeolocationService implements GeolocationService {
   }
 }
 
+class OpenMeteoGeolocationService implements GeolocationService {
+  @override
+  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
+    final url = Uri.parse(
+      'https://geocoding-api.open-meteo.com/v1/search?name=$query&count=10&language=en&format=json',
+    );
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final results = data['results'] as List? ?? [];
+      return results.map((item) {
+        return LocationSuggestion(
+          name: item['name'] ?? 'Unknown',
+          lat: item['latitude'] ?? 0.0,
+          lon: item['longitude'] ?? 0.0,
+          country: item['country'],
+          state: item['admin1'],
+          county: item['admin3'],
+        );
+      }).toList();
+    } else {
+      throw Exception('Failed to fetch suggestions: ${response.statusCode}');
+    }
+  }
+}
+
 enum GeolocationProvider {
   //geoapify,
   photon,
+  openMeteo,
 }
-
 class GeolocationServiceFactory {
   static GeolocationService create(GeolocationProvider provider, String apiKey) {
     switch (provider) {
@@ -90,6 +116,8 @@ class GeolocationServiceFactory {
        // return GeoapifyGeolocationService(apiKey);
       case GeolocationProvider.photon:
         return PhotonGeolocationService();
+      case GeolocationProvider.openMeteo:
+        return OpenMeteoGeolocationService();
     }
   }
 }

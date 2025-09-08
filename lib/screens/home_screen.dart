@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //late final GeolocationService _geolocationService = GeoapifyGeolocationService(geoapifyApiKey);
   late final GeolocationService _geolocationService = FallbackGeolocationService([
    // GeoapifyGeolocationService(geoapifyApiKey),
+    OpenMeteoGeolocationService(),
     PhotonGeolocationService(),
   ]);
   late final LocationService _locationService = LocationService(_geolocationService);

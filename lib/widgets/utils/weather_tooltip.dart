@@ -165,7 +165,8 @@ class WeatherTooltip {
                       ),
                       const SizedBox(height: 8),
                       // Weather Description
-                      if (data is DailyForecast)
+                      if (data is DailyForecast && data.weatherCode != null ||
+                          data is HourlyForecast && data.weatherCode != null)
                         Text(
                           data.weatherCode != null
                               ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
