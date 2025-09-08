@@ -390,6 +390,15 @@ class HourlyChartBuilder {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Text(
+              //   '${hourly.windSpeed!.round()} km/h',
+              //   textAlign: TextAlign.center,
+              //   style: const TextStyle(
+              //     fontSize: 12,
+              //     fontWeight: FontWeight.w600,
+              //     color: Colors.blue, // Blue color for wind speed    
+              //   )
+              // ),
               // Wind direction icon with rotation
               // Arrow SVG points east (90°) by default, so rotate relative to that
               Transform.rotate(

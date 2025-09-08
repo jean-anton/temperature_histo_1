@@ -18,6 +18,7 @@ import '../widgets/loading_indicator_widget.dart';
 import '../widgets/weather_chart_widget.dart';
 import '../widgets/weather_table_widget.dart';
 import '../widgets/city_management_dialog.dart';
+import '../widgets/utils/weather_tooltip.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -311,30 +312,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).primaryColor.withOpacity(0.1),
-              Colors.white,
-            ],
+      body: GestureDetector(
+        onTap: () {
+          // Dismiss tooltips when tapped anywhere in the UI
+          WeatherTooltip.removeTooltip();
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Theme.of(context).primaryColor.withOpacity(0.1),
+                Colors.white,
+              ],
+            ),
           ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(0.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (_isLoading)
-                const LoadingIndicator()
-              else if (_errorMessage != null)
-                ErrorDisplay(message: _errorMessage!)
-              else if (_forecast != null || _hourlyForecast != null)
-                  _buildWeatherDisplay(),
-              _buildControlPanel(),
-            ],
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(0.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_isLoading)
+                  const LoadingIndicator()
+                else if (_errorMessage != null)
+                  ErrorDisplay(message: _errorMessage!)
+                else if (_forecast != null || _hourlyForecast != null)
+                    _buildWeatherDisplay(),
+                _buildControlPanel(),
+              ],
+            ),
           ),
         ),
       ),

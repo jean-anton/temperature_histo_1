@@ -206,6 +206,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
         _touchedIndex = tappedIndex;
       });
       _showTooltip(tappedIndex, details.globalPosition);
+    } else {
+      // If tapped outside data points, dismiss any active tooltip
+      WeatherTooltip.removeTooltip();
     }
   }
 
