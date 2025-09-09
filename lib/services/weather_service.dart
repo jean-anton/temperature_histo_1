@@ -60,11 +60,21 @@ class WeatherService {
     required String model,
     required String locationName,
   }) async {
-    const hourlyParameters =
+    String hourlyParameters = '';
+    if(model == 'ecmwf_ifs025') {
+      hourlyParameters =
+        'temperature_2m,weather_code,apparent_temperature,'
+        'precipitation_probability,precipitation,rain,'
+        'cloud_cover,wind_speed_10m,wind_gusts_10m,'
+        'is_day,sunshine_duration,wind_direction_10m';
+    }else{
+      hourlyParameters =
         'temperature_2m,weather_code,apparent_temperature,'
         'precipitation_probability,precipitation,rain,'
         'cloud_cover,wind_speed_10m,windgusts_10m,'
         'is_day,sunshine_duration,wind_direction_10m';
+    }
+    
 
     print("### CJG 192: hourlyParameters: $hourlyParameters");
     print("### CJG 192: latitude: $latitude longitude: $longitude");

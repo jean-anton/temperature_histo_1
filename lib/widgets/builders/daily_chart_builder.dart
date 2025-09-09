@@ -373,7 +373,7 @@ class DailyChartBuilder {
       final int index = entry.key;
       final DailyForecast daily = entry.value;
 
-      if (daily.windSpeedMax == null) return const SizedBox.shrink();
+      if (daily.windSpeedMax == null || daily.windGustsMax == null) return const SizedBox.shrink();
 
       final screenPos = ChartHelpers.calculateScreenPosition(
         index.toDouble(),
@@ -387,7 +387,7 @@ class DailyChartBuilder {
       final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
       //final windIconPath = "assets/google_weather_icons/v3/arrow_centered_jg.svg";
       final windDirectionDegrees = daily.windDirection10mDominant ?? 0;
-      //print("### CJG daily.windGustsMax!: ${daily.windGustsMax!}");
+      //print("### CJG daily.windGustsMax: ${daily.windGustsMax}");
       print("### CJG windDirectionDegrees: $windDirectionDegrees");
 
 

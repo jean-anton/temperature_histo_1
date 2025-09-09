@@ -200,7 +200,8 @@ class HourlyWeather {
     final rainList = hourlyData['rain'] as List?;
     final cloudCoverList = hourlyData['cloud_cover'] as List?;
     final windSpeedList = hourlyData['wind_speed_10m'] as List?;
-    final windGustsList = hourlyData['windgusts_10m'] as List?;
+    //final windGustsList = hourlyData['windgusts_10m'] as List?;
+    final windGustsList = (hourlyData['windgusts_10m'] ?? hourlyData['wind_gusts_10m']) as List?;
     final isDayList = hourlyData['is_day'] as List?;
     final sunshineDurationList = hourlyData['sunshine_duration'] as List?;
     final windDirectionList = hourlyData['wind_direction_10m'] as List?;
