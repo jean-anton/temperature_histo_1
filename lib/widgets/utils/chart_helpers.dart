@@ -291,3 +291,15 @@ class ChartHelpers {
     }
   }
 }
+
+
+Color gustColor(double gustKmh) {
+  if (gustKmh <= 10) return Color(0xFFBBDEFB);
+  if (gustKmh <= 20) return Color(0xFF64B5F6);
+  if (gustKmh <= 30) return Color(0xFF4DB6AC);
+  if (gustKmh <= 40) return Color(0xFFDCE775);
+  if (gustKmh <= 50) return Color(0xFFFFB74D);
+  if (gustKmh <= 60) return Color(0xFFFF8A65);
+  if (gustKmh <= 70) return Color(0xFFF4511E);
+  return Color(0xFFE53935);
+}

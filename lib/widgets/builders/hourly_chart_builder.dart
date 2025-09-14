@@ -383,10 +383,10 @@ class HourlyChartBuilder {
       final windDirectionDegrees = hourly.windDirection10m ?? 0;
 
       return Positioned(
-        left: screenPos.dx - 30,
+        left: screenPos.dx - 100,
         top: screenPos.dy + 45, // Position below temperature
         child: SizedBox(
-          width: 60,
+          width: 200,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -406,9 +406,13 @@ class HourlyChartBuilder {
                 angle: (135 + windDirectionDegrees) * (3.14159 / 180), // Convert degrees to radians
                 child: SvgPicture.asset(
                   windIconPath,
-                  width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
-                  height: 50 * (hourly.windGusts ?? 0.0) / 20,
-                  colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                  // width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
+                  // height: 50 * (hourly.windGusts ?? 0.0) / 20,
+                  // colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                  width: (hourly.windGusts ?? 0.0) *2, // Scale size by wind speed (max 20 m/s)
+                  height:(hourly.windGusts ?? 0.0) *2,
+                  //colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
+                  colorFilter:  ColorFilter.mode(gustColor(hourly.windGusts ?? 0.0), BlendMode.srcIn),
                 ),
               ),
             ],

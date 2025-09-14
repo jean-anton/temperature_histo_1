@@ -373,7 +373,7 @@ class DailyChartBuilder {
       final int index = entry.key;
       final DailyForecast daily = entry.value;
 
-      if (daily.windSpeedMax == null) return const SizedBox.shrink();
+      if (daily.windSpeedMax == null || daily.windGustsMax == null) return const SizedBox.shrink();
 
       final screenPos = ChartHelpers.calculateScreenPosition(
         index.toDouble(),
@@ -387,7 +387,7 @@ class DailyChartBuilder {
       final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
       //final windIconPath = "assets/google_weather_icons/v3/arrow_centered_jg.svg";
       final windDirectionDegrees = daily.windDirection10mDominant ?? 0;
-      //print("### CJG daily.windGustsMax!: ${daily.windGustsMax!}");
+      //print("### CJG daily.windGustsMax: ${daily.windGustsMax}");
       print("### CJG windDirectionDegrees: $windDirectionDegrees");
 
 
@@ -409,9 +409,9 @@ class DailyChartBuilder {
                   windIconPath,
                   // width: 50 * daily.windGustsMax! / 20, // Scale size by wind speed (max 20 m/s)
                   // height: 50 * daily.windGustsMax! / 20,
-                  width: daily.windGustsMax! *2, // Scale size by wind speed (max 20 m/s)
-                  height: daily.windGustsMax! *2,
-                  colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
+                  width: (daily.windGustsMax ?? 0.0) *2, // Scale size by wind speed (max 20 m/s)
+                  height: (daily.windGustsMax ?? 0.0) *2,
+                  colorFilter:  ColorFilter.mode(gustColor(daily.windGustsMax ?? 0.0), BlendMode.srcIn),
                 ),
               ),
             ],
