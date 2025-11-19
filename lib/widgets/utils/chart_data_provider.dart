@@ -9,14 +9,14 @@ class ChartDataProvider {
   /// Get maximum temperature spots for daily chart
   static List<FlSpot> getMaxTempSpots(DailyWeather forecast) {
     return forecast.dailyForecasts.asMap().entries.map((entry) {
-      return FlSpot(entry.key.toDouble(), entry.value.temperatureMax);
+      return FlSpot(entry.value.date.millisecondsSinceEpoch.toDouble(), entry.value.temperatureMax);
     }).toList();
   }
 
   /// Get minimum temperature spots for daily chart
   static List<FlSpot> getMinTempSpots(DailyWeather forecast) {
     return forecast.dailyForecasts.asMap().entries.map((entry) {
-      return FlSpot(entry.key.toDouble(), entry.value.temperatureMin);
+      return FlSpot(entry.value.date.millisecondsSinceEpoch.toDouble(), entry.value.temperatureMin);
     }).toList();
   }
 
@@ -32,7 +32,7 @@ class ChartDataProvider {
           final normal = entry.key < deviations.length
               ? deviations[entry.key]?.normal
               : null;
-          return FlSpot(entry.key.toDouble(), normal?.temperatureMax ?? 0);
+          return FlSpot(entry.value.date.millisecondsSinceEpoch.toDouble(), normal?.temperatureMax ?? 0);
         })
         .where((spot) => spot.y != 0)
         .toList();
@@ -50,7 +50,7 @@ class ChartDataProvider {
           final normal = entry.key < deviations.length
               ? deviations[entry.key]?.normal
               : null;
-          return FlSpot(entry.key.toDouble(), normal?.temperatureMin ?? 0);
+          return FlSpot(entry.value.date.millisecondsSinceEpoch.toDouble(), normal?.temperatureMin ?? 0);
         })
         .where((spot) => spot.y != 0)
         .toList();
@@ -58,8 +58,11 @@ class ChartDataProvider {
 
   /// Get hourly temperature spots for hourly chart
   static List<FlSpot> getHourlyTempSpots(HourlyWeather dailyWeather) {
-    return dailyWeather.hourlyForecasts.asMap().entries.map((entry) {
-      return FlSpot(entry.key.toDouble(), entry.value.temperature ?? 0);
+    return dailyWeather.hourlyForecasts.map((hourly) {
+      return FlSpot(
+        hourly.time.millisecondsSinceEpoch.toDouble(),
+        hourly.temperature ?? 0,
+      );
     }).toList();
   }
 

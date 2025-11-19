@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:temperature_histo_1/widgets/utils/chart_data_provider.dart';
 import 'dart:math';
 
 import '../../data/weather_icon_data.dart';
@@ -9,6 +10,8 @@ import '../../models/weather_forecast_model.dart';
 import '../../models/weather_icon.dart';
 //import 'weather_deviation.dart';
 import 'chart_constants.dart';
+
+
 
 /// Helper class containing chart-related utility methods
 class ChartHelpers {
@@ -41,7 +44,10 @@ class ChartHelpers {
   }
 
   /// Get weather icon path considering day/night variants
-  static String? getIconPathForCodeWithDayNight(String baseIconPath, int? isDay) {
+  static String? getIconPathForCodeWithDayNight(
+    String baseIconPath,
+    int? isDay,
+  ) {
     if (isDay == null) return baseIconPath;
 
     // If it's night (isDay == 0), try to find night variant
@@ -98,7 +104,10 @@ class ChartHelpers {
   static List<String> generateHourLabels(HourlyWeather? dailyWeather) {
     if (dailyWeather != null && dailyWeather.hourlyForecasts.isNotEmpty) {
       return dailyWeather.hourlyForecasts.map((hourly) {
-        return DateFormat('HH:mm EEE', 'fr_FR').format(hourly.time);
+        //return DateFormat('HH:mm EEE', 'fr_FR').format(hourly.time);
+        final hour = DateFormat('HH', 'fr_FR').format(hourly.time);
+        final dayAbbrev = DateFormat('EEE', 'fr_FR').format(hourly.time);
+        return '${hour}h $dayAbbrev';
       }).toList();
     } else {
       return [];
@@ -109,7 +118,8 @@ class ChartHelpers {
   static List<String> generateDateLabels(DailyWeather? forecast) {
     if (forecast == null) return [];
     return forecast.dailyForecasts
-        .map((daily) => DateFormat('E, d MMM', 'fr_FR').format(daily.date))
+        //.map((daily) => DateFormat('E, d MMM', 'fr_FR').format(daily.date))
+        .map((daily) => DateFormat('E, d', 'fr_FR').format(daily.date))
         .toList();
   }
 
@@ -120,7 +130,7 @@ class ChartHelpers {
     String displayMode,
   ) {
     late List<double> allTemps;
-    
+
     if (displayMode == 'daily' && forecast != null) {
       allTemps = forecast.dailyForecasts
           .expand((d) => [d.temperatureMax, d.temperatureMin])
@@ -150,15 +160,17 @@ class ChartHelpers {
     int maxIndex,
     String displayMode,
   ) {
-    final double gridLeft = ChartConstants.leftPadding +
-        ChartConstants.leftTitleReservedSize;
+    final double gridLeft =
+        ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize;
     final double gridTop = ChartConstants.topPadding;
 
-    final double gridWidth = containerSize.width -
+    final double gridWidth =
+        containerSize.width -
         ChartConstants.leftPadding -
         ChartConstants.rightPadding -
         ChartConstants.leftTitleReservedSize;
-    final double gridHeight = containerSize.height -
+    final double gridHeight =
+        containerSize.height -
         ChartConstants.topPadding -
         ChartConstants.bottomPadding -
         ChartConstants.bottomTitleReservedSize;
@@ -174,13 +186,67 @@ class ChartHelpers {
         ? (maxTemp + 6).ceilToDouble()
         : (maxTemp + 2).ceilToDouble();
 
-    final double normalizedX = (maxX > minX) ? (chartX - minX) / (maxX - minX) : 0.0;
-    final double normalizedY = (maxY > minY) ? (chartY - minY) / (maxY - minY) : 0.0;
+    final double normalizedX = (maxX > minX)
+        ? (chartX - minX) / (maxX - minX)
+        : 0.0;
+    final double normalizedY = (maxY > minY)
+        ? (chartY - minY) / (maxY - minY)
+        : 0.0;
 
     final double screenX = gridLeft + (normalizedX * gridWidth);
     final double screenY = gridTop + ((1.0 - normalizedY) * gridHeight);
 
     return Offset(screenX, screenY);
+  }
+
+  /// Calculate screen position from chart coordinates
+  static Offset calculateScreenPosition2(
+    double chartX,
+    double chartY,
+    Size containerSize,
+    double minTemp,
+    double maxTemp,
+    //HourlyWeather dailyWeather,
+    DateTime startTime,
+    DateTime endTime,
+  ) {
+    final chartWidth =
+        //constraints.maxWidth -
+        containerSize.width -
+        ChartConstants.leftAxisTitleSize -
+        ChartConstants.leftAxisNameSize -
+        2 * ChartConstants.borderWidth;
+    final chartHeight =
+        //constraints.maxHeight -
+        containerSize.height -
+        ChartConstants.bottomAxisTitleSize -
+        ChartConstants.bottomAxisNameSize -
+        2 * ChartConstants.borderWidth;
+
+    //final List<FlSpot> spots = ChartDataProvider.getHourlyTempSpots(dailyWeather);
+
+    //final startTime = dailyWeather.hourlyForecasts.first.time;
+    //print("### CJG 192: startTime: $startTime minTemp: $minTemp maxTemp: $maxTemp,${dailyWeather.hourlyForecasts.first.temperature} ");
+    final minX = startTime.millisecondsSinceEpoch.toDouble();
+    // final maxX = startTime
+    //     .add(const Duration(hours: 44))
+    //     .millisecondsSinceEpoch
+    //     .toDouble();
+    final maxX = endTime.millisecondsSinceEpoch.toDouble();
+    final minY = minTemp - 5;
+    final maxY = maxTemp + 5;
+
+    final x =
+        ChartConstants.leftAxisTitleSize +
+        ChartConstants.leftAxisNameSize +
+        (chartX - minX) / (maxX - minX) * chartWidth +
+        ChartConstants.borderWidth;
+    final y =
+        chartHeight -
+        ((chartY - minY) / (maxY - minY)) * chartHeight +
+        ChartConstants.borderWidth;
+
+    return Offset(x, y);
   }
 
   /// Calculate screen X position for a given chart X coordinate (for vertical alignment)
@@ -190,9 +256,10 @@ class ChartHelpers {
     int maxIndex,
   ) {
     // Calculate the grid dimensions
-    final double gridLeft = ChartConstants.leftPadding + 
-        ChartConstants.leftTitleReservedSize;
-    final double gridWidth = containerSize.width -
+    final double gridLeft =
+        ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize;
+    final double gridWidth =
+        containerSize.width -
         ChartConstants.leftPadding -
         ChartConstants.rightPadding -
         ChartConstants.leftTitleReservedSize;
@@ -213,11 +280,45 @@ class ChartHelpers {
     Size containerSize,
     int maxIndex,
   ) {
-    final double gridLeft = ChartConstants.leftPadding +
-        ChartConstants.leftTitleReservedSize;
+    final double gridLeft =
+        ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize;
     final double gridTop = ChartConstants.topPadding;
     final double gridRight = containerSize.width - ChartConstants.rightPadding;
-    final double gridBottom = containerSize.height -
+    final double gridBottom =
+        containerSize.height -
+        ChartConstants.bottomPadding -
+        ChartConstants.bottomTitleReservedSize;
+    final double gridWidth = gridRight - gridLeft;
+
+    if (localPosition.dx < gridLeft ||
+        localPosition.dx > gridRight ||
+        localPosition.dy < gridTop ||
+        localPosition.dy > gridBottom) {
+      return null;
+    }
+
+    final double relativeX = localPosition.dx - gridLeft;
+    if (gridWidth <= 0) return null;
+    final double normalizedX = relativeX / gridWidth;
+
+    if (maxIndex < 0) return null;
+    final int index = (normalizedX * maxIndex).round().clamp(0, maxIndex);
+
+    return index;
+  }
+
+  /// Get tapped index from local position
+  static int? getTappedIndex_old(
+    Offset localPosition,
+    Size containerSize,
+    int maxIndex,
+  ) {
+    final double gridLeft =
+        ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize;
+    final double gridTop = ChartConstants.topPadding;
+    final double gridRight = containerSize.width - ChartConstants.rightPadding;
+    final double gridBottom =
+        containerSize.height -
         ChartConstants.bottomPadding -
         ChartConstants.bottomTitleReservedSize;
     final double gridWidth = gridRight - gridLeft;
@@ -291,7 +392,6 @@ class ChartHelpers {
     }
   }
 }
-
 
 Color gustColor(double gustKmh) {
   if (gustKmh <= 10) return Color(0xFFBBDEFB);

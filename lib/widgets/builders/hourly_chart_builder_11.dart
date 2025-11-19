@@ -10,7 +10,7 @@ import '../utils/chart_helpers.dart';
 import '../utils/chart_data_provider.dart';
 
 /// Builder for hourly weather chart
-class HourlyChartBuilder {
+class HourlyChartBuilder_11 {
   /// Build the hourly chart widget
   static Widget build({
     required HourlyWeather hourlyWeather,
@@ -51,10 +51,7 @@ class HourlyChartBuilder {
             minY: minY,
             maxY: maxY,
             borderData: FlBorderData(
-              border: Border.all(
-                color: Colors.black,
-                width: ChartConstants.borderWidth,
-              ),
+              border: Border.all(color: Colors.black, width: ChartConstants.borderWidth),
             ),
             gridData: FlGridData(
               show: true,
@@ -72,11 +69,9 @@ class HourlyChartBuilder {
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                 axisNameSize: ChartConstants.bottomAxisNameSize,
-                //axisNameWidget: const Text('Hour'),
-                axisNameWidget: Container(),
+                axisNameWidget: const Text('Hour'),
                 sideTitles: SideTitles(
-                  showTitles:
-                      true, // Hide default fl_chart labels - using custom labels instead
+                  showTitles:false, // Hide default fl_chart labels - using custom labels instead
                   interval: const Duration(hours: 2).inMilliseconds.toDouble(),
                   reservedSize: ChartConstants.bottomAxisTitleSize,
                   getTitlesWidget: (value, meta) {
@@ -85,8 +80,7 @@ class HourlyChartBuilder {
                     );
                     return Padding(
                       padding: const EdgeInsets.only(top: 8.0),
-                      //child: Text('${date.hour}:00'),
-                      child: Container(),
+                      child: Text('${date.hour}:00'),
                     );
                   },
                 ),
@@ -114,7 +108,8 @@ class HourlyChartBuilder {
                 dotData: const FlDotData(show: true),
               ),
             ],
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors
+                .transparent,
             lineTouchData: const LineTouchData(enabled: false),
           ),
         ),
@@ -127,7 +122,7 @@ class HourlyChartBuilder {
           containerSize,
         ),
         ..._buildWeatherIcons(hourlyWeather, minTemp, maxTemp, containerSize),
-        // _buildCurrentTimeLine(hourlyWeather, minTemp, maxTemp, containerSize),
+        _buildCurrentTimeLine(hourlyWeather, minTemp, maxTemp, containerSize),
         ..._buildApparentTempLabels(
           hourlyWeather,
           minTemp,
@@ -141,8 +136,6 @@ class HourlyChartBuilder {
           containerSize,
           hourLabels,
         ),
-        _buildCurrentTimeLine(hourlyWeather, minTemp, maxTemp, containerSize),
-        ..._buildSunriseSunsetInfo(hourlyWeather, forecast, minTemp, maxTemp, containerSize),
         if (showWindInfo)
           ..._buildWindInfo(hourlyWeather, minTemp, maxTemp, containerSize),
       ],
@@ -299,7 +292,7 @@ class HourlyChartBuilder {
       left: screenPos.dx,
       top: ChartConstants.topPadding,
       child: Container(
-        width: 2,
+        width: 5,
         height:
             containerSize.height -
             ChartConstants.topPadding -
@@ -343,7 +336,7 @@ class HourlyChartBuilder {
       final y = screenPosition.dy;
       return Positioned(
         left: x - 22.5,
-        top: y - 75,
+        top: y - 65,
         child: SizedBox(
           width: 45,
           child: Column(
@@ -390,12 +383,12 @@ class HourlyChartBuilder {
 
       return Positioned(
         left: screenPos.dx - 25,
-        top: screenPos.dy + 5,
+        top: screenPos.dy -5,
         child: SizedBox(
           width: 50,
           child: Text(
-            '${hourly.apparentTemperature!.round()}°',
-            //'x',
+            //'${hourly.apparentTemperature!.round()}°',
+            'x',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 12,
@@ -443,21 +436,21 @@ class HourlyChartBuilder {
 
       return Positioned(
         left: x - 100,
-        top: y + 25, // Position below temperature
+        top: y + 45, // Position below temperature
         child: SizedBox(
           width: 200,
           child: Column(
-            //mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '${hourly.windSpeed!.round()} km/h',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue, // Blue color for wind speed
-                ),
-              ),
+              // Text(
+              //   '${hourly.windSpeed!.round()} km/h',
+              //   textAlign: TextAlign.center,
+              //   style: const TextStyle(
+              //     fontSize: 12,
+              //     fontWeight: FontWeight.w600,
+              //     color: Colors.blue, // Blue color for wind speed
+              //   )
+              // ),
               // Wind direction icon with rotation
               // Arrow SVG points east (90°) by default, so rotate relative to that
               Transform.rotate(
@@ -499,7 +492,7 @@ class HourlyChartBuilder {
     return hourlyWeather.hourlyForecasts
         .asMap()
         .entries
-        .where((entry) => entry.key % 2 == 0) // keep only every 3rd
+        .where((entry) => entry.key % 3 == 0) // keep only every 3rd
         .map((entry) {
           final int index = entry.key;
           final HourlyForecast hourly = entry.value;
@@ -542,144 +535,4 @@ class HourlyChartBuilder {
         })
         .toList();
   }
-
-  /// Build sunrise and sunset icons and times
-  static List<Widget> _buildSunriseSunsetInfo(
-    HourlyWeather hourlyWeather,
-    DailyWeather forecast,
-    double minTemp,
-    double maxTemp,
-    Size containerSize,
-  ) {
-    if (forecast == null) {
-      return [];
-    }
-
-    final List<Widget> sunriseSunsetWidgets = [];
-    final double chartWidth =
-        containerSize.width -
-        ChartConstants.leftPadding -
-        ChartConstants.rightPadding -
-        ChartConstants.leftTitleReservedSize;
-    final double hourWidth = chartWidth / hourlyWeather.hourlyForecasts.length;
-
-    for (var daily in forecast.dailyForecasts) {
-      if (daily.sunrise != null) {
-        final int sunriseHour = daily.sunrise!.hour;
-        final int sunriseMinute = daily.sunrise!.minute;
-        final double fractionalHour = sunriseHour + sunriseMinute / 60.0;
-
-        int hourIndex = -1;
-        for (int i = 0; i < hourlyWeather.hourlyForecasts.length; i++) {
-          if (hourlyWeather.hourlyForecasts[i].time.day == daily.date.day &&
-              hourlyWeather.hourlyForecasts[i].time.hour == sunriseHour) {
-            hourIndex = i;
-            break;
-          }
-        }
-
-        if (hourIndex != -1) {
-          final double xPos =
-              ChartConstants.leftPadding +
-              ChartConstants.leftTitleReservedSize +
-              (hourIndex * hourWidth) +
-              (sunriseMinute / 60.0 * hourWidth);
-          final screenPos = ChartHelpers.calculateScreenPosition2(
-            daily.sunrise!.millisecondsSinceEpoch.toDouble(),
-            ChartConstants.bottomTitleReservedSize - 15,
-            containerSize,
-            minTemp,
-            maxTemp,
-            hourlyWeather.hourlyForecasts.first.time,
-            hourlyWeather.hourlyForecasts.last.time,
-          );
-
-          sunriseSunsetWidgets.add(
-            Positioned(
-              //left: xPos - 15,
-              left: screenPos.dx - 15,
-              bottom: ChartConstants.bottomTitleReservedSize - 15,
-              child: Column(
-                children: [
-                  const Icon(Icons.wb_sunny, color: Colors.amber, size: 20),
-                  Text(
-                    '${sunriseHour.toString().padLeft(2, '0')}:${sunriseMinute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-      }
-
-      if (daily.sunset != null) {
-        final int sunsetHour = daily.sunset!.hour;
-        final int sunsetMinute = daily.sunset!.minute;
-        final double fractionalHour = sunsetHour + sunsetMinute / 60.0;
-
-        int hourIndex = -1;
-        for (int i = 0; i < hourlyWeather.hourlyForecasts.length; i++) {
-          if (hourlyWeather.hourlyForecasts[i].time.day == daily.date.day &&
-              hourlyWeather.hourlyForecasts[i].time.hour == sunsetHour) {
-            hourIndex = i;
-            break;
-          }
-        }
-
-        if (hourIndex != -1) {
-          final double xPos =
-              ChartConstants.leftPadding +
-              ChartConstants.leftTitleReservedSize +
-              (hourIndex * hourWidth) +
-              (sunsetMinute / 60.0 * hourWidth);
-
-          final screenPos = ChartHelpers.calculateScreenPosition2(
-            daily.sunset!.millisecondsSinceEpoch.toDouble(),
-            ChartConstants.bottomTitleReservedSize - 15,
-            containerSize,
-            minTemp,
-            maxTemp,
-            hourlyWeather.hourlyForecasts.first.time,
-            hourlyWeather.hourlyForecasts.last.time,
-          );
-
-          sunriseSunsetWidgets.add(
-            Positioned(
-              left: screenPos.dx - 15,
-              bottom: ChartConstants.bottomTitleReservedSize - 15,
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.nights_stay,
-                    color: Colors.blueGrey,
-                    size: 20,
-                  ),
-                  Text(
-                    '${sunsetHour.toString().padLeft(2, '0')}:${sunsetMinute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-      }
-    }
-
-    return sunriseSunsetWidgets;
-  }
-}
-
-class _SunriseSunset {
-  final DateTime sunrise;
-  final DateTime sunset;
-
-  _SunriseSunset(this.sunrise, this.sunset);
 }

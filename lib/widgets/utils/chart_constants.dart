@@ -10,4 +10,11 @@ class ChartConstants {
   static const double dailyChartHeight = 500;
   static const double hourlyChartHeight = 350;
   static const double hourlyChartWidthPerHour = 60;
+  static const double leftAxisTitleSize = 30.0;
+static const double leftAxisNameSize = 20.0;
+
+static const double bottomAxisTitleSize = 30.0;
+static const double bottomAxisNameSize = 20.0;
+
+static const double borderWidth = 1.0;
 }

@@ -42,6 +42,8 @@ class DailyWeather {
     final windSpeedMaxList = dailyData['windspeed_10m_max'] as List?;
     final windGustsMaxList = dailyData['windgusts_10m_max'] as List?;
     final windDirection10mDominantList = dailyData['wind_direction_10m_dominant'] as List?;
+    final sunriseList = dailyData['sunrise'] as List?;
+    final sunsetList = dailyData['sunset'] as List?;
 
     // If essential time data is missing, we cannot proceed.
     if (timeList == null) {
@@ -79,6 +81,8 @@ class DailyWeather {
         windSpeedMax: (windSpeedMaxList?[i] as num?)?.toDouble(),
         windGustsMax: (windGustsMaxList?[i] as num?)?.toDouble(),
         windDirection10mDominant: (windDirection10mDominantList?[i] as num?)?.toInt(),
+        sunrise: sunriseList?[i] != null ? DateTime.parse(sunriseList?[i] as String) : null,
+        sunset: sunsetList?[i] != null ? DateTime.parse(sunsetList?[i] as String) : null,
       ));
     }
 
@@ -135,6 +139,8 @@ class DailyForecast {
   final double? windSpeedMax;
   final double? windGustsMax;
   final int? windDirection10mDominant;
+  final DateTime? sunrise;
+  final DateTime? sunset;
 
   DailyForecast({
     required this.date,
@@ -150,6 +156,8 @@ class DailyForecast {
     this.windSpeedMax,
     this.windGustsMax,
     this.windDirection10mDominant,
+    this.sunrise,
+    this.sunset,
   });
 
   // Convenience getters for use in UI
@@ -210,6 +218,9 @@ class HourlyWeather {
 
     if (timeList != null) {
       for (int i = 0; i < timeList.length; i++) {
+        if(temperatureList?[i] == null){
+          continue;
+        }
         forecasts.add(HourlyForecast(
           time: DateTime.parse(timeList[i] as String),
           temperature: (temperatureList?[i] as num?)?.toDouble(),

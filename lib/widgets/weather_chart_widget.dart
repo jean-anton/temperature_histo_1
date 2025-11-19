@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:temperature_histo_1/widgets/builders/daily_chart_builder_test1.dart';
+import 'package:temperature_histo_1/widgets/builders/hourly_chart_builder.dart';
+import 'package:temperature_histo_1/widgets/builders/hourly_chart_builder_test1.dart';
 
 import '../models/climate_normal_model.dart';
 import '../models/weather_forecast_model.dart';
@@ -12,7 +15,7 @@ import 'builders/hourly_chart_builder.dart';
 
 class WeatherChart2 extends StatefulWidget {
   final DailyWeather? forecast;
-  final HourlyWeather? dailyWeather;
+  final HourlyWeather? hourlyWeather;
   final List<ClimateNormal> climateNormals;
   final String displayMode; // 'daily' or 'hourly'
   final bool showWindInfo;
@@ -20,7 +23,7 @@ class WeatherChart2 extends StatefulWidget {
   const WeatherChart2({
     super.key,
     this.forecast,
-    this.dailyWeather,
+    this.hourlyWeather,
     required this.climateNormals,
     required this.displayMode,
     this.showWindInfo = true,
@@ -46,7 +49,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
     _initializeChartData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.displayMode == 'hourly' && widget.dailyWeather != null) {
+      if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
         _scrollToCurrentTime();
       }
     });
@@ -59,7 +62,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
     // Recompute chart data when inputs or mode change.
     final modeChanged = oldWidget.displayMode != widget.displayMode;
     final forecastChanged = oldWidget.forecast != widget.forecast;
-    final dailyChanged = oldWidget.dailyWeather != widget.dailyWeather;
+    final dailyChanged = oldWidget.hourlyWeather != widget.hourlyWeather;
     final normalsChanged = oldWidget.climateNormals != widget.climateNormals;
 
     if (modeChanged || forecastChanged || dailyChanged || normalsChanged) {
@@ -67,7 +70,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
       _initializeChartData();
 
       // Scroll after layout so ScrollController has valid extents.
-      if (widget.displayMode == 'hourly' && widget.dailyWeather != null) {
+      if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scrollToCurrentTime();
         });
@@ -102,12 +105,15 @@ class _WeatherChart2State extends State<WeatherChart2> {
     }
 
     _deviations = widget.forecast!.dailyForecasts
-        .map((daily) => ChartHelpers.getDeviationForDay(daily, widget.climateNormals))
+        .map(
+          (daily) =>
+              ChartHelpers.getDeviationForDay(daily, widget.climateNormals),
+        )
         .toList();
 
     final tempRange = ChartHelpers.calculateTempRange(
       widget.forecast,
-      widget.dailyWeather,
+      widget.hourlyWeather,
       widget.displayMode,
     );
     _maxTemp = tempRange['max']!;
@@ -118,7 +124,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
 
   // Initialize hourly chart data.
   void _initHourlyChart() {
-    if (widget.dailyWeather == null) {
+    if (widget.hourlyWeather == null) {
       _deviations = [];
       _maxTemp = 0;
       _minTemp = 0;
@@ -130,60 +136,70 @@ class _WeatherChart2State extends State<WeatherChart2> {
 
     final tempRange = ChartHelpers.calculateTempRange(
       widget.forecast,
-      widget.dailyWeather,
+      widget.hourlyWeather,
       widget.displayMode,
     );
     _maxTemp = tempRange['max']!;
     _minTemp = tempRange['min']!;
 
-    _labels = ChartHelpers.generateHourLabels(widget.dailyWeather);
+    _labels = ChartHelpers.generateHourLabels(widget.hourlyWeather);
   }
 
   // Scroll so that the hour equal to (now - 1h) is at the LEFT EDGE of the viewport.
-  // If there is no exact match, choose the latest hour <= (now - 1h).
   void _scrollToCurrentTime() {
-    final daily = widget.dailyWeather;
-    if (daily == null || !_scrollController.hasClients) return;
+    final hourlyWeather = widget.hourlyWeather;
+    if (hourlyWeather == null || !_scrollController.hasClients) return;
 
-    final List<HourlyForecast> hours = daily.hourlyForecasts;
-    if (hours.isEmpty) return;
-
-    final DateTime target = DateTime.now().toLocal().subtract(const Duration(hours: 1));
-
-    // Pick the last index whose local time <= target. If none, use 0. If beyond, clamp later.
-    int targetIndex = 0;
-    bool found = false;
-
-    for (int i = 0; i < hours.length; i++) {
-      final DateTime t = hours[i].time.toLocal();
-      if (t.isBefore(target) || t.isAtSameMomentAs(target)) {
-        targetIndex = i;
-        found = true;
-      } else {
-        // Since data is expected in chronological order, we can break on first > target.
-        if (found) break;
-      }
-    }
-
-    _scrollToHourlyIndexLeftAligned(targetIndex);
+    final DateTime targetTime = DateTime.now().subtract(const Duration(hours: 1));
+    _scrollToHourlyTime(targetTime);
   }
 
-  // Helper to align a given hourly index to the left edge of the viewport.
-  void _scrollToHourlyIndexLeftAligned(int index) {
-    if (!_scrollController.hasClients) return;
+  /// Helper to scroll the chart to a specific time, aligning it to the left edge.
+  ///
+  /// This method calculates the precise pixel offset by using the same
+  /// `calculateScreenPosition2` helper that the chart uses to draw its elements.
+  /// This ensures that the scroll position is perfectly synchronized with the
+  /// time-based rendering of the chart, avoiding alignment issues caused by
+  /// mismatched calculation logic (e.g., index-based vs. time-based).
+  void _scrollToHourlyTime(DateTime targetTime) {
+    if (!_scrollController.hasClients || widget.hourlyWeather == null) return;
 
-    final double itemWidth = ChartConstants.hourlyChartWidthPerHour.toDouble();
-    double targetOffset = index * itemWidth;
+    final hourlyWeather = widget.hourlyWeather!;
 
-    // Clamp to valid scrollable range.
+    // To calculate the correct screen position, we need the total dimensions
+    // of the chart as if it were fully rendered.
+    final totalWidth = hourlyWeather.hourlyForecasts.length *
+        ChartConstants.hourlyChartWidthPerHour;
+    final containerSize = Size(totalWidth, ChartConstants.hourlyChartHeight);
+
+    // Use the canonical helper to convert a time coordinate into a pixel coordinate.
+    // This guarantees consistency with the chart's own rendering logic.
+    final screenPos = ChartHelpers.calculateScreenPosition2(
+      targetTime.millisecondsSinceEpoch.toDouble(),
+      _minTemp, // Y-coordinate is not relevant for horizontal scrolling.
+      containerSize,
+      _minTemp,
+      _maxTemp,
+      hourlyWeather.hourlyForecasts.first.time,
+      hourlyWeather.hourlyForecasts.last.time,
+    );
+
+    // `screenPos.dx` gives the absolute pixel position from the left edge of the
+    // chart widget. To align this position with the left edge of the viewport,
+    // we must subtract the chart's internal padding.
+    double targetOffset =
+        screenPos.dx -
+        ChartConstants.leftPadding -
+        ChartConstants.leftTitleReservedSize;
+
+    // Ensure the calculated offset is within the valid scrollable range.
     final maxExtent = _scrollController.position.maxScrollExtent;
-    if (targetOffset < 0) targetOffset = 0;
-    if (targetOffset > maxExtent) targetOffset = maxExtent;
+    targetOffset = targetOffset.clamp(0.0, maxExtent);
 
-    // CJG Animate to the position.
+    // Animate the scroll to the calculated offset.
     _scrollController.animateTo(
       targetOffset,
-      duration: const Duration(milliseconds: 1),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
@@ -193,7 +209,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
     final Offset localPosition = details.localPosition;
     final int maxIndex = widget.displayMode == 'daily'
         ? (widget.forecast?.dailyForecasts.length ?? 1) - 1
-        : (widget.dailyWeather?.hourlyForecasts.length ?? 1) - 1;
+        : (widget.hourlyWeather?.hourlyForecasts.length ?? 1) - 1;
 
     final int? tappedIndex = ChartHelpers.getTappedIndex(
       localPosition,
@@ -222,12 +238,12 @@ class _WeatherChart2State extends State<WeatherChart2> {
         widget.forecast!,
         _deviations,
       );
-    } else if (widget.displayMode == 'hourly' && widget.dailyWeather != null) {
+    } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       WeatherTooltip.showHourlyTooltip(
         context,
         touchedIndex,
         position,
-        widget.dailyWeather!,
+        widget.hourlyWeather!,
       );
     }
   }
@@ -241,14 +257,12 @@ class _WeatherChart2State extends State<WeatherChart2> {
       chartWidth =
           widget.forecast!.dailyForecasts.length * ChartConstants.widthPerDay;
       finalHeight = ChartConstants.dailyChartHeight;
-      if(minWidth > 600) {
+      if (minWidth > 600) {
         chartWidth = minWidth;
       }
-
-
-      
-    } else if (widget.displayMode == 'hourly' && widget.dailyWeather != null) {
-      chartWidth = widget.dailyWeather!.hourlyForecasts.length *
+    } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
+      chartWidth =
+          widget.hourlyWeather!.hourlyForecasts.length *
           ChartConstants.hourlyChartWidthPerHour;
       finalHeight = ChartConstants.hourlyChartHeight;
     } else {
@@ -258,14 +272,11 @@ class _WeatherChart2State extends State<WeatherChart2> {
 
     final double finalWidth = chartWidth > minWidth ? chartWidth : minWidth;
 
-    return {
-      'width': finalWidth,
-      'height': finalHeight,
-    };
+    return {'width': finalWidth, 'height': finalHeight};
   }
 
   // Build the appropriate chart based on display mode.
-  Widget _buildChart(Size containerSize) {
+  Widget _buildChart(Size containerSize, BoxConstraints constraints) {
     if (widget.displayMode == 'daily' && widget.forecast != null) {
       return DailyChartBuilder.build(
         forecast: widget.forecast!,
@@ -276,12 +287,17 @@ class _WeatherChart2State extends State<WeatherChart2> {
         containerSize: containerSize,
         showWindInfo: widget.showWindInfo,
       );
-    } else if (widget.displayMode == 'hourly' && widget.dailyWeather != null) {
+    } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       return HourlyChartBuilder.build(
-        dailyWeather: widget.dailyWeather!,
+      //return HourlyChartBuilder_test1.build(
+      //return HourlyChartBuilderOLD.build(
+        hourlyWeather: widget.hourlyWeather!,
+        forecast: widget.forecast!,
         minTemp: _minTemp,
         maxTemp: _maxTemp,
         hourLabels: _labels,
+        constraints: constraints,
+
         containerSize: containerSize,
         showWindInfo: widget.showWindInfo,
       );
@@ -300,8 +316,10 @@ class _WeatherChart2State extends State<WeatherChart2> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final dimensions = _calculateChartDimensions(constraints.maxWidth);
-        final Size containerSize =
-            Size(dimensions['width']!, dimensions['height']!);
+        final Size containerSize = Size(
+          dimensions['width']!,
+          dimensions['height']!,
+        );
 
         return Scrollbar(
           controller: _scrollController,
@@ -315,7 +333,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
               height: dimensions['height'],
               child: GestureDetector(
                 onTapDown: (details) => _onChartTap(details, containerSize),
-                child: _buildChart(containerSize),
+                child: _buildChart(containerSize, constraints),
               ),
             ),
           ),

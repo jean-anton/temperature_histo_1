@@ -12,7 +12,7 @@ class WeatherService {
   static const String _baseUrl = 'https://api.open-meteo.com/v1/forecast';
 
   static const String _dailyParameters =
-      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max,wind_direction_10m_dominant';
+      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max,wind_direction_10m_dominant,sunrise,sunset';
 
   /// Fetches a weather forecast for a single model from the Open-Meteo API.
   Future<DailyWeather> getWeatherForecast({
@@ -34,7 +34,7 @@ class WeatherService {
 
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 15));
-
+      print("### CJG 192: getWeatherForecast URL: $url");
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final forecast = DailyWeather.fromJson(
@@ -88,7 +88,7 @@ class WeatherService {
         'longitude': longitude.toString(),
         'hourly': hourlyParameters,
         'timezone': 'auto',
-        'forecast_days': '3', 
+        'forecast_days': '7', 
         'models': model, // Only fetch today's data
       },
     );
