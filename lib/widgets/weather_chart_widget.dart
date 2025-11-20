@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:temperature_histo_1/widgets/builders/daily_chart_builder_test1.dart';
 import 'package:temperature_histo_1/widgets/builders/hourly_chart_builder.dart';
-import 'package:temperature_histo_1/widgets/builders/hourly_chart_builder_test1.dart';
 
 import '../models/climate_normal_model.dart';
 import '../models/weather_forecast_model.dart';

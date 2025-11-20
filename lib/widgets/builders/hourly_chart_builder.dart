@@ -336,7 +336,7 @@ class HourlyChartBuilder {
         hourlyWeather.hourlyForecasts.first.time,
         hourlyWeather.hourlyForecasts.last.time,
       );
-      print("### CJG 293: screenPosition: $screenPosition");
+      //print("### CJG 293: screenPosition: $screenPosition");
 
       //screenPosition = Offset(298.5, 212.3);
       final x = screenPosition.dx;
@@ -430,7 +430,7 @@ class HourlyChartBuilder {
         hourlyWeather.hourlyForecasts.first.time,
         hourlyWeather.hourlyForecasts.last.time,
       );
-      print("### CJG 293: screenPosition: $screenPosition");
+      //print("### CJG 293: screenPosition: $screenPosition");
 
       //screenPosition = Offset(298.5, 212.3);
       final x = screenPosition.dx;
@@ -597,15 +597,15 @@ class HourlyChartBuilder {
           sunriseSunsetWidgets.add(
             Positioned(
               //left: xPos - 15,
-              left: screenPos.dx - 15,
+              left: screenPos.dx - 20,
               bottom: ChartConstants.bottomTitleReservedSize - 15,
               child: Column(
                 children: [
-                  const Icon(Icons.wb_sunny, color: Colors.amber, size: 20),
+                  const Icon(Icons.wb_sunny, color: Colors.amber, size: 25),
                   Text(
                     '${sunriseHour.toString().padLeft(2, '0')}:${sunriseMinute.toString().padLeft(2, '0')}',
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -649,19 +649,19 @@ class HourlyChartBuilder {
 
           sunriseSunsetWidgets.add(
             Positioned(
-              left: screenPos.dx - 15,
+              left: screenPos.dx - 20,
               bottom: ChartConstants.bottomTitleReservedSize - 15,
               child: Column(
                 children: [
                   const Icon(
                     Icons.nights_stay,
                     color: Colors.blueGrey,
-                    size: 20,
+                    size: 25,
                   ),
                   Text(
                     '${sunsetHour.toString().padLeft(2, '0')}:${sunsetMinute.toString().padLeft(2, '0')}',
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
