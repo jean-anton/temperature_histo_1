@@ -274,20 +274,9 @@ class DailyChartBuilder {
   ) {
     final List<Widget> rectangles = [];
 
-    // Calculate the width of each day column
-    final double chartWidth =
-        containerSize.width -
-        ChartConstants.leftPadding -
-        ChartConstants.rightPadding -
-        ChartConstants.leftTitleReservedSize;
-    final double dayWidth = chartWidth / forecast.dailyForecasts.length;
-
-    // Calculate the height of the chart area
-    final double chartHeight =
-        containerSize.height -
-        ChartConstants.topPadding -
-        ChartConstants.bottomPadding -
-        ChartConstants.bottomTitleReservedSize;
+    // Get the first and last dates for proper positioning
+    final DateTime firstDate = forecast.dailyForecasts.first.date;
+    final DateTime lastDate = forecast.dailyForecasts.last.date;
 
     for (int i = 0; i < forecast.dailyForecasts.length; i++) {
       final daily = forecast.dailyForecasts[i];
@@ -296,16 +285,46 @@ class DailyChartBuilder {
           daily.date.weekday == DateTime.sunday;
 
       if (isWeekend) {
+        // Use calculateScreenPosition2 to get accurate positioning
+        // We'll position at minY and maxY to span the full height
+        final screenPosLeft = ChartHelpers.calculateScreenPosition2(
+          daily.date.subtract(Duration(hours:12)).millisecondsSinceEpoch.toDouble(),
+          0, // Use 0 as Y coordinate, we'll adjust positioning manually
+          containerSize,
+          0, // Use 0 as minY since we're positioning manually
+          100, // Use arbitrary maxY since we're positioning manually
+          firstDate,
+          lastDate,
+        );
+
+        // Calculate the position for the next day to determine width
+        final DateTime nextDate = i < forecast.dailyForecasts.length - 1
+            ? forecast.dailyForecasts[i + 1].date
+            : daily.date.add(const Duration(days: 1));
+        
+        final screenPosRight = ChartHelpers.calculateScreenPosition2(
+          nextDate.subtract(Duration(hours:12)).millisecondsSinceEpoch.toDouble(),
+          0, // Use 0 as Y coordinate
+          containerSize,
+          0, // Use 0 as minY
+          100, // Use arbitrary maxY
+          firstDate,
+          lastDate,
+        );
+
+        // Calculate width based on the difference between positions
+        final double dayWidth = screenPosRight.dx - screenPosLeft.dx;
+
         rectangles.add(
           Positioned(
-            left:
-                ChartConstants.leftPadding +
-                ChartConstants.leftTitleReservedSize +
-                (i * dayWidth),
+            left: screenPosLeft.dx,
             top: ChartConstants.topPadding,
             child: Container(
               width: dayWidth,
-              height: chartHeight,
+              height:
+                  containerSize.height -
+            ChartConstants.topPadding -
+            ChartConstants.bottomPadding,
               color: Colors.lightBlue.shade300.withOpacity(
                 0.3,
               ), // Light blue background for weekends
@@ -508,44 +527,87 @@ class DailyChartBuilder {
         'daily',
       );
       final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+      final windIconPathContour = "assets/google_weather_icons/v3/arrow_contour.svg";
       //final windIconPath = "assets/google_weather_icons/v3/arrow_centered_jg.svg";
       final windDirectionDegrees = daily.windDirection10mDominant ?? 0;
       //print("### CJG daily.windGustsMax: ${daily.windGustsMax}");
       print("### CJG windDirectionDegrees: $windDirectionDegrees");
 
-      return Positioned(
-        left: screenPos.dx - 100,
-        top: screenPos.dy + 5, // Position below temperature
-        child: SizedBox(
-          width: 200,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Wind direction icon with rotation
-              // Arrow SVG points east (90°) by default, so rotate relative to that
-              Transform.rotate(
-                //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
-                angle:
-                    (135 + windDirectionDegrees) *
-                    (3.14159 / 180), // Convert degrees to radians
-                //angle: (0) * (3.14159 / 180), // Convert degrees to radians
-                child: SvgPicture.asset(
-                  windIconPath,
-                  // width: 50 * daily.windGustsMax! / 20, // Scale size by wind speed (max 20 m/s)
-                  // height: 50 * daily.windGustsMax! / 20,
-                  width:
-                      (daily.windGustsMax ?? 0.0) *
-                      2, // Scale size by wind speed (max 20 m/s)
-                  height: (daily.windGustsMax ?? 0.0) * 2,
-                  colorFilter: ColorFilter.mode(
-                    gustColor(daily.windGustsMax ?? 0.0),
-                    BlendMode.srcIn,
+      return Stack(
+        children: [
+          
+          Positioned(
+          left: screenPos.dx - 100,
+          top: screenPos.dy + 5, // Position below temperature
+          child: SizedBox(
+            width: 200,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Wind direction icon with rotation
+                // Arrow SVG points east (90°) by default, so rotate relative to that
+                Transform.rotate(
+                  //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+                  angle:
+                      (135 + windDirectionDegrees) *
+                      (3.14159 / 180), // Convert degrees to radians
+                  //angle: (0) * (3.14159 / 180), // Convert degrees to radians
+                  child: SvgPicture.asset(
+                    windIconPath,
+                    // width: 50 * daily.windGustsMax! / 20, // Scale size by wind speed (max 20 m/s)
+                    // height: 50 * daily.windGustsMax! / 20,
+                    width:
+                        (daily.windGustsMax ?? 0.0) *
+                        2, // Scale size by wind speed (max 20 m/s)
+                    height: (daily.windGustsMax ?? 0.0) * 2,
+                    colorFilter: ColorFilter.mode(
+                      gustColor(daily.windGustsMax ?? 0.0),
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+        
+          
+          Positioned(
+          left: screenPos.dx - 100,
+          top: screenPos.dy + 5, // Position below temperature
+          child: SizedBox(
+            width: 200,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Wind direction icon with rotation
+                // Arrow SVG points east (90°) by default, so rotate relative to that
+                Transform.rotate(
+                  //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+                  angle:
+                      (135 + windDirectionDegrees) *
+                      (3.14159 / 180), // Convert degrees to radians
+                  //angle: (0) * (3.14159 / 180), // Convert degrees to radians
+                  child: SvgPicture.asset(
+                    windIconPathContour,
+                    // width: 50 * daily.windGustsMax! / 20, // Scale size by wind speed (max 20 m/s)
+                    // height: 50 * daily.windGustsMax! / 20,
+                    width:
+                        (daily.windGustsMax ?? 0.0) *
+                        2, // Scale size by wind speed (max 20 m/s)
+                    height: (daily.windGustsMax ?? 0.0) * 2,
+                    // colorFilter: ColorFilter.mode(
+                    //   gustColor(daily.windGustsMax ?? 0.0),
+                    //   BlendMode.srcIn,
+                    // ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        ]
       );
     }).toList();
   }

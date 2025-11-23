@@ -110,6 +110,7 @@ class HourlyChartBuilder {
             ),
             lineBarsData: [
               LineChartBarData(
+                isCurved: true,
                 spots: spots,
                 dotData: const FlDotData(show: true),
               ),
@@ -142,7 +143,13 @@ class HourlyChartBuilder {
           hourLabels,
         ),
         _buildCurrentTimeLine(hourlyWeather, minTemp, maxTemp, containerSize),
-        ..._buildSunriseSunsetInfo(hourlyWeather, forecast, minTemp, maxTemp, containerSize),
+        ..._buildSunriseSunsetInfo(
+          hourlyWeather,
+          forecast,
+          minTemp,
+          maxTemp,
+          containerSize,
+        ),
         if (showWindInfo)
           ..._buildWindInfo(hourlyWeather, minTemp, maxTemp, containerSize),
       ],
@@ -438,6 +445,9 @@ class HourlyChartBuilder {
 
       //final windIconPath = ChartHelpers.getWindDirectionIconPath(hourly.windDirection10m);
       final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+      final windIconPathContour =
+          "assets/google_weather_icons/v3/arrow_contour.svg";
+
       //final windIconPath = "assets/google_weather_icons/v3/arrow_centered_jg.svg";
       final windDirectionDegrees = hourly.windDirection10m ?? 0;
 
@@ -460,26 +470,51 @@ class HourlyChartBuilder {
               ),
               // Wind direction icon with rotation
               // Arrow SVG points east (90°) by default, so rotate relative to that
-              Transform.rotate(
-                //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
-                angle:
-                    (135 + windDirectionDegrees) *
-                    (3.14159 / 180), // Convert degrees to radians
-                child: SvgPicture.asset(
-                  windIconPath,
-                  // width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
-                  // height: 50 * (hourly.windGusts ?? 0.0) / 20,
-                  // colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
-                  width:
-                      (hourly.windGusts ?? 0.0) *
-                      2, // Scale size by wind speed (max 20 m/s)
-                  height: (hourly.windGusts ?? 0.0) * 2,
-                  //colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
-                  colorFilter: ColorFilter.mode(
-                    gustColor(hourly.windGusts ?? 0.0),
-                    BlendMode.srcIn,
+              Stack(
+                children: [
+                  Transform.rotate(
+                    //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+                    angle:
+                        (135 + windDirectionDegrees) *
+                        (3.14159 / 180), // Convert degrees to radians
+                    child: SvgPicture.asset(
+                      windIconPath,
+                      // width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
+                      // height: 50 * (hourly.windGusts ?? 0.0) / 20,
+                      // colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                      width:
+                          (hourly.windGusts ?? 0.0) *
+                          2, // Scale size by wind speed (max 20 m/s)
+                      height: (hourly.windGusts ?? 0.0) * 2,
+                      //colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                        gustColor(hourly.windGusts ?? 0.0),
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
-                ),
+                  Transform.rotate(
+                    //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+                    angle:
+                        (135 + windDirectionDegrees) *
+                        (3.14159 / 180), // Convert degrees to radians
+                    child: SvgPicture.asset(
+                      windIconPathContour,
+                      // width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
+                      // height: 50 * (hourly.windGusts ?? 0.0) / 20,
+                      // colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                      width:
+                          (hourly.windGusts ?? 0.0) *
+                          2, // Scale size by wind speed (max 20 m/s)
+                      height: (hourly.windGusts ?? 0.0) * 2,
+                      //colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
+                      // colorFilter: ColorFilter.mode(
+                      //   gustColor(hourly.windGusts ?? 0.0),
+                      //   BlendMode.srcIn,
+                      // ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
