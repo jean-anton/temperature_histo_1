@@ -89927,7 +89927,7 @@ p=A.aFM(B.rs,o.dE(o,new A.asb(),t.b7).cu(0),l.gQd(),p,r)
 o=A.aRN(B.TS,B.agS,new A.asc(l))
 n=l.Q
 m=t.y
-return A.a3J(new A.c2(B.qH,A.f4(A.b([s,B.c8,B.agQ,B.c8,B.ah3,B.c9,q,B.c8,B.agK,B.c9,p,B.c8,B.agH,B.c9,o,B.c8,B.agZ,B.c9,A.aFM(B.rs,l.a5p(j),l.gad7(),n,r),B.c8,B.agY,B.c9,A.aiP(new A.asd(l),B.a0N,A.c0([l.cy],m),m),B.c8,B.ah1,B.c9,A.aiP(new A.ase(l),B.a1J,A.c0([l.db],m),m),B.c8,A.bw("version: _V2.20.3, main: /Users/jg/devel/projects/flutter/temperature_histo_1\n Running with Wasm: false",k,k,k,k,k,k)],t.p),B.cj,B.ah,B.b8),k),k)},
+return A.a3J(new A.c2(B.qH,A.f4(A.b([s,B.c8,B.agQ,B.c8,B.ah3,B.c9,q,B.c8,B.agK,B.c9,p,B.c8,B.agH,B.c9,o,B.c8,B.agZ,B.c9,A.aFM(B.rs,l.a5p(j),l.gad7(),n,r),B.c8,B.agY,B.c9,A.aiP(new A.asd(l),B.a0N,A.c0([l.cy],m),m),B.c8,B.ah1,B.c9,A.aiP(new A.ase(l),B.a1J,A.c0([l.db],m),m),B.c8,A.bw("version: _V3.0.0, main: /Users/jg/devel/projects/flutter/temperature_histo_1\n Running with Wasm: false",k,k,k,k,k,k)],t.p),B.cj,B.ah,B.b8),k),k)},
 a5p(a){var s,r,q
 if(a==null){s=this.w
 r=A.l(s).h("dm<1,2>")
