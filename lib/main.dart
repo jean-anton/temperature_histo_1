@@ -1,9 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'features/weather/presentation/screens/home_screen.dart';
+import 'features/weather/presentation/providers/weather_provider.dart';
+import 'features/weather/data/weather_repository.dart';
+import 'features/settings/presentation/providers/settings_provider.dart';
+import 'features/locations/presentation/providers/location_provider.dart';
+import 'features/locations/data/location_repository.dart';
+import 'core/services/geolocation_service.dart';
 
-const VERSION = "_V2.20.3";
+const VERSION = "_V3.0.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/temperature_histo_1";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
@@ -27,7 +34,36 @@ void main() async {
   const isRunningWithWasm = bool.fromEnvironment('dart.tool.dart2wasm');
   print('###### CJG Running with Wasm: $isRunningWithWasm');
 
-  runApp(const ClimaDeviationApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        // Repositories
+        Provider(create: (_) => WeatherRepository()),
+        Provider(
+          create: (_) => LocationRepository(
+            FallbackGeolocationService([
+              OpenMeteoGeolocationService(),
+              PhotonGeolocationService(),
+            ]),
+          ),
+        ),
+        // Providers
+        ChangeNotifierProvider(
+          create: (context) =>
+              WeatherProvider(context.read<WeatherRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SettingsProvider()..loadSettings(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) =>
+              LocationProvider(context.read<LocationRepository>())
+                ..initialize(),
+        ),
+      ],
+      child: const ClimaDeviationApp(),
+    ),
+  );
 }
 
 class ClimaDeviationApp extends StatelessWidget {
