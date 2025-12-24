@@ -363,7 +363,7 @@ class HourlyChartBuilder {
               SvgPicture.asset(iconPath, width: 45, height: 45),
               const SizedBox(height: 4),
               Text(
-                '${hourly.temperature!.round()}° ${hourly.weatherCode}',
+                '${hourly.temperature!.round()}°',
                 style: ChartTheme.temperatureMaxLabelStyle,
               ),
             ],

@@ -10,6 +10,37 @@ class MeteoFranceMapper {
       longitude: forecast.position.lon,
       timezone: forecast.position.timezone,
       dailyForecasts: forecast.dailyForecast.map((d) {
+        final dayStart = DateTime(d.date.year, d.date.month, d.date.day);
+        final dayEnd = dayStart.add(const Duration(days: 1));
+
+        // Filter hours between 6:00 and 20:00 for the current day
+        final relevantHours = forecast.forecast.where((h) {
+          final hourDate = h.date;
+          return hourDate.isAfter(
+                dayStart.subtract(const Duration(seconds: 1)),
+              ) &&
+              hourDate.isBefore(dayEnd) &&
+              hourDate.hour >= 6 &&
+              hourDate.hour <= 20;
+        }).toList();
+
+        double? avgWindSpeed;
+        double? avgWindGust;
+
+        if (relevantHours.isNotEmpty) {
+          final totalWindSpeed = relevantHours.fold<double>(
+            0,
+            (sum, h) => sum + (h.windSpeed ?? 0.0),
+          );
+          final totalWindGust = relevantHours.fold<double>(
+            0,
+            (sum, h) => sum + (h.windGust ?? 0.0),
+          );
+
+          avgWindSpeed = (totalWindSpeed / relevantHours.length) * 3.6;
+          avgWindGust = (totalWindGust / relevantHours.length) * 3.6;
+        }
+
         return DailyForecast(
           date: d.date,
           temperatureMax: d.maxTemp ?? 0.0,
@@ -24,6 +55,8 @@ class MeteoFranceMapper {
               : null,
           // Map other fields if possible, or leave null
           weatherCode: _mapIconToCode(d.weatherIcon),
+          windSpeedMax: avgWindSpeed,
+          windGustsMax: avgWindGust,
         );
       }).toList(),
     );
@@ -55,8 +88,8 @@ class MeteoFranceMapper {
               precipitation: h.rain1h + (h.snow1h ?? 0.0),
               rain: h.rain1h,
               weatherIcon: h.weatherIcon,
-              windSpeed: h.windSpeed,
-              windGusts: h.windGust,
+              windSpeed: (h.windSpeed ?? 0.0) * 3.6,
+              windGusts: (h.windGust ?? 0.0) * 3.6,
               windDirection10m: h.windDirection,
               humidity: h
                   .humidity, // Existing model doesn't have humidity in HourlyForecast?
@@ -84,91 +117,89 @@ class MeteoFranceMapper {
     return 0;
   }
 
-
   static int _mapIconToCode(String? icon) {
-  if (icon == null) return 0;
+    if (icon == null) return 0;
 
-  switch (icon) {
-    // Clear / Sunny
-    case 'p1j':
-    case 'p1n':
-      return 0;
-    case 'p1bisj':
-    case 'p1bisn':
-      return 1;
+    switch (icon) {
+      // Clear / Sunny
+      case 'p1j':
+      case 'p1n':
+        return 0;
+      case 'p1bisj':
+      case 'p1bisn':
+        return 1;
 
-    // Partly cloudy / Variable
-    case 'p2j':
-    case 'p2n':
-    case 'p2bisj':
-    case 'p2bisn':
-      return 2;
+      // Partly cloudy / Variable
+      case 'p2j':
+      case 'p2n':
+      case 'p2bisj':
+      case 'p2bisn':
+      case 'p4j':
+      case 'p4n':
+        return 2;
 
-    // Cloudy / Overcast
-    case 'p3j':
-    case 'p3n':
-    case 'p3bisj':
-    case 'p3bisn':
-    case 'p4j':
-    case 'p4n':
-      return 3;
+      // Cloudy / Overcast
+      case 'p3j':
+      case 'p3n':
+      case 'p3bisj':
+      case 'p3bisn':
+        return 3;
 
-    // Fog / Mist / Haze
-    case 'p5j':
-    case 'p5n':
-    case 'p5bisn':
-    case 'p6j':
-    case 'p6n':
-    case 'p7j':
-    case 'p7n':
-      return 45;
+      // Fog / Mist / Haze
+      case 'p5j':
+      case 'p5n':
+      case 'p5bisn':
+      case 'p6j':
+      case 'p6n':
+      case 'p7j':
+      case 'p7n':
+        return 45;
 
-    // Light rain
-    case 'p12j':
-    case 'p12n':
-    case 'p13j':
-    case 'p13n':
-    case 'p13terj':
-    case 'p13tern':
-      return 61;
+      // Light rain
+      case 'p12j':
+      case 'p12n':
+      case 'p13j':
+      case 'p13n':
+      case 'p13terj':
+      case 'p13tern':
+        return 61;
 
-    // Moderate rain
-    case 'p14terj':
-    case 'p14tern':
-      return 63;
+      // Moderate rain
+      case 'p14terj':
+      case 'p14tern':
+        return 63;
 
-    // Heavy rain
-    case 'p15j':
-    case 'p15n':
-      return 65;
+      // Heavy rain
+      case 'p15j':
+      case 'p15n':
+        return 65;
 
-    // Showers
-    case 'p12bisj':
-    case 'p12bisn':
-      return 80;
-    case 'p14bisj':
-    case 'p14bisn':
-      return 81;
+      // Showers
+      case 'p12bisj':
+      case 'p12bisn':
+        return 80;
+      case 'p14bisj':
+      case 'p14bisn':
+        return 81;
 
-    // Thunderstorms
-    case 'p16bisj':
-    case 'p16bisn':
-    case 'p28n':
-      return 95;
+      // Thunderstorms
+      case 'p16bisj':
+      case 'p16bisn':
+      case 'p28n':
+        return 95;
 
-    // Snow
-    case 'p18j':
-    case 'p18n':
-      return 71;
-    case 'p19bisj':
-      return 85;
-    case 'p20bisj':
-    case 'p20bisn':
-      return 67;
+      // Snow
+      case 'p18j':
+      case 'p18n':
+        return 71;
+      case 'p19bisj':
+        return 85;
+      case 'p20bisj':
+      case 'p20bisn':
+        return 67;
 
-    default:
-      return 0;
+      default:
+        return 0;
+    }
   }
-}
-
 }

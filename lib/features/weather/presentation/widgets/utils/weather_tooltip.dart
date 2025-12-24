@@ -43,7 +43,8 @@ class WeatherTooltip {
     Offset position,
     HourlyWeather dailyWeather,
   ) {
-    if (touchedIndex < 0 || touchedIndex >= dailyWeather.hourlyForecasts.length) {
+    if (touchedIndex < 0 ||
+        touchedIndex >= dailyWeather.hourlyForecasts.length) {
       return;
     }
 
@@ -61,9 +62,9 @@ class WeatherTooltip {
     BuildContext context,
     Offset position,
     String formattedDate,
-    dynamic data, // DailyForecast or HourlyForecast
-    [WeatherDeviation? deviation,]
-  ) {
+    dynamic data, [ // DailyForecast or HourlyForecast
+    WeatherDeviation? deviation,
+  ]) {
     Widget buildDetailRow(String label, String? value, {Color? valueColor}) {
       if (value == null || value.isEmpty) {
         return const SizedBox.shrink();
@@ -164,18 +165,59 @@ class WeatherTooltip {
                       ),
                       const SizedBox(height: 8),
                       // Weather Description
+                      // Weather Description
                       if (data is DailyForecast && data.weatherCode != null ||
                           data is HourlyForecast && data.weatherCode != null)
-                        Text(
-                          data.weatherCode != null
-                              ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
-                              : "",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                data.weatherCode != null
+                                    ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
+                                    : "",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            if (data is DailyForecast) ...[
+                              if (data.sunrise != null) ...[
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.wb_sunny_outlined,
+                                  color: Colors.amberAccent,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  DateFormat('HH:mm').format(data.sunrise!),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                              if (data.sunset != null) ...[
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.nights_stay_outlined,
+                                  color: Colors.orangeAccent,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  DateFormat('HH:mm').format(data.sunset!),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ],
                         ),
                       Container(
                         margin: const EdgeInsets.symmetric(vertical: 8),
@@ -295,11 +337,16 @@ class WeatherTooltip {
                         'Direction vent',
                         data is DailyForecast
                             ? data.windDirection10mDominant != null
-                                  ? ChartHelpers.getWindDirectionAbbrev(data.windDirection10mDominant)
+                                  ? ChartHelpers.getWindDirectionAbbrev(
+                                      data.windDirection10mDominant,
+                                    )
                                   : null
                             : data is HourlyForecast
                             ? data.windDirection10m != null
-                                  ? ChartHelpers.getWindDirectionAbbrev(data.windDirection10m) + ' (${data.windDirection10m}°)'
+                                  ? ChartHelpers.getWindDirectionAbbrev(
+                                          data.windDirection10m,
+                                        ) +
+                                        ' (${data.windDirection10m}°)'
                                   : null
                             : null,
                       ),
