@@ -5,6 +5,7 @@ set -e
 echo "🛠️ Building Flutter web..."
 # flutter build web
 flutter build web  --wasm --release
+# flutter build web  --release
 
 # Modifier <base href="/">
 INDEX_FILE="build/web/index.html"

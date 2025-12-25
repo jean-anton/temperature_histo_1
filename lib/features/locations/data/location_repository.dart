@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/core/utils/api_keys.dart';
 import 'package:temperature_histo_1/core/services/geolocation_service.dart';
 
 class LocationRepository {
@@ -106,8 +104,8 @@ class LocationRepository {
         final key = cityData['key'] as String;
         weatherLocations[key] = WeatherLocationInfo(
           displayName: cityData['displayName'] as String,
-          lat: cityData['lat'] as double,
-          lon: cityData['lon'] as double,
+          lat: (cityData['lat'] as num).toDouble(),
+          lon: (cityData['lon'] as num).toDouble(),
           country: cityData['country'] as String?,
           state: cityData['state'] as String?,
           county: cityData['county'] as String?,
@@ -203,5 +201,58 @@ class LocationRepository {
   bool isCustomCity(String cityKey) {
     // Hard-coded cities are not custom
     return !_hardcodedWeatherLocations.containsKey(cityKey);
+  }
+
+  Future<String> exportCustomCities() async {
+    final prefs = await SharedPreferences.getInstance();
+    final customCitiesJson = prefs.getStringList(_kCustomCitiesKey) ?? [];
+
+    // Return as a pretty-printed JSON array
+    final List<dynamic> cities = customCitiesJson
+        .map((s) => jsonDecode(s))
+        .toList();
+    return const JsonEncoder.withIndent('  ').convert(cities);
+  }
+
+  Future<int> importCustomCities(String jsonContent) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentCustomCitiesJson =
+        prefs.getStringList(_kCustomCitiesKey) ?? [];
+
+    final List<dynamic> importedCities = jsonDecode(jsonContent);
+    int addedCount = 0;
+
+    for (var cityData in importedCities) {
+      if (cityData is! Map<String, dynamic>) continue;
+
+      // Check if this city already exists (by lat/lon)
+      bool exists = false;
+      for (var existingJson in currentCustomCitiesJson) {
+        try {
+          final existingData = jsonDecode(existingJson);
+          if ((existingData['lat'] as double).toStringAsFixed(4) ==
+                  (cityData['lat'] as double).toStringAsFixed(4) &&
+              (existingData['lon'] as double).toStringAsFixed(4) ==
+                  (cityData['lon'] as double).toStringAsFixed(4)) {
+            exists = true;
+            break;
+          }
+        } catch (_) {}
+      }
+
+      if (!exists) {
+        // Ensure it has a new unique key to avoid conflicts
+        cityData['key'] =
+            'custom_${DateTime.now().millisecondsSinceEpoch}_$addedCount';
+        currentCustomCitiesJson.add(jsonEncode(cityData));
+        addedCount++;
+      }
+    }
+
+    if (addedCount > 0) {
+      await prefs.setStringList(_kCustomCitiesKey, currentCustomCitiesJson);
+    }
+
+    return addedCount;
   }
 }
