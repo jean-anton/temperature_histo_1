@@ -456,7 +456,7 @@ class WeatherTooltip {
 
   /// Schedule tooltip removal after delay
   static void scheduleTooltipRemoval({bool showExtendedWindInfo = false}) {
-    final duration = showExtendedWindInfo ? 60 : 10;
+    final duration = showExtendedWindInfo ? 60*5 : 10;
     _tooltipTimer = Timer(Duration(seconds: duration), () {
       removeTooltip();
     });
