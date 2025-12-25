@@ -117,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Display mode: 'daily' or 'hourly'
   String _displayMode = 'daily';
+  DisplayType _displayType = DisplayType.graphique;
   String _selectedClimateLocation = '04336_Saarbrücken-Ensheim_1961_1990';
   String _selectedWeatherLocation = 'rosbruck_fr';
   String _selectedModel = 'best_match';
@@ -125,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<ClimateNormal> _climateNormals = [];
   bool _isLoading = true;
   String? _errorMessage;
-  bool _showChart = true;
   bool _showWindInfo = true;
   bool _showExtendedWindInfo = false;
 
@@ -153,6 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _displayMode = prefs.getString(_kDisplayModeKey) ?? 'daily';
+      final displayTypeIndex =
+          prefs.getInt(_kDisplayModeKey + '_type') ??
+          DisplayType.graphique.index;
+      _displayType = DisplayType
+          .values[displayTypeIndex.clamp(0, DisplayType.values.length - 1)];
       _selectedClimateLocation =
           prefs.getString(_kSelectedClimateLocationKey) ??
           _selectedClimateLocation;
@@ -176,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kDisplayModeKey, _displayMode);
+    await prefs.setInt(_kDisplayModeKey + '_type', _displayType.index);
     await prefs.setString(
       _kSelectedClimateLocationKey,
       _selectedClimateLocation,
@@ -246,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
           _isLoading = false;
         });
-      } else if (_displayMode == 'hourly') {
+      } else if (_displayMode == 'hourly' || _displayType == DisplayType.vent) {
         final results = await Future.wait([
           _climateService.loadClimateNormals(climateInfo.assetPath),
           _weatherService.getHourlyWeatherForecast(
@@ -527,25 +533,38 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
-            SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment<bool>(
-                  value: true,
-                  label: Text('Graphique'),
-                  icon: Icon(Icons.bar_chart),
-                ),
-                ButtonSegment<bool>(
-                  value: false,
-                  label: Text('Tableau'),
-                  icon: Icon(Icons.table_chart),
-                ),
-              ],
-              selected: {_showChart},
-              onSelectionChanged: (Set<bool> selection) {
-                setState(() {
-                  _showChart = selection.first;
-                });
-              },
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SegmentedButton<DisplayType>(
+                segments: [
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.graphique,
+                    label: const Text('Graphique'),
+                    icon: const Icon(Icons.bar_chart),
+                  ),
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.tableau,
+                    label: const Text('Tableau'),
+                    icon: const Icon(Icons.table_chart),
+                  ),
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.vent,
+                    label: const Text('Vent'),
+                    icon: const Icon(Icons.air),
+                  ),
+                ],
+                selected: {_displayType},
+                onSelectionChanged: (Set<DisplayType> selection) {
+                  setState(() {
+                    _displayType = selection.first;
+                    _savePreferences();
+                    if (_displayType == DisplayType.vent &&
+                        _hourlyForecast == null) {
+                      _loadData();
+                    }
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -704,12 +723,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            if (_showChart)
+            if (_displayType != DisplayType.tableau)
               WeatherChart2(
                 forecast: _forecast,
                 hourlyWeather: _hourlyForecast,
                 climateNormals: _climateNormals,
                 displayMode: _displayMode,
+                displayType: _displayType,
                 showWindInfo: _showWindInfo,
                 showExtendedWindInfo: _showExtendedWindInfo,
               )

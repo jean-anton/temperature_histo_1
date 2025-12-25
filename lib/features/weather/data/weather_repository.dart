@@ -102,8 +102,8 @@ class WeatherRepository {
         'longitude': longitude.toString(),
         'hourly': hourlyParameters,
         'timezone': 'auto',
-        'forecast_days': '7',
-        'models': model, // Only fetch today's data
+        'forecast_days': '16',
+        'models': model,
       },
     );
     print("### CJG getDailyWeatherForecast: URL: $url");

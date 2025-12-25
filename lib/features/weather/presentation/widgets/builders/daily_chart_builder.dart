@@ -29,7 +29,9 @@ class DailyChartBuilder {
     final startTime = forecast.dailyForecasts.first.date;
 
     final minX = startTime.millisecondsSinceEpoch.toDouble();
-    final maxX = forecast.dailyForecasts.last.date.millisecondsSinceEpoch
+    final maxX = forecast.dailyForecasts.last.date
+        .add(const Duration(days: 1))
+        .millisecondsSinceEpoch
         .toDouble();
     final minY = minTemp - 5;
     final maxY = maxTemp + 5;

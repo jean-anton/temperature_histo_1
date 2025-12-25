@@ -34,7 +34,9 @@ class HourlyChartBuilder {
     //     .millisecondsSinceEpoch
     //     .toDouble();
     //final maxX = hourlyWeather.hourlyForecasts.last.time.subtract(Duration(days: 1)).millisecondsSinceEpoch.toDouble();
-    final maxX = hourlyWeather.hourlyForecasts.last.time.millisecondsSinceEpoch
+    final maxX = hourlyWeather.hourlyForecasts.last.time
+        .add(const Duration(hours: 1))
+        .millisecondsSinceEpoch
         .toDouble();
 
     final minY = minTemp - 5;
