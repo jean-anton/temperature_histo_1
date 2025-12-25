@@ -38,6 +38,7 @@ class WindChartBuilder {
           minY,
           maxY,
         ),
+        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY),
         _buildXAxisLabels(
           containerSize,
           hourlyWeather,
@@ -102,6 +103,31 @@ class WindChartBuilder {
         ),
         lineBarsData: [],
       ),
+    );
+  }
+
+  static Widget _buildSeparationLine(
+    Size containerSize,
+    DateTime startTime,
+    DateTime endTime,
+    double minY,
+    double maxY,
+  ) {
+    final pos = ChartPositioning.calculatePosition(
+      timeMs: startTime.millisecondsSinceEpoch.toDouble(),
+      value: 10.0,
+      containerSize: containerSize,
+      minValue: minY,
+      maxValue: maxY,
+      startTime: startTime,
+      endTime: endTime,
+    );
+
+    return Positioned(
+      left: ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize,
+      right: ChartConstants.rightPadding,
+      top: pos.dy - 1.0,
+      child: Container(height: 2.0, color: Colors.black),
     );
   }
 
@@ -176,7 +202,7 @@ class WindChartBuilder {
   ) {
     final List<Widget> segments = [];
     final List<double> altitudes = [
-      0.0,
+      -20.0,
       10.0,
       20.0,
       50.0,
@@ -281,7 +307,7 @@ class WindChartBuilder {
     double bottom,
     double top,
   ) {
-    if (bottom == 0.0 && top == 10.0) {
+    if (bottom == -20.0 && top == 10.0) {
       return forecast.windGusts ?? forecast.windSpeed;
     }
 
@@ -447,7 +473,7 @@ class WindChartBuilder {
     ];
 
     return Stack(
-      children: altitudes.map((alt) {
+      children: altitudes.where((alt) => alt >= 10.0).map((alt) {
         final pos = ChartPositioning.calculatePosition(
           timeMs: chartStartTime.millisecondsSinceEpoch.toDouble(),
           value: alt,

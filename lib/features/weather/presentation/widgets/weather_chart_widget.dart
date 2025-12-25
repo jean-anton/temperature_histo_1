@@ -183,7 +183,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         startTime: startTime,
         endTime: endTime,
         labels: _labels,
-        minY: 0,
+        minY: -20.0,
         maxY: 210,
       );
     }
