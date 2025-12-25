@@ -1,14 +1,15 @@
 Analyzing temperature_histo_1...                                
 
-   info • Don't invoke 'print' in production code • lib/core/services/geolocation_service.dart:58:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/core/services/geolocation_service.dart:65:5 • avoid_print
    info • Don't invoke 'print' in production code • lib/features/climate/data/climate_repository.dart:38:9 • avoid_print
    info • Unnecessary braces in a string interpolation • lib/features/climate/domain/climate_model.dart:47:13 • unnecessary_brace_in_string_interps
    info • Unnecessary braces in a string interpolation • lib/features/climate/domain/climate_model.dart:52:13 • unnecessary_brace_in_string_interps
    info • Unnecessary braces in a string interpolation • lib/features/climate/domain/climate_model.dart:57:13 • unnecessary_brace_in_string_interps
 warning • Unused import: 'package:http/http.dart' • lib/features/locations/data/location_repository.dart:2:8 • unused_import
 warning • Unused import: 'package:temperature_histo_1/core/utils/api_keys.dart' • lib/features/locations/data/location_repository.dart:5:8 • unused_import
-   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:89:7 • avoid_print
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/locations/presentation/widgets/city_management_dialog.dart:227:58 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:99:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:154:7 • avoid_print
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/locations/presentation/widgets/city_management_dialog.dart:391:58 • deprecated_member_use
 warning • Unused import: 'dart:developer' • lib/features/weather/data/weather_repository.dart:5:8 • unused_import
 warning • Unused import: 'dart:math' • lib/features/weather/data/weather_repository.dart:7:8 • unused_import
    info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:38:7 • avoid_print
@@ -92,4 +93,4 @@ warning • The value of the field '_touchedIndex' isn't used • lib/features/w
    info • Don't invoke 'print' in production code • lib/main.dart:35:3 • avoid_print
 warning • Unused import: 'package:flutter/material.dart' • test/widget_test.dart:8:8 • unused_import
 
-91 issues found. (ran in 2.4s)
+92 issues found. (ran in 4.2s)

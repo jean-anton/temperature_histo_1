@@ -31,6 +31,12 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
   Timer? _debounceTimer;
   String? _errorMessage;
 
+  // New fields for coordinate-based entry
+  bool _addByCoordinates = false;
+  final TextEditingController _coordsController = TextEditingController();
+  final TextEditingController _manualNameController = TextEditingController();
+  LocationSuggestion? _reverseGeocodedSuggestion;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +48,8 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _coordsController.dispose();
+    _manualNameController.dispose();
     super.dispose();
   }
 
@@ -80,7 +88,9 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
     });
 
     try {
-      final suggestions = await widget.locationService.fetchSuggestions(_searchController.text);
+      final suggestions = await widget.locationService.fetchSuggestions(
+        _searchController.text,
+      );
       setState(() {
         _suggestions = suggestions;
         _errorMessage = suggestions.isEmpty ? 'Aucune ville trouvée' : null;
@@ -102,7 +112,8 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
     await widget.locationService.addCity(suggestion);
 
     // Reload locations
-    final weatherLocations = await widget.locationService.loadWeatherLocations();
+    final weatherLocations = await widget.locationService
+        .loadWeatherLocations();
     setState(() {
       _currentLocations = weatherLocations;
       _searchController.clear();
@@ -111,9 +122,94 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
     widget.onLocationsUpdated();
 
     // If this is the first custom city, select it
-    if (_currentLocations.length == 4) { // 3 hard-coded + 1 new
+    if (_currentLocations.length == 4) {
+      // 3 hard-coded + 1 new
       final newKey = _currentLocations.keys.last;
       widget.onLocationChanged(newKey);
+    }
+  }
+
+  Future<void> _handleReverseGeocode() async {
+    final coordsStr = _coordsController.text.trim();
+    if (coordsStr.isEmpty) return;
+
+    final parts = coordsStr.split(',');
+    if (parts.length < 2) return;
+
+    final lat = double.tryParse(parts[0].trim());
+    final lon = double.tryParse(parts[1].trim());
+
+    if (lat == null || lon == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final suggestion = await widget.locationService.reverseGeocode(lat, lon);
+      if (suggestion != null) {
+        setState(() {
+          _reverseGeocodedSuggestion = suggestion;
+          _manualNameController.text = suggestion.name;
+        });
+      }
+    } catch (e) {
+      print('Error reverse geocoding: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _addManualCity() async {
+    final name = _manualNameController.text.trim();
+    final coordsStr = _coordsController.text.trim();
+    final parts = coordsStr.split(',');
+
+    if (name.isEmpty || parts.length < 2) {
+      setState(() => _errorMessage = 'Veuillez remplir tous les champs');
+      return;
+    }
+
+    final lat = double.tryParse(parts[0].trim());
+    final lon = double.tryParse(parts[1].trim());
+
+    if (lat == null || lon == null) {
+      setState(
+        () => _errorMessage = 'Coordonnées invalides (format: lat, lon)',
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await widget.locationService.addManualCity(
+        name: name,
+        lat: lat,
+        lon: lon,
+        country: _reverseGeocodedSuggestion?.country,
+        state: _reverseGeocodedSuggestion?.state,
+        county: _reverseGeocodedSuggestion?.county,
+      );
+
+      // Reload locations
+      final weatherLocations = await widget.locationService
+          .loadWeatherLocations();
+      setState(() {
+        _currentLocations = weatherLocations;
+        _coordsController.clear();
+        _manualNameController.clear();
+        _reverseGeocodedSuggestion = null;
+        _errorMessage = null;
+        _addByCoordinates = false;
+      });
+      widget.onLocationsUpdated();
+
+      // If this is the first custom city, select it
+      if (_currentLocations.length == 4) {
+        final newKey = _currentLocations.keys.last;
+        widget.onLocationChanged(newKey);
+      }
+    } catch (e) {
+      setState(() => _errorMessage = 'Erreur lors de l\'ajout: $e');
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -121,14 +217,16 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
     await widget.locationService.deleteCity(cityKey);
 
     // Reload locations
-    final weatherLocations = await widget.locationService.loadWeatherLocations();
+    final weatherLocations = await widget.locationService
+        .loadWeatherLocations();
     setState(() {
       _currentLocations = weatherLocations;
     });
     widget.onLocationsUpdated();
 
     // If the deleted city was selected, switch to the first available city
-    if (widget.selectedWeatherLocation == cityKey && _currentLocations.isNotEmpty) {
+    if (widget.selectedWeatherLocation == cityKey &&
+        _currentLocations.isNotEmpty) {
       final firstKey = _currentLocations.keys.first;
       widget.onLocationChanged(firstKey);
     }
@@ -149,24 +247,90 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
           children: [
             // Add new city section
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: const InputDecoration(
-                      labelText: 'Ajouter une ville',
-                      hintText: 'Tapez le nom d\'une ville...',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                  ),
+                ChoiceChip(
+                  label: const Text('Nom'),
+                  selected: !_addByCoordinates,
+                  onSelected: (selected) {
+                    if (selected) setState(() => _addByCoordinates = false);
+                  },
                 ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _searchCities,
+                const SizedBox(width: 12),
+                ChoiceChip(
+                  label: const Text('Coordonnées'),
+                  selected: _addByCoordinates,
+                  onSelected: (selected) {
+                    if (selected) setState(() => _addByCoordinates = true);
+                  },
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            if (!_addByCoordinates) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        labelText: 'Ajouter une ville',
+                        hintText: 'Tapez le nom d\'une ville...',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: _searchCities,
+                  ),
+                ],
+              ),
+            ] else ...[
+              Column(
+                children: [
+                  TextField(
+                    controller: _coordsController,
+                    decoration: const InputDecoration(
+                      labelText: 'Coordonnées (lat, lon)',
+                      hintText: 'ex: 49.101, 6.793',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    onChanged: (_) => _handleReverseGeocode(),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _manualNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nom du lieu',
+                      hintText: 'Entrez un nom pour ce lieu',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.add),
+                      label: const Text('Ajouter ce lieu'),
+                      onPressed: _addManualCity,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             if (_isLoading)
               const Padding(
                 padding: EdgeInsets.all(8.0),

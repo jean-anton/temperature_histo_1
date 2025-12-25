@@ -3,7 +3,12 @@ import 'package:http/http.dart' as http;
 import '../../features/locations/domain/location_model.dart';
 
 abstract class GeolocationService {
-  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon});
+  Future<List<LocationSuggestion>> fetchSuggestions(
+    String query, {
+    double? lat,
+    double? lon,
+  });
+  Future<LocationSuggestion?> reverseGeocode(double lat, double lon);
 }
 
 // class GeoapifyGeolocationService implements GeolocationService {
@@ -44,18 +49,22 @@ abstract class GeolocationService {
 //   }
 // }
 
-
-
 class PhotonGeolocationService implements GeolocationService {
   @override
-  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
+  Future<List<LocationSuggestion>> fetchSuggestions(
+    String query, {
+    double? lat,
+    double? lon,
+  }) async {
     final bias = lat != null && lon != null ? '&lat=$lat&lon=$lon' : '';
     final url = Uri.parse(
       'https://photon.komoot.io/api/?q=$query&layer=city$bias&limit=5',
     );
 
     final response = await http.get(url);
-    print("####### CJG PhotonGeolocationService: URL: $url, Status: ${response.statusCode}");
+    print(
+      "####### CJG PhotonGeolocationService: URL: $url, Status: ${response.statusCode}",
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final features = data['features'] as List;
@@ -75,11 +84,42 @@ class PhotonGeolocationService implements GeolocationService {
       throw Exception('Failed to fetch suggestions: ${response.statusCode}');
     }
   }
+
+  @override
+  Future<LocationSuggestion?> reverseGeocode(double lat, double lon) async {
+    final url = Uri.parse('https://photon.komoot.io/reverse?lat=$lat&lon=$lon');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final features = data['features'] as List;
+      if (features.isEmpty) return null;
+
+      final props = features[0]['properties'];
+      final geometry = features[0]['geometry'];
+      return LocationSuggestion(
+        name:
+            props['name'] ??
+            props['formatted'] ??
+            '${lat.toStringAsFixed(4)}, ${lon.toStringAsFixed(4)}',
+        lat: geometry['coordinates'][1],
+        lon: geometry['coordinates'][0],
+        country: props['country'],
+        state: props['state'],
+        county: props['county'],
+      );
+    }
+    return null;
+  }
 }
 
 class OpenMeteoGeolocationService implements GeolocationService {
   @override
-  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
+  Future<List<LocationSuggestion>> fetchSuggestions(
+    String query, {
+    double? lat,
+    double? lon,
+  }) async {
     final url = Uri.parse(
       'https://geocoding-api.open-meteo.com/v1/search?name=$query&count=10&language=en&format=json',
     );
@@ -101,6 +141,12 @@ class OpenMeteoGeolocationService implements GeolocationService {
       throw Exception('Failed to fetch suggestions: ${response.statusCode}');
     }
   }
+
+  @override
+  Future<LocationSuggestion?> reverseGeocode(double lat, double lon) async {
+    // Open-Meteo doesn't seem to have a straightforward reverse geocoding API in their free geocoding service
+    return null;
+  }
 }
 
 enum GeolocationProvider {
@@ -108,12 +154,16 @@ enum GeolocationProvider {
   photon,
   openMeteo,
 }
+
 class GeolocationServiceFactory {
-  static GeolocationService create(GeolocationProvider provider, String apiKey) {
+  static GeolocationService create(
+    GeolocationProvider provider,
+    String apiKey,
+  ) {
     switch (provider) {
       // case GeolocationProvider.geoapify:
       //   return PhotonGeolocationService();
-       // return GeoapifyGeolocationService(apiKey);
+      // return GeoapifyGeolocationService(apiKey);
       case GeolocationProvider.photon:
         return PhotonGeolocationService();
       case GeolocationProvider.openMeteo:
@@ -128,10 +178,18 @@ class FallbackGeolocationService implements GeolocationService {
   FallbackGeolocationService(this._services);
 
   @override
-  Future<List<LocationSuggestion>> fetchSuggestions(String query, {double? lat, double? lon}) async {
+  Future<List<LocationSuggestion>> fetchSuggestions(
+    String query, {
+    double? lat,
+    double? lon,
+  }) async {
     for (final service in _services) {
       try {
-        final suggestions = await service.fetchSuggestions(query, lat: lat, lon: lon);
+        final suggestions = await service.fetchSuggestions(
+          query,
+          lat: lat,
+          lon: lon,
+        );
         if (suggestions.isNotEmpty) {
           return suggestions;
         }
@@ -142,5 +200,20 @@ class FallbackGeolocationService implements GeolocationService {
     }
     // If all services fail, return empty list
     return [];
+  }
+
+  @override
+  Future<LocationSuggestion?> reverseGeocode(double lat, double lon) async {
+    for (final service in _services) {
+      try {
+        final suggestion = await service.reverseGeocode(lat, lon);
+        if (suggestion != null) {
+          return suggestion;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+    return null;
   }
 }
