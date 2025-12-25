@@ -33,7 +33,13 @@ class WeatherTooltip {
       'fr_FR',
     ).format(forecastData.date);
 
-    _buildTooltip(context, position, formattedDate, forecastData, deviation);
+    _buildTooltip(
+      context,
+      position,
+      formattedDate,
+      forecastData,
+      deviation: deviation,
+    );
   }
 
   /// Show tooltip for hourly weather data
@@ -41,8 +47,9 @@ class WeatherTooltip {
     BuildContext context,
     int touchedIndex,
     Offset position,
-    HourlyWeather dailyWeather,
-  ) {
+    HourlyWeather dailyWeather, {
+    bool showExtendedWindInfo = false,
+  }) {
     if (touchedIndex < 0 ||
         touchedIndex >= dailyWeather.hourlyForecasts.length) {
       return;
@@ -54,7 +61,13 @@ class WeatherTooltip {
       'fr_FR',
     ).format(hourly.time);
 
-    _buildTooltip(context, position, formattedDate, hourly);
+    _buildTooltip(
+      context,
+      position,
+      formattedDate,
+      hourly,
+      showExtendedWindInfo: showExtendedWindInfo,
+    );
   }
 
   /// Build the tooltip widget
@@ -62,9 +75,10 @@ class WeatherTooltip {
     BuildContext context,
     Offset position,
     String formattedDate,
-    dynamic data, [ // DailyForecast or HourlyForecast
+    dynamic data, {
     WeatherDeviation? deviation,
-  ]) {
+    bool showExtendedWindInfo = false,
+  }) {
     Widget buildDetailRow(String label, String? value, {Color? valueColor}) {
       if (value == null || value.isEmpty) {
         return const SizedBox.shrink();
@@ -350,6 +364,56 @@ class WeatherTooltip {
                                   : null
                             : null,
                       ),
+                      if (showExtendedWindInfo && data is HourlyForecast) ...[
+                        buildDetailRow(
+                          'Vent 20m',
+                          data.windSpeed20m != null
+                              ? '${data.windSpeed20m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 50m',
+                          data.windSpeed50m != null
+                              ? '${data.windSpeed50m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 80m',
+                          data.windSpeed80m != null
+                              ? '${data.windSpeed80m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 100m',
+                          data.windSpeed100m != null
+                              ? '${data.windSpeed100m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 120m',
+                          data.windSpeed120m != null
+                              ? '${data.windSpeed120m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 150m',
+                          data.windSpeed150m != null
+                              ? '${data.windSpeed150m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 180m',
+                          data.windSpeed180m != null
+                              ? '${data.windSpeed180m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                        buildDetailRow(
+                          'Vent 200m',
+                          data.windSpeed200m != null
+                              ? '${data.windSpeed200m?.toStringAsFixed(1)} km/h'
+                              : null,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -380,7 +444,7 @@ class WeatherTooltip {
     );
 
     Overlay.of(context).insert(_overlayEntry!);
-    scheduleTooltipRemoval();
+    scheduleTooltipRemoval(showExtendedWindInfo: showExtendedWindInfo);
   }
 
   /// Remove the current tooltip
@@ -391,8 +455,9 @@ class WeatherTooltip {
   }
 
   /// Schedule tooltip removal after delay
-  static void scheduleTooltipRemoval() {
-    _tooltipTimer = Timer(const Duration(seconds: 10), () {
+  static void scheduleTooltipRemoval({bool showExtendedWindInfo = false}) {
+    final duration = showExtendedWindInfo ? 60 : 10;
+    _tooltipTimer = Timer(Duration(seconds: duration), () {
       removeTooltip();
     });
   }

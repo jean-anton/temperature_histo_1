@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String _kSelectedModelKey = 'selectedModel';
   static const String _kDisplayModeKey = 'displayMode';
   static const String _kShowWindInfoKey = 'showWindInfo';
+  static const String _kShowExtendedWindInfoKey = 'showExtendedWindInfo';
 
   final Map<String, ClimateLocationInfo> _climateLocationData = {
     '00460_Berus_1961_1990': const ClimateLocationInfo(
@@ -108,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'ecmwf_ifs025': 'ECMWF IFS',
     'gfs_seamless': 'GFS',
 
+    'meteofrance_arome_seamless': 'Météo-France (AROME)',
     'meteofrance_seamless': 'ARPEGE',
     'icon_seamless': 'ICON/DWD',
     'meteo_france_api': 'MeteoFrance API',
@@ -125,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _errorMessage;
   bool _showChart = true;
   bool _showWindInfo = true;
+  bool _showExtendedWindInfo = false;
 
   @override
   void initState() {
@@ -158,6 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _selectedWeatherLocation;
       _selectedModel = prefs.getString(_kSelectedModelKey) ?? _selectedModel;
       _showWindInfo = prefs.getBool(_kShowWindInfoKey) ?? true;
+      _showExtendedWindInfo = prefs.getBool(_kShowExtendedWindInfoKey) ?? false;
 
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {
         _selectedClimateLocation = _climateLocationData.keys.first;
@@ -182,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     await prefs.setString(_kSelectedModelKey, _selectedModel);
     await prefs.setBool(_kShowWindInfoKey, _showWindInfo);
+    await prefs.setBool(_kShowExtendedWindInfoKey, _showExtendedWindInfo);
   }
 
   Future<void> _loadData() async {
@@ -217,7 +222,9 @@ class _HomeScreenState extends State<HomeScreen> {
             longitude: weatherInfo.lon,
           );
         } catch (e) {
-          throw Exception('# CJG 362: Failed to fetch Météo-France forecast: $e');
+          throw Exception(
+            '# CJG 362: Failed to fetch Météo-France forecast: $e',
+          );
         }
 
         setState(() {
@@ -542,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Informations vent:',
+              'Informations vent (km/h):',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
@@ -563,6 +570,33 @@ class _HomeScreenState extends State<HomeScreen> {
               onSelectionChanged: (Set<bool> selection) {
                 setState(() {
                   _showWindInfo = selection.first;
+                  _savePreferences();
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Wind Info étendue (km/h):',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment<bool>(
+                  value: true,
+                  label: Text('Oui'),
+                  icon: Icon(Icons.add_chart),
+                ),
+                ButtonSegment<bool>(
+                  value: false,
+                  label: Text('Non'),
+                  icon: Icon(Icons.remove_circle_outline),
+                ),
+              ],
+              selected: {_showExtendedWindInfo},
+              onSelectionChanged: (Set<bool> selection) {
+                setState(() {
+                  _showExtendedWindInfo = selection.first;
                   _savePreferences();
                 });
               },
@@ -677,6 +711,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 climateNormals: _climateNormals,
                 displayMode: _displayMode,
                 showWindInfo: _showWindInfo,
+                showExtendedWindInfo: _showExtendedWindInfo,
               )
             else
               // TODO: Implement hourly table view

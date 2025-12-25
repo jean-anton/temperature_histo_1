@@ -221,6 +221,14 @@ class HourlyWeather {
     final isDayList = hourlyData['is_day'] as List?;
     final sunshineDurationList = hourlyData['sunshine_duration'] as List?;
     final windDirectionList = hourlyData['wind_direction_10m'] as List?;
+    final windSpeed20mList = hourlyData['windspeed_20m'] as List?;
+    final windSpeed50mList = hourlyData['windspeed_50m'] as List?;
+    final windSpeed80mList = hourlyData['windspeed_80m'] as List?;
+    final windSpeed100mList = hourlyData['windspeed_100m'] as List?;
+    final windSpeed120mList = hourlyData['windspeed_120m'] as List?;
+    final windSpeed150mList = hourlyData['windspeed_150m'] as List?;
+    final windSpeed180mList = hourlyData['windspeed_180m'] as List?;
+    final windSpeed200mList = hourlyData['windspeed_200m'] as List?;
 
     final forecasts = <HourlyForecast>[];
 
@@ -246,6 +254,14 @@ class HourlyWeather {
             isDay: (isDayList?[i] as num?)?.toInt(),
             sunshineDuration: (sunshineDurationList?[i] as num?)?.toDouble(),
             windDirection10m: (windDirectionList?[i] as num?)?.toInt(),
+            windSpeed20m: (windSpeed20mList?[i] as num?)?.toDouble(),
+            windSpeed50m: (windSpeed50mList?[i] as num?)?.toDouble(),
+            windSpeed80m: (windSpeed80mList?[i] as num?)?.toDouble(),
+            windSpeed100m: (windSpeed100mList?[i] as num?)?.toDouble(),
+            windSpeed120m: (windSpeed120mList?[i] as num?)?.toDouble(),
+            windSpeed150m: (windSpeed150mList?[i] as num?)?.toDouble(),
+            windSpeed180m: (windSpeed180mList?[i] as num?)?.toDouble(),
+            windSpeed200m: (windSpeed200mList?[i] as num?)?.toDouble(),
           ),
         );
       }
@@ -302,6 +318,14 @@ class HourlyForecast {
   final int? isDay;
   final double? sunshineDuration;
   final int? windDirection10m;
+  final double? windSpeed20m;
+  final double? windSpeed50m;
+  final double? windSpeed80m;
+  final double? windSpeed100m;
+  final double? windSpeed120m;
+  final double? windSpeed150m;
+  final double? windSpeed180m;
+  final double? windSpeed200m;
   final String? weatherIcon;
 
   HourlyForecast({
@@ -319,6 +343,14 @@ class HourlyForecast {
     this.isDay,
     this.sunshineDuration,
     this.windDirection10m,
+    this.windSpeed20m,
+    this.windSpeed50m,
+    this.windSpeed80m,
+    this.windSpeed100m,
+    this.windSpeed120m,
+    this.windSpeed150m,
+    this.windSpeed180m,
+    this.windSpeed200m,
     this.weatherIcon,
   });
 

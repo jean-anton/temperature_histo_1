@@ -16,6 +16,7 @@ class WeatherChart2 extends StatefulWidget {
   final List<ClimateNormal> climateNormals;
   final String displayMode; // 'daily' or 'hourly'
   final bool showWindInfo;
+  final bool showExtendedWindInfo;
 
   const WeatherChart2({
     super.key,
@@ -24,6 +25,7 @@ class WeatherChart2 extends StatefulWidget {
     required this.climateNormals,
     required this.displayMode,
     this.showWindInfo = true,
+    this.showExtendedWindInfo = false,
   });
 
   @override
@@ -253,6 +255,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         touchedIndex,
         position,
         widget.hourlyWeather!,
+        showExtendedWindInfo: widget.showExtendedWindInfo,
       );
     }
   }
@@ -270,7 +273,11 @@ class _WeatherChart2State extends State<WeatherChart2> {
         chartWidth = minWidth;
       }
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
-      chartWidth = widget.hourlyWeather!.hourlyForecasts.last.time.difference(widget.hourlyWeather!.hourlyForecasts.first.time).inHours * ChartConstants.hourlyChartWidthPerHour;
+      chartWidth =
+          widget.hourlyWeather!.hourlyForecasts.last.time
+              .difference(widget.hourlyWeather!.hourlyForecasts.first.time)
+              .inHours *
+          ChartConstants.hourlyChartWidthPerHour;
       finalHeight = ChartConstants.hourlyChartHeight;
     } else {
       chartWidth = minWidth;

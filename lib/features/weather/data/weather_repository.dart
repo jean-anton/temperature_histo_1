@@ -68,6 +68,21 @@ class WeatherRepository {
           'precipitation_probability,precipitation,rain,'
           'cloud_cover,wind_speed_10m,wind_gusts_10m,'
           'is_day,sunshine_duration,wind_direction_10m';
+    } else if (model == 'meteofrance_arome_seamless' ||
+        model == 'meteofrance_seamless') {
+      hourlyParameters =
+          'temperature_2m,weather_code,apparent_temperature,'
+          'precipitation_probability,precipitation,rain,'
+          'cloud_cover,wind_speed_10m,windgusts_10m,'
+          'is_day,sunshine_duration,wind_direction_10m,'
+          'windspeed_20m,windspeed_50m,windspeed_80m,windspeed_100m,windspeed_120m,windspeed_150m,windspeed_180m,windspeed_200m';
+    } else if (model == 'icon_seamless') {
+      hourlyParameters =
+          'temperature_2m,weather_code,apparent_temperature,'
+          'precipitation_probability,precipitation,rain,'
+          'cloud_cover,wind_speed_10m,windgusts_10m,'
+          'is_day,sunshine_duration,wind_direction_10m,'
+          'windspeed_80m,windspeed_120m,windspeed_180m';
     } else {
       hourlyParameters =
           'temperature_2m,weather_code,apparent_temperature,'
@@ -136,16 +151,12 @@ class WeatherRepository {
         final jsonData = json.decode(response.body);
         //print("### CJG getMeteoFranceForecast response: ${jsonData}");
         try {
-        final forecast = MeteoFranceForecast.fromJson(jsonData);
-        
-        return forecast;
+          final forecast = MeteoFranceForecast.fromJson(jsonData);
+
+          return forecast;
         } catch (e) {
           throw Exception('Failed to parse MeteoFrance weather: $e');
         }
-
-
-
-
       } else {
         throw Exception(
           'API Error MeteoFrance: ${response.statusCode} ${response.reasonPhrase}',

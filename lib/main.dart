@@ -10,7 +10,7 @@ import 'features/locations/presentation/providers/location_provider.dart';
 import 'features/locations/data/location_repository.dart';
 import 'core/services/geolocation_service.dart';
 
-const VERSION = "_V3.4.0";
+const VERSION = "_V3.5.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/temperature_histo_1";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
