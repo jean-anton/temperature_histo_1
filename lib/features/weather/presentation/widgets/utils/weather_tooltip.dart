@@ -5,6 +5,7 @@ import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
 import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
 //import 'weather_deviation.dart';
 import 'chart_helpers.dart';
+import 'chart_theme.dart';
 
 /// Widget for displaying weather tooltips
 class WeatherTooltip {
@@ -79,8 +80,13 @@ class WeatherTooltip {
     WeatherDeviation? deviation,
     bool showExtendedWindInfo = false,
   }) {
-    Widget buildDetailRow(String label, String? value, {Color? valueColor}) {
-      if (value == null || value.isEmpty) {
+    Widget buildDetailRow(
+      String label,
+      String? value, {
+      Color? valueColor,
+      Widget? valueWidget,
+    }) {
+      if ((value == null || value.isEmpty) && valueWidget == null) {
         return const SizedBox.shrink();
       }
       return Padding(
@@ -96,20 +102,54 @@ class WeatherTooltip {
                 fontSize: 13,
               ),
             ),
-            Flexible(
-              child: Text(
-                value,
-                style: TextStyle(
-                  color: valueColor ?? Colors.white,
-                  fontSize: 13,
-                  fontWeight: valueColor != null
-                      ? FontWeight.bold
-                      : FontWeight.w500,
+            if (valueWidget != null)
+              valueWidget
+            else
+              Flexible(
+                child: Text(
+                  value!,
+                  style: TextStyle(
+                    color: valueColor ?? Colors.white,
+                    fontSize: 13,
+                    fontWeight: valueColor != null
+                        ? FontWeight.bold
+                        : FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
+      );
+    }
+
+    Widget? buildColorChar(double? value) {
+      if (value == null) return null;
+      final color = ChartTheme.windGustColor(value);
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '${value.toStringAsFixed(1)} km/h ',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            '███',
+            style: TextStyle(color: color, fontSize: 13, letterSpacing: -1),
+          ),
+        ],
+      );
+    }
+
+    Widget? buildOnlyColorBlock(double? value) {
+      if (value == null) return null;
+      final color = ChartTheme.windGustColor(value);
+      return Text(
+        '███',
+        style: TextStyle(color: color, fontSize: 13, letterSpacing: -1),
       );
     }
 
@@ -239,181 +279,208 @@ class WeatherTooltip {
                         color: Colors.white.withOpacity(0.3),
                       ),
                       // Temperature Details
-                      if (data is DailyForecast) ...[
-                        buildDetailRow(
-                          'Temp. max.',
-                          '${data.temperatureMax?.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.maxDeviationText ?? ''})' : ''}',
-                          valueColor: (deviation?.maxDeviation ?? 0) > 0
-                              ? Colors.redAccent.shade100
-                              : Colors.lightBlueAccent.shade100,
-                        ),
-                        buildDetailRow(
-                          'Temp. min.',
-                          '${data.temperatureMin?.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.minDeviationText ?? ''})' : ''}',
-                          valueColor: (deviation?.minDeviation ?? 0) > 0
-                              ? Colors.redAccent.shade100
-                              : Colors.lightBlueAccent.shade100,
-                        ),
-                      ],
-                      if (data is HourlyForecast) ...[
-                        buildDetailRow(
-                          'Température',
-                          '${data.temperature?.toStringAsFixed(1)}°C',
-                        ),
-                        buildDetailRow(
-                          'Ressenti',
-                          '${data.apparentTemperature?.toStringAsFixed(1)}°C',
-                        ),
-                      ],
-                      // Precipitation Sum/Amount
-                      buildDetailRow(
-                        'Précipitations',
-                        data is DailyForecast
-                            ? data.precipitationSum != null
-                                  ? '${data.precipitationSum?.toStringAsFixed(1)} mm'
-                                  : null
-                            : data is HourlyForecast
-                            ? data.precipitation != null
-                                  ? '${data.precipitation?.toStringAsFixed(1)} mm'
-                                  : null
-                            : null,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (data is DailyForecast) ...[
+                                buildDetailRow(
+                                  'Temp. max.',
+                                  '${data.temperatureMax?.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.maxDeviationText ?? ''})' : ''}',
+                                  valueColor: (deviation?.maxDeviation ?? 0) > 0
+                                      ? Colors.redAccent.shade100
+                                      : Colors.lightBlueAccent.shade100,
+                                ),
+                                buildDetailRow(
+                                  'Temp. min.',
+                                  '${data.temperatureMin?.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.minDeviationText ?? ''})' : ''}',
+                                  valueColor: (deviation?.minDeviation ?? 0) > 0
+                                      ? Colors.redAccent.shade100
+                                      : Colors.lightBlueAccent.shade100,
+                                ),
+                              ],
+                              if (data is HourlyForecast) ...[
+                                buildDetailRow(
+                                  'Température',
+                                  '${data.temperature?.toStringAsFixed(1)}°C',
+                                ),
+                                buildDetailRow(
+                                  'Ressenti',
+                                  '${data.apparentTemperature?.toStringAsFixed(1)}°C',
+                                ),
+                              ],
+                              // Precipitation Sum/Amount
+                              buildDetailRow(
+                                'Précipitations',
+                                data is DailyForecast
+                                    ? data.precipitationSum != null
+                                          ? '${data.precipitationSum?.toStringAsFixed(1)} mm'
+                                          : null
+                                    : data is HourlyForecast
+                                    ? data.precipitation != null
+                                          ? '${data.precipitation?.toStringAsFixed(1)} mm'
+                                          : null
+                                    : null,
+                              ),
+                              // Precipitation Hours (DailyForecast only)
+                              if (data is DailyForecast)
+                                buildDetailRow(
+                                  'Heures de précip.',
+                                  data.precipitationHours != null
+                                      ? '${data.precipitationHours?.toStringAsFixed(1)} h'
+                                      : null,
+                                ),
+                              // Precipitation Probability
+                              buildDetailRow(
+                                'Chance de précip.',
+                                data is DailyForecast
+                                    ? data.precipitationProbabilityMax != null
+                                          ? '${data.precipitationProbabilityMax}%'
+                                          : null
+                                    : data is HourlyForecast
+                                    ? data.precipitationProbability != null
+                                          ? '${data.precipitationProbability}%'
+                                          : null
+                                    : null,
+                              ),
+                              // Snowfall Sum (DailyForecast only)
+                              if (data is DailyForecast)
+                                buildDetailRow(
+                                  'Chute de neige',
+                                  data.snowfallSum != null &&
+                                          data.snowfallSum! > 0
+                                      ? '${data.snowfallSum?.toStringAsFixed(1)} cm'
+                                      : null,
+                                ),
+                              // Cloud Cover
+                              buildDetailRow(
+                                'Couverture nuageuse',
+                                data is DailyForecast
+                                    ? data.cloudCoverMean != null
+                                          ? '${data.cloudCoverMean}%'
+                                          : null
+                                    : data is HourlyForecast
+                                    ? data.cloudCover != null
+                                          ? '${data.cloudCover}%'
+                                          : null
+                                    : null,
+                              ),
+
+                              buildDetailRow(
+                                'Vent',
+                                null,
+                                valueWidget: buildColorChar(
+                                  data is DailyForecast
+                                      ? data.windSpeedMax
+                                      : data is HourlyForecast
+                                      ? data.windSpeed
+                                      : null,
+                                ),
+                              ),
+                              // Wind Gusts
+                              buildDetailRow(
+                                'Rafales',
+                                null,
+                                valueWidget: buildColorChar(
+                                  data is DailyForecast
+                                      ? data.windGustsMax
+                                      : data is HourlyForecast
+                                      ? data.windGusts
+                                      : null,
+                                ),
+                              ),
+                              // Wind Direction
+                              buildDetailRow(
+                                'Direction vent',
+                                data is DailyForecast
+                                    ? data.windDirection10mDominant != null
+                                          ? ChartHelpers.getWindDirectionAbbrev(
+                                              data.windDirection10mDominant,
+                                            )
+                                          : null
+                                    : data is HourlyForecast
+                                    ? data.windDirection10m != null
+                                          ? ChartHelpers.getWindDirectionAbbrev(
+                                                  data.windDirection10m,
+                                                ) +
+                                                ' (${data.windDirection10m}°)'
+                                          : null
+                                    : null,
+                              ),
+
+                              // Wind Speed
+                            ],
+                          ),
+                          if (showExtendedWindInfo &&
+                              data is HourlyForecast) ...[
+                            const SizedBox(width: 24),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                buildDetailRow(
+                                  '200m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed200m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '180m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed180m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '150m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed150m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '120m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed120m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '100m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed100m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '80m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed80m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '50m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed50m,
+                                  ),
+                                ),
+                                buildDetailRow(
+                                  '20m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed20m,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
                       ),
-                      // Precipitation Hours (DailyForecast only)
-                      if (data is DailyForecast)
-                        buildDetailRow(
-                          'Heures de précip.',
-                          data.precipitationHours != null
-                              ? '${data.precipitationHours?.toStringAsFixed(1)} h'
-                              : null,
-                        ),
-                      // Precipitation Probability
-                      buildDetailRow(
-                        'Chance de précip.',
-                        data is DailyForecast
-                            ? data.precipitationProbabilityMax != null
-                                  ? '${data.precipitationProbabilityMax}%'
-                                  : null
-                            : data is HourlyForecast
-                            ? data.precipitationProbability != null
-                                  ? '${data.precipitationProbability}%'
-                                  : null
-                            : null,
-                      ),
-                      // Snowfall Sum (DailyForecast only)
-                      if (data is DailyForecast)
-                        buildDetailRow(
-                          'Chute de neige',
-                          data.snowfallSum != null && data.snowfallSum! > 0
-                              ? '${data.snowfallSum?.toStringAsFixed(1)} cm'
-                              : null,
-                        ),
-                      // Cloud Cover
-                      buildDetailRow(
-                        'Couverture nuageuse',
-                        data is DailyForecast
-                            ? data.cloudCoverMean != null
-                                  ? '${data.cloudCoverMean}%'
-                                  : null
-                            : data is HourlyForecast
-                            ? data.cloudCover != null
-                                  ? '${data.cloudCover}%'
-                                  : null
-                            : null,
-                      ),
-                      // Wind Speed
-                      buildDetailRow(
-                        'Vent',
-                        data is DailyForecast
-                            ? data.windSpeedMax != null
-                                  ? '${data.windSpeedMax?.toStringAsFixed(1)} km/h'
-                                  : null
-                            : data is HourlyForecast
-                            ? data.windSpeed != null
-                                  ? '${data.windSpeed?.toStringAsFixed(1)} km/h'
-                                  : null
-                            : null,
-                      ),
-                      // Wind Gusts
-                      buildDetailRow(
-                        'Rafales',
-                        data is DailyForecast
-                            ? data.windGustsMax != null
-                                  ? '${data.windGustsMax?.toStringAsFixed(1)} km/h'
-                                  : null
-                            : data is HourlyForecast
-                            ? data.windGusts != null
-                                  ? '${data.windGusts?.toStringAsFixed(1)} km/h'
-                                  : null
-                            : null,
-                      ),
-                      // Wind Direction
-                      buildDetailRow(
-                        'Direction vent',
-                        data is DailyForecast
-                            ? data.windDirection10mDominant != null
-                                  ? ChartHelpers.getWindDirectionAbbrev(
-                                      data.windDirection10mDominant,
-                                    )
-                                  : null
-                            : data is HourlyForecast
-                            ? data.windDirection10m != null
-                                  ? ChartHelpers.getWindDirectionAbbrev(
-                                          data.windDirection10m,
-                                        ) +
-                                        ' (${data.windDirection10m}°)'
-                                  : null
-                            : null,
-                      ),
-                      if (showExtendedWindInfo && data is HourlyForecast) ...[
-                        buildDetailRow(
-                          'Vent 20m',
-                          data.windSpeed20m != null
-                              ? '${data.windSpeed20m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 50m',
-                          data.windSpeed50m != null
-                              ? '${data.windSpeed50m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 80m',
-                          data.windSpeed80m != null
-                              ? '${data.windSpeed80m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 100m',
-                          data.windSpeed100m != null
-                              ? '${data.windSpeed100m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 120m',
-                          data.windSpeed120m != null
-                              ? '${data.windSpeed120m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 150m',
-                          data.windSpeed150m != null
-                              ? '${data.windSpeed150m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 180m',
-                          data.windSpeed180m != null
-                              ? '${data.windSpeed180m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                        buildDetailRow(
-                          'Vent 200m',
-                          data.windSpeed200m != null
-                              ? '${data.windSpeed200m?.toStringAsFixed(1)} km/h'
-                              : null,
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -456,7 +523,7 @@ class WeatherTooltip {
 
   /// Schedule tooltip removal after delay
   static void scheduleTooltipRemoval({bool showExtendedWindInfo = false}) {
-    final duration = showExtendedWindInfo ? 60*5 : 10;
+    final duration = showExtendedWindInfo ? 60 * 5 : 10;
     _tooltipTimer = Timer(Duration(seconds: duration), () {
       removeTooltip();
     });

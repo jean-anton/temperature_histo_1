@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'chart_data_provider.dart';
 import 'dart:math';
 
 import 'package:temperature_histo_1/features/weather/data/weather_icon_data.dart';
@@ -10,6 +8,7 @@ import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
 import 'package:temperature_histo_1/features/weather/domain/weather_icon.dart';
 //import 'weather_deviation.dart';
 import 'chart_constants.dart';
+import 'chart_theme.dart';
 
 /// Helper class containing chart-related utility methods
 class ChartHelpers {
@@ -64,81 +63,92 @@ class ChartHelpers {
     // Default fallback
     return '${basePath}cloudy.svg';
   }
-static String _getMeteoFranceIconPath(String icon) {
-  const basePath = 'assets/google_weather_icons/v4/';
 
-  // Check suffix for day/night
-  final isDay = icon.endsWith('j');
-  final isNight = icon.endsWith('n');
+  static String _getMeteoFranceIconPath(String icon) {
+    const basePath = 'assets/google_weather_icons/v4/';
 
-  // Normalize base code (strip j/n)
-  final normalized = icon.replaceAll(RegExp(r'[jn]$'), '');
+    // Check suffix for day/night
+    final isDay = icon.endsWith('j');
+    final isNight = icon.endsWith('n');
 
-  switch (normalized) {
-    case 'p1': // Clear sky
-      return basePath + (isDay ? 'clear_day.svg' : 'clear_night.svg');
+    // Normalize base code (strip j/n)
+    final normalized = icon.replaceAll(RegExp(r'[jn]$'), '');
 
-    case 'p1bis': // Mostly clear
-      return basePath + (isDay ? 'mostly_clear_day.svg' : 'mostly_clear_night.svg');
+    switch (normalized) {
+      case 'p1': // Clear sky
+        return basePath + (isDay ? 'clear_day.svg' : 'clear_night.svg');
 
-    case 'p2': // Partly cloudy
-      return basePath + (isDay ? 'partly_cloudy_day.svg' : 'partly_cloudy_night.svg');
+      case 'p1bis': // Mostly clear
+        return basePath +
+            (isDay ? 'mostly_clear_day.svg' : 'mostly_clear_night.svg');
 
-    case 'p3': // Cloudy
-      return basePath + 'cloudy.svg';
-    case 'p3bis': // Overcast
-      return basePath + (isDay ? 'mostly_cloudy_day.svg' : 'mostly_cloudy_night.svg');
+      case 'p2': // Partly cloudy
+        return basePath +
+            (isDay ? 'partly_cloudy_day.svg' : 'partly_cloudy_night.svg');
 
-    case 'p4': // Ciel voilé
-      return basePath + (isDay ? 'cloudy_with_sunny_light.svg' : 'cloudy_with_snow_light.svg');
+      case 'p3': // Cloudy
+        return basePath + 'cloudy.svg';
+      case 'p3bis': // Overcast
+        return basePath +
+            (isDay ? 'mostly_cloudy_day.svg' : 'mostly_cloudy_night.svg');
 
-    case 'p5': // Drizzle
-      return basePath + 'drizzle.svg';
+      case 'p4': // Ciel voilé
+        return basePath +
+            (isDay
+                ? 'cloudy_with_sunny_light.svg'
+                : 'cloudy_with_snow_light.svg');
 
-    case 'p6': // Brume
-      return basePath + 'haze_fog_dust_smoke.svg';
+      case 'p5': // Drizzle
+        return basePath + 'drizzle.svg';
 
-    case 'p7': // Brouillard
-      return basePath + 'haze_fog_dust_smoke.svg';
+      case 'p6': // Brume
+        return basePath + 'haze_fog_dust_smoke.svg';
 
-    case 'p11': // Fog
-      return basePath + 'haze_fog_dust_smoke.svg';
+      case 'p7': // Brouillard
+        return basePath + 'haze_fog_dust_smoke.svg';
 
-    case 'p13': // Light rain
-      return basePath + 'slight_rain.svg';
+      case 'p11': // Fog
+        return basePath + 'haze_fog_dust_smoke.svg';
 
-    case 'p14': // Rain
-      return basePath + 'showers_rain.svg';
-    case 'p14bis': // Showers
-      return basePath + (isDay ? 'scattered_showers_day.svg' : 'scattered_showers_night.svg');
+      case 'p13': // Light rain
+        return basePath + 'slight_rain.svg';
 
-    case 'p8': // Light snow
-      return basePath + 'slight_snow.svg';
-    case 'p9': // Heavy snow
-      return basePath + 'heavy_snow.svg';
-    case 'p10': // Rain + snow
-      return basePath + 'mixed_rain_snow.svg';
-    case 'p12': // Flurries
-      return basePath + 'flurries.svg';
+      case 'p14': // Rain
+        return basePath + 'showers_rain.svg';
+      case 'p14bis': // Showers
+        return basePath +
+            (isDay
+                ? 'scattered_showers_day.svg'
+                : 'scattered_showers_night.svg');
 
-    case 'p24': // Isolated thunderstorms
-      return basePath + (isDay
-          ? 'isolated_scattered_thunderstorms_day.svg'
-          : 'isolated_scattered_thunderstorms_night.svg');
+      case 'p8': // Light snow
+        return basePath + 'slight_snow.svg';
+      case 'p9': // Heavy snow
+        return basePath + 'heavy_snow.svg';
+      case 'p10': // Rain + snow
+        return basePath + 'mixed_rain_snow.svg';
+      case 'p12': // Flurries
+        return basePath + 'flurries.svg';
 
-    case 'p25': // Strong thunderstorms
-      return basePath + 'strong_thunderstorms.svg';
+      case 'p24': // Isolated thunderstorms
+        return basePath +
+            (isDay
+                ? 'isolated_scattered_thunderstorms_day.svg'
+                : 'isolated_scattered_thunderstorms_night.svg');
 
-    case 'p26': // Tornado
-      return basePath + 'tornado.svg';
+      case 'p25': // Strong thunderstorms
+        return basePath + 'strong_thunderstorms.svg';
 
-    case 'p27': // Tropical storm
-      return basePath + 'tropical_storm_hurricane.svg';
+      case 'p26': // Tornado
+        return basePath + 'tornado.svg';
 
-    default:
-      return basePath + 'cloudy.svg'; // Fallback
+      case 'p27': // Tropical storm
+        return basePath + 'tropical_storm_hurricane.svg';
+
+      default:
+        return basePath + 'cloudy.svg'; // Fallback
+    }
   }
-}
 
   /// Get weather icon path considering day/night variants
   static String? getIconPathForCodeWithDayNight(
@@ -553,13 +563,4 @@ static String _getMeteoFranceIconPath(String icon) {
   }
 }
 
-Color gustColor(double gustKmh) {
-  if (gustKmh <= 10) return Color(0xFFBBDEFB);
-  if (gustKmh <= 20) return Color(0xFF64B5F6);
-  if (gustKmh <= 30) return Color(0xFF4DB6AC);
-  if (gustKmh <= 40) return Color(0xFFDCE775);
-  if (gustKmh <= 50) return Color(0xFFFFB74D);
-  if (gustKmh <= 60) return Color(0xFFFF8A65);
-  if (gustKmh <= 70) return Color(0xFFF4511E);
-  return Color(0xFFE53935);
-}
+Color gustColor(double speed) => ChartTheme.windGustColor(speed);

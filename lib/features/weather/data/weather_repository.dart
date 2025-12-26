@@ -67,7 +67,7 @@ class WeatherRepository {
           'temperature_2m,weather_code,apparent_temperature,'
           'precipitation_probability,precipitation,rain,'
           'cloud_cover,wind_speed_10m,wind_gusts_10m,'
-          'is_day,sunshine_duration,wind_direction_10m';
+          'is_day,sunshine_duration,wind_direction_10m,windspeed_100m';
     } else if (model == 'meteofrance_arome_seamless' ||
         model == 'meteofrance_seamless') {
       hourlyParameters =

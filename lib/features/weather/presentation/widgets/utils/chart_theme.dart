@@ -34,15 +34,14 @@ class ChartTheme {
   static final deviationCoolText = Colors.blue.shade900;
 
   // Wind colors (by gust speed in km/h)
-  static Color windGustColor(double gustKmh) {
-    if (gustKmh <= 10) return const Color(0xFFBBDEFB);
-    if (gustKmh <= 20) return const Color(0xFF64B5F6);
-    if (gustKmh <= 30) return const Color(0xFF4DB6AC);
-    if (gustKmh <= 40) return const Color(0xFFDCE775);
-    if (gustKmh <= 50) return const Color(0xFFFFB74D);
-    if (gustKmh <= 60) return const Color(0xFFFF8A65);
-    if (gustKmh <= 70) return const Color(0xFFF4511E);
-    return const Color(0xFFE53935);
+  static Color windGustColor(double speed) {
+    if (speed < 5) return Colors.blue.withValues(alpha: 0.3);
+    if (speed < 10) return Colors.green.withValues(alpha: 0.5);
+    if (speed < 20) return Colors.yellow.withValues(alpha: 0.7);
+    if (speed < 30) return Colors.orange.withValues(alpha: 0.8);
+    if (speed < 50) return Colors.red.withValues(alpha: 0.9);
+    if (speed < 70) return Colors.purple;
+    return Colors.black;
   }
 
   // Text styles

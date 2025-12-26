@@ -65,7 +65,47 @@ class WindChartBuilder {
     double minY,
     double maxY,
   ) {
-    return LineChart(
+    return
+    // LineChart(
+    //   LineChartData(
+    //     minX: chartStartTime.millisecondsSinceEpoch.toDouble(),
+    //     maxX: chartEndTime.millisecondsSinceEpoch.toDouble(),
+    //     minY: minY,
+    //     maxY: maxY,
+    //     borderData: FlBorderData(
+    //       border: Border.all(
+    //         color: ChartTheme.borderColor,
+    //         width: ChartConstants.borderWidth,
+    //       ),
+    //     ),
+    //     gridData: FlGridData(
+    //       show: true,
+    //       drawVerticalLine: true,
+    //       verticalInterval: displayMode == 'daily'
+    //           ? const Duration(days: 1).inMilliseconds.toDouble()
+    //           : const Duration(hours: 1).inMilliseconds.toDouble(),
+    //       getDrawingVerticalLine: (value) {
+    //         final dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    //         final isMidnight = dateTime.hour == 0 && dateTime.minute == 0;
+    //         return FlLine(
+    //           color: isMidnight
+    //               ? Colors.grey.shade500
+    //               : ChartTheme.gridLineColorLight,
+    //           strokeWidth: isMidnight ? 1.0 : 0.5,
+    //         );
+    //       },
+    //       drawHorizontalLine: false,
+    //     ),
+    //     titlesData: const FlTitlesData(
+    //       leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    //       bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    //       topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    //       rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    //     ),
+    //     lineBarsData: [],
+    //   ),
+    // );
+    LineChart(
       LineChartData(
         minX: chartStartTime.millisecondsSinceEpoch.toDouble(),
         maxX: chartEndTime.millisecondsSinceEpoch.toDouble(),
@@ -80,28 +120,52 @@ class WindChartBuilder {
         gridData: FlGridData(
           show: true,
           drawVerticalLine: true,
-          verticalInterval: displayMode == 'daily'
-              ? const Duration(days: 1).inMilliseconds.toDouble()
-              : const Duration(hours: 1).inMilliseconds.toDouble(),
-          getDrawingVerticalLine: (value) {
-            final dateTime = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-            final isMidnight = dateTime.hour == 0 && dateTime.minute == 0;
-            return FlLine(
-              color: isMidnight
-                  ? Colors.grey.shade500
-                  : ChartTheme.gridLineColorLight,
-              strokeWidth: isMidnight ? 1.0 : 0.5,
-            );
-          },
-          drawHorizontalLine: false,
+          verticalInterval: const Duration(hours: 1).inMilliseconds.toDouble(),
+          getDrawingVerticalLine: (value) =>
+              FlLine(color: ChartTheme.gridLineColor, strokeWidth: 0.5),
+          drawHorizontalLine: true,
+          horizontalInterval: 5,
+          getDrawingHorizontalLine: (value) =>
+              FlLine(color: ChartTheme.gridLineColorLight, strokeWidth: 0.5),
         ),
-        titlesData: const FlTitlesData(
-          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            axisNameSize: ChartConstants.bottomAxisNameSize,
+            //axisNameWidget: const Text('Hour'),
+            axisNameWidget: Container(),
+            sideTitles: SideTitles(
+              showTitles:
+                  true, // Hide default fl_chart labels - using custom labels instead
+              interval: const Duration(hours: 2).inMilliseconds.toDouble(),
+              reservedSize: ChartConstants.bottomAxisTitleSize,
+              getTitlesWidget: (value, meta) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Container(),
+                );
+              },
+            ),
+          ),
+          leftTitles: AxisTitles(
+            axisNameSize: ChartConstants.leftAxisNameSize,
+            axisNameWidget: const Text('°C'),
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 20,
+              reservedSize: ChartConstants.leftAxisTitleSize,
+              getTitlesWidget: (value, meta) => const SizedBox.shrink(),
+            ),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         lineBarsData: [],
+        backgroundColor: Colors.transparent,
+        lineTouchData: const LineTouchData(enabled: false),
       ),
     );
   }
@@ -285,14 +349,24 @@ class WindChartBuilder {
             top: posTop.dy,
             width: hourWidth,
             height: segmentHeight,
-            child: Container(
-              decoration: BoxDecoration(
-                color: _getWindColor(windSpeed),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  width: 0.2,
+            child: Stack(
+              children: [
+                Text(
+                  //'x',
+                  f.time.hour.toString(),
+                  style: ChartTheme.hourLabelStyle,
+                  //textAlign: TextAlign.center,
                 ),
-              ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: ChartTheme.windGustColor(windSpeed),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      width: 0.2,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -349,16 +423,6 @@ class WindChartBuilder {
     return null;
   }
 
-  static Color _getWindColor(double speed) {
-    if (speed < 5) return Colors.blue.withValues(alpha: 0.3);
-    if (speed < 10) return Colors.green.withValues(alpha: 0.5);
-    if (speed < 20) return Colors.yellow.withValues(alpha: 0.7);
-    if (speed < 30) return Colors.orange.withValues(alpha: 0.8);
-    if (speed < 50) return Colors.red.withValues(alpha: 0.9);
-    if (speed < 70) return Colors.purple;
-    return Colors.black;
-  }
-
   static Widget _buildXAxisLabels(
     Size containerSize,
     HourlyWeather hourlyWeather,
@@ -411,7 +475,7 @@ class WindChartBuilder {
       }
       return Stack(children: dailyLabels);
     } else {
-      final int step = (forecasts.length > 24) ? 4 : 2;
+      final int step = (forecasts.length > 24) ? 2 : 2;
       return Stack(
         children: forecasts
             .asMap()
@@ -440,10 +504,19 @@ class WindChartBuilder {
                     30,
                 child: SizedBox(
                   width: 80,
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: ChartTheme.hourLabelStyle,
+                  child: Column(
+                    children: [
+                      Text(
+                        'x',
+                        textAlign: TextAlign.center,
+                        style: ChartTheme.hourLabelStyle,
+                      ),
+                      Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: ChartTheme.hourLabelStyle,
+                      ),
+                    ],
                   ),
                 ),
               );

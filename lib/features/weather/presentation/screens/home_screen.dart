@@ -456,6 +456,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 _onDisplayModeChanged(selection.first);
               },
             ),
+            
+            
+            const SizedBox(height: 16),
+            const Text(
+              'Affichage:',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SegmentedButton<DisplayType>(
+                segments: [
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.graphique,
+                    label: const Text('Graphique'),
+                    icon: const Icon(Icons.bar_chart),
+                  ),
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.tableau,
+                    label: const Text('Tableau'),
+                    icon: const Icon(Icons.table_chart),
+                  ),
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.vent,
+                    label: const Text('Vent'),
+                    icon: const Icon(Icons.air),
+                  ),
+                ],
+                selected: {_displayType},
+                onSelectionChanged: (Set<DisplayType> selection) {
+                  setState(() {
+                    _displayType = selection.first;
+                    _savePreferences();
+                    if (_displayType == DisplayType.vent &&
+                        _hourlyForecast == null) {
+                      _loadData();
+                    }
+                  });
+                },
+              ),
+            ),
+            
+            
+            
             const SizedBox(height: 16),
             const Text(
               'Lieu (Prévisions météo):',
@@ -527,45 +571,8 @@ class _HomeScreenState extends State<HomeScreen> {
               items: _buildSortedClimateLocationItems(selectedWeatherInfo),
               onChanged: _onClimateLocationChanged,
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Affichage:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SegmentedButton<DisplayType>(
-                segments: [
-                  ButtonSegment<DisplayType>(
-                    value: DisplayType.graphique,
-                    label: const Text('Graphique'),
-                    icon: const Icon(Icons.bar_chart),
-                  ),
-                  ButtonSegment<DisplayType>(
-                    value: DisplayType.tableau,
-                    label: const Text('Tableau'),
-                    icon: const Icon(Icons.table_chart),
-                  ),
-                  ButtonSegment<DisplayType>(
-                    value: DisplayType.vent,
-                    label: const Text('Vent'),
-                    icon: const Icon(Icons.air),
-                  ),
-                ],
-                selected: {_displayType},
-                onSelectionChanged: (Set<DisplayType> selection) {
-                  setState(() {
-                    _displayType = selection.first;
-                    _savePreferences();
-                    if (_displayType == DisplayType.vent &&
-                        _hourlyForecast == null) {
-                      _loadData();
-                    }
-                  });
-                },
-              ),
-            ),
+            
+            
             const SizedBox(height: 16),
             const Text(
               'Informations vent (km/h):',
