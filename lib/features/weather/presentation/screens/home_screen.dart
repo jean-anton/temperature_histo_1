@@ -252,7 +252,9 @@ class _HomeScreenState extends State<HomeScreen> {
           );
           _isLoading = false;
         });
-      } else if (_displayMode == 'hourly' || _displayType == DisplayType.vent) {
+      } else if (_displayMode == 'hourly' ||
+          _displayType == DisplayType.vent ||
+          _displayType == DisplayType.ventDay) {
         final results = await Future.wait([
           _climateService.loadClimateNormals(climateInfo.assetPath),
           _weatherService.getHourlyWeatherForecast(
@@ -456,8 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _onDisplayModeChanged(selection.first);
               },
             ),
-            
-            
+
             const SizedBox(height: 16),
             const Text(
               'Affichage:',
@@ -483,13 +484,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: const Text('Vent'),
                     icon: const Icon(Icons.air),
                   ),
+                  ButtonSegment<DisplayType>(
+                    enabled: true,
+                    value: DisplayType.ventDay,
+                    label: const Text('Vent Jour'),
+                    icon: const Icon(Icons.wb_sunny),
+                  ),
                 ],
                 selected: {_displayType},
                 onSelectionChanged: (Set<DisplayType> selection) {
                   setState(() {
                     _displayType = selection.first;
                     _savePreferences();
-                    if (_displayType == DisplayType.vent &&
+                    if ((_displayType == DisplayType.vent ||
+                            _displayType == DisplayType.ventDay) &&
                         _hourlyForecast == null) {
                       _loadData();
                     }
@@ -497,9 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            
-            
-            
+
             const SizedBox(height: 16),
             const Text(
               'Lieu (Prévisions météo):',
@@ -571,8 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
               items: _buildSortedClimateLocationItems(selectedWeatherInfo),
               onChanged: _onClimateLocationChanged,
             ),
-            
-            
+
             const SizedBox(height: 16),
             const Text(
               'Informations vent (km/h):',

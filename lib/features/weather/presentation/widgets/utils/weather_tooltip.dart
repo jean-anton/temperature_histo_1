@@ -122,9 +122,55 @@ class WeatherTooltip {
       );
     }
 
+    Widget buildDetailRowWind(
+      String label,
+      String? value, {
+      Color? valueColor,
+      Widget? valueWidget,
+    }) {
+      if ((value == null || value.isEmpty) && valueWidget == null) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 50, // pick the width you want
+              child: Text(
+                '$label:',
+                textAlign: TextAlign.left,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            if (valueWidget != null)
+              valueWidget
+            else
+              Flexible(
+                child: Text(
+                  value!,
+                  style: TextStyle(
+                    color: valueColor ?? Colors.white,
+                    fontSize: 13,
+                    // fontWeight: valueColor != null
+                    //     ? FontWeight.bold
+                    //     : FontWeight.w500,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
     Widget? buildColorChar(double? value) {
       if (value == null) return null;
-      final color = ChartTheme.windGustColor(value);
+      final color = ChartTheme.windGustColor(value).withAlpha(255);
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -146,7 +192,7 @@ class WeatherTooltip {
 
     Widget? buildOnlyColorBlock(double? value) {
       if (value == null) return null;
-      final color = ChartTheme.windGustColor(value);
+      final color = ChartTheme.windGustColor(value).withAlpha(255);
       return Text(
         '███',
         style: TextStyle(color: color, fontSize: 13, letterSpacing: -1),
@@ -357,7 +403,7 @@ class WeatherTooltip {
                                 ),
                               // Cloud Cover
                               buildDetailRow(
-                                'Couverture nuageuse',
+                                'Couverture nuag.',
                                 data is DailyForecast
                                     ? data.cloudCoverMean != null
                                           ? '${data.cloudCoverMean}%'
@@ -420,60 +466,75 @@ class WeatherTooltip {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '200m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed200m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '180m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed180m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '150m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed150m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '120m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed120m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '100m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed100m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '80m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed80m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '50m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed50m,
                                   ),
                                 ),
-                                buildDetailRow(
+                                buildDetailRowWind(
                                   '20m',
                                   null,
                                   valueWidget: buildOnlyColorBlock(
                                     data.windSpeed20m,
+                                  ),
+                                ),
+
+                                buildDetailRowWind(
+                                  '10m',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windSpeed,
+                                  ),
+                                ),
+                                buildDetailRowWind(
+                                  'Gusts',
+                                  null,
+                                  valueWidget: buildOnlyColorBlock(
+                                    data.windGusts,
                                   ),
                                 ),
                               ],

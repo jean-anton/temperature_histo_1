@@ -84,7 +84,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
       localOffset.dy,
     );
 
-    if (widget.displayType == DisplayType.vent &&
+    if ((widget.displayType == DisplayType.vent ||
+            widget.displayType == DisplayType.ventDay) &&
         widget.hourlyWeather != null) {
       final tappedIndex = ChartHelpers.getTappedIndexForHourly(
         chartOffset,
@@ -142,8 +143,15 @@ class _WeatherChart2State extends State<WeatherChart2> {
     const double minWidth = 600.0;
 
     if (widget.displayMode == 'daily' && widget.forecast != null) {
-      chartWidth =
-          widget.forecast!.dailyForecasts.length * ChartConstants.widthPerDay;
+      if (widget.displayType == DisplayType.vent ||
+          widget.displayType == DisplayType.ventDay) {
+        chartWidth =
+            widget.forecast!.dailyForecasts.length *
+            ChartConstants.widthPerDayWind;
+      } else {
+        chartWidth =
+            widget.forecast!.dailyForecasts.length * ChartConstants.widthPerDay;
+      }
       finalHeight = ChartConstants.dailyChartHeight;
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       chartWidth =
@@ -162,7 +170,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
   // Build the appropriate chart based on display mode.
   Widget _buildChart(Size containerSize, BoxConstraints constraints) {
     // Check display type first for Vent mode
-    if (widget.displayType == DisplayType.vent &&
+    if ((widget.displayType == DisplayType.vent ||
+            widget.displayType == DisplayType.ventDay) &&
         widget.hourlyWeather != null) {
       final startTime = widget.displayMode == 'daily'
           ? widget.forecast!.dailyForecasts.first.date
@@ -180,6 +189,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         forecast: widget.forecast!,
         containerSize: containerSize,
         displayMode: widget.displayMode,
+        displayType: widget.displayType,
         startTime: startTime,
         endTime: endTime,
         labels: _labels,

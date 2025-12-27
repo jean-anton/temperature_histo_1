@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../data/weather_repository.dart';
 
-enum DisplayType { graphique, tableau, vent }
+enum DisplayType { graphique, tableau, vent, ventDay }
 
 class DailyWeather {
   final String locationName;
