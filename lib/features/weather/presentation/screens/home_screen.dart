@@ -19,6 +19,7 @@ import 'package:temperature_histo_1/features/weather/presentation/widgets/weathe
 import 'package:temperature_histo_1/features/locations/presentation/widgets/city_management_dialog.dart';
 import 'package:temperature_histo_1/features/weather/presentation/widgets/utils/weather_tooltip.dart';
 import 'package:temperature_histo_1/features/weather/domain/meteo_france_mapper.dart';
+import 'package:temperature_histo_1/features/weather/domain/weathercode_calculator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -278,6 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoading = false;
         });
       } else {
+        // Fetch daily, hourly, and climate data in parallel for daytime weathercode calculation
         final results = await Future.wait([
           _climateService.loadClimateNormals(climateInfo.assetPath),
           _weatherService.getWeatherForecast(
@@ -286,14 +288,68 @@ class _HomeScreenState extends State<HomeScreen> {
             model: _selectedModel,
             locationName: weatherInfo.displayName,
           ),
+          _weatherService.getHourlyWeatherForecast(
+            latitude: weatherInfo.lat,
+            longitude: weatherInfo.lon,
+            model: _selectedModel,
+            locationName: weatherInfo.displayName,
+          ),
         ]);
 
+        final climateNormals = results[0] as List<ClimateNormal>;
+        final dailyWeather = results[1] as DailyWeather;
+        final hourlyWeather = results[2] as HourlyWeather;
+
+        // Calculate daytime weathercodes for each daily forecast
+        final enhancedForecasts = dailyWeather.dailyForecasts.map((daily) {
+          final result = WeathercodeCalculator.calculateDaytimeWeathercode(
+            hourlyForecasts: hourlyWeather.hourlyForecasts,
+            targetDate: daily.date,
+          );
+
+          return DailyForecast(
+            date: daily.date,
+            temperatureMax: daily.temperatureMax,
+            temperatureMin: daily.temperatureMin,
+            precipitationSum: daily.precipitationSum,
+            precipitationHours: daily.precipitationHours,
+            snowfallSum: daily.snowfallSum,
+            precipitationProbabilityMax: daily.precipitationProbabilityMax,
+            weatherCode: daily.weatherCode,
+            weatherCodeDaytime: result.calculatedCode,
+            daytimeHoursAnalyzed: result.hoursAnalyzed,
+            cloudCoverMean: daily.cloudCoverMean,
+            windSpeedMax: daily.windSpeedMax,
+            windGustsMax: daily.windGustsMax,
+            windDirection10mDominant: daily.windDirection10mDominant,
+            sunrise: daily.sunrise,
+            sunset: daily.sunset,
+            weatherIcon: daily.weatherIcon,
+          );
+        }).toList();
+
         setState(() {
-          _climateNormals = results[0] as List<ClimateNormal>;
-          _forecast = results[1] as DailyWeather;
+          _climateNormals = climateNormals;
+          _forecast = DailyWeather(
+            locationName: dailyWeather.locationName,
+            model: dailyWeather.model,
+            dailyForecasts: enhancedForecasts,
+            latitude: dailyWeather.latitude,
+            longitude: dailyWeather.longitude,
+            timezone: dailyWeather.timezone,
+          );
           _hourlyForecast = null;
           _isLoading = false;
         });
+
+        // Log the results
+        print('### Daytime weathercode calculation completed for daily mode:');
+        for (final forecast in enhancedForecasts.take(5)) {
+          print(
+            '  ${forecast.formattedDate}: Original=${forecast.weatherCode}, '
+            'Daytime=${forecast.weatherCodeDaytime} (${forecast.daytimeHoursAnalyzed}h)',
+          );
+        }
       }
     } catch (e) {
       setState(() {

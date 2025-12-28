@@ -142,6 +142,9 @@ class DailyForecast {
   final double? snowfallSum;
   final int? precipitationProbabilityMax;
   final int? weatherCode;
+  final int? weatherCodeDaytime; // NEW: Calculated daytime-only weathercode
+  final int?
+  daytimeHoursAnalyzed; // NEW: Number of daytime hours used in calculation
   final int? cloudCoverMean;
   final double? windSpeedMax;
   final double? windGustsMax;
@@ -160,6 +163,8 @@ class DailyForecast {
     this.snowfallSum,
     this.precipitationProbabilityMax,
     this.weatherCode,
+    this.weatherCodeDaytime,
+    this.daytimeHoursAnalyzed,
     this.cloudCoverMean,
     this.windSpeedMax,
     this.windGustsMax,
@@ -183,8 +188,11 @@ class DailyForecast {
         ? '${windSpeedMax?.toStringAsFixed(1)}km/h'
         : 'N/A';
     final codeText = weatherCode != null ? '$weatherCode' : 'N/A';
+    final codeDaytimeText = weatherCodeDaytime != null
+        ? '$weatherCodeDaytime (${daytimeHoursAnalyzed}h)'
+        : 'N/A';
 
-    return 'DailyForecast(date: $formattedDate, max: ${temperatureMax.toStringAsFixed(1)}°C, min: ${temperatureMin.toStringAsFixed(1)}°C, precip: $precipText, wind: $windText, code: $codeText)';
+    return 'DailyForecast(date: $formattedDate, max: ${temperatureMax.toStringAsFixed(1)}°C, min: ${temperatureMin.toStringAsFixed(1)}°C, precip: $precipText, wind: $windText, code: $codeText, codeDaytime: $codeDaytimeText)';
   }
 }
 

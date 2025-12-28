@@ -348,8 +348,10 @@ class DailyChartBuilder {
     return forecast.dailyForecasts.asMap().entries.map((entry) {
       final int index = entry.key;
       final DailyForecast daily = entry.value;
+      // Use daytime weathercode if available, fallback to original
+      final weatherCodeToUse = daily.weatherCodeDaytime ?? daily.weatherCode;
       final String? iconPath = ChartHelpers.getIconPath(
-        code: daily.weatherCode,
+        code: weatherCodeToUse,
         iconName: daily.weatherIcon,
       );
       final WeatherDeviation? deviation = index < deviations.length

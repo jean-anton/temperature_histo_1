@@ -72,8 +72,11 @@ class WindChartBuilder {
           displayType,
         ),
         if (isVentDay) ..._buildDaySeparators(containerSize, displayForecasts),
-        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 10.0),
-        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, -20.0),
+        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 10.0, 3.0),
+        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, -20.0, 3.0),
+        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 50.0, 1.0),
+        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 100.0, 1.0),
+        _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 150.0, 1.0),
         _buildXAxisLabels(
           containerSize,
           displayForecasts,
@@ -181,6 +184,7 @@ class WindChartBuilder {
     double minY,
     double maxY,
     double value,
+    double height,
   ) {
     final pos = ChartPositioning.calculatePosition(
       timeMs: startTime.millisecondsSinceEpoch.toDouble(),
@@ -198,7 +202,7 @@ class WindChartBuilder {
           right: ChartConstants.rightPadding,
           top: pos.dy - 1.0,
           child: Container(
-            height: 3.0,
+            height: height,
             color: const Color.fromARGB(255, 10, 10, 10).withValues(alpha: 0.6),
           ),
         );
