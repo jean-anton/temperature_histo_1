@@ -20,6 +20,7 @@ import 'package:temperature_histo_1/features/locations/presentation/widgets/city
 import 'package:temperature_histo_1/features/weather/presentation/widgets/utils/weather_tooltip.dart';
 import 'package:temperature_histo_1/features/weather/domain/meteo_france_mapper.dart';
 import 'package:temperature_histo_1/features/weather/domain/weathercode_calculator.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/vent_table_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -48,6 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String _kDisplayModeKey = 'displayMode';
   static const String _kShowWindInfoKey = 'showWindInfo';
   static const String _kShowExtendedWindInfoKey = 'showExtendedWindInfo';
+  static const String _kMaxGustSpeedKey = 'maxGustSpeed';
+  static const String _kMaxPrecipitationProbabilityKey =
+      'maxPrecipitationProbability';
 
   final Map<String, ClimateLocationInfo> _climateLocationData = {
     '00460_Berus_1961_1990': const ClimateLocationInfo(
@@ -129,6 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _errorMessage;
   bool _showWindInfo = true;
   bool _showExtendedWindInfo = false;
+  double _maxGustSpeed = 30.0;
+  int _maxPrecipitationProbability = 20;
 
   @override
   void initState() {
@@ -168,6 +174,9 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedModel = prefs.getString(_kSelectedModelKey) ?? _selectedModel;
       _showWindInfo = prefs.getBool(_kShowWindInfoKey) ?? true;
       _showExtendedWindInfo = prefs.getBool(_kShowExtendedWindInfoKey) ?? false;
+      _maxGustSpeed = prefs.getDouble(_kMaxGustSpeedKey) ?? 30.0;
+      _maxPrecipitationProbability =
+          prefs.getInt(_kMaxPrecipitationProbabilityKey) ?? 20;
 
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {
         _selectedClimateLocation = _climateLocationData.keys.first;
@@ -194,6 +203,11 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setString(_kSelectedModelKey, _selectedModel);
     await prefs.setBool(_kShowWindInfoKey, _showWindInfo);
     await prefs.setBool(_kShowExtendedWindInfoKey, _showExtendedWindInfo);
+    await prefs.setDouble(_kMaxGustSpeedKey, _maxGustSpeed);
+    await prefs.setInt(
+      _kMaxPrecipitationProbabilityKey,
+      _maxPrecipitationProbability,
+    );
   }
 
   Future<void> _loadData() async {
@@ -255,7 +269,8 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else if (_displayMode == 'hourly' ||
           _displayType == DisplayType.vent ||
-          _displayType == DisplayType.ventDay) {
+          _displayType == DisplayType.ventDay ||
+          _displayType == DisplayType.ventTable) {
         final results = await Future.wait([
           _climateService.loadClimateNormals(climateInfo.assetPath),
           _weatherService.getHourlyWeatherForecast(
@@ -546,6 +561,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: const Text('Vent Jour'),
                     icon: const Icon(Icons.wb_sunny),
                   ),
+                  ButtonSegment<DisplayType>(
+                    value: DisplayType.ventTable,
+                    label: const Text('Table Vent'),
+                    icon: const Icon(Icons.table_rows),
+                  ),
                 ],
                 selected: {_displayType},
                 onSelectionChanged: (Set<DisplayType> selection) {
@@ -553,7 +573,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     _displayType = selection.first;
                     _savePreferences();
                     if ((_displayType == DisplayType.vent ||
-                            _displayType == DisplayType.ventDay) &&
+                            _displayType == DisplayType.ventDay ||
+                            _displayType == DisplayType.ventTable) &&
                         _hourlyForecast == null) {
                       _loadData();
                     }
@@ -689,6 +710,99 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             const SizedBox(height: 16),
+            const Text(
+              'Filtres Table Vent:',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Rafales max (km/h):'),
+                      const SizedBox(height: 4),
+                      DropdownButtonFormField<double>(
+                        value: _maxGustSpeed,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        items:
+                            [
+                                  5.0,
+                                  10.0,
+                                  15.0,
+                                  20.0,
+                                  25.0,
+                                  30.0,
+                                  35.0,
+                                  40.0,
+                                  45.0,
+                                  50.0,
+                                ]
+                                .map(
+                                  (value) => DropdownMenuItem<double>(
+                                    value: value,
+                                    child: Text(value.toStringAsFixed(0)),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _maxGustSpeed = value;
+                              _savePreferences();
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Précipitations max (%):'),
+                      const SizedBox(height: 4),
+                      DropdownButtonFormField<int>(
+                        value: _maxPrecipitationProbability,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        items: [0, 10, 20, 30, 40, 50]
+                            .map(
+                              (value) => DropdownMenuItem<int>(
+                                value: value,
+                                child: Text('$value%'),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _maxPrecipitationProbability = value;
+                              _savePreferences();
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             Text(
               "version: $VERSION, main: $mainFileName\n Running with Wasm: $isRunningWithWasm",
             ),
@@ -791,7 +905,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            if (_displayType != DisplayType.tableau)
+            if (_displayType != DisplayType.tableau &&
+                _displayType != DisplayType.ventTable)
               WeatherChart2(
                 forecast: _forecast,
                 hourlyWeather: _hourlyForecast,
@@ -801,8 +916,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 showWindInfo: _showWindInfo,
                 showExtendedWindInfo: _showExtendedWindInfo,
               )
+            else if (_displayType == DisplayType.ventTable)
+              // Display ventTable view
+              _hourlyForecast != null && _forecast != null
+                  ? VentTableWidget(
+                      hourlyWeather: _hourlyForecast!,
+                      dailyWeather: _forecast!,
+                      maxGustSpeed: _maxGustSpeed,
+                      maxPrecipitationProbability: _maxPrecipitationProbability,
+                    )
+                  : const Center(child: Text('Tableau Vent non disponible'))
             else
-              // TODO: Implement hourly table view
+              // Display normal table view
               _displayMode == 'daily'
                   ? WeatherTable(
                       forecast: _forecast!,
