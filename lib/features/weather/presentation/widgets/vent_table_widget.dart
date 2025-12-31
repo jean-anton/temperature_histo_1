@@ -138,6 +138,13 @@ class VentTableWidget extends StatelessWidget {
           numeric: true,
         ),
         DataColumn(
+          label: Text(
+            'Rafales\n(km/h)',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          numeric: true,
+        ),
+        DataColumn(
           label: Text('Météo', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         DataColumn(
@@ -180,7 +187,19 @@ class VentTableWidget extends StatelessWidget {
   }
 
   DataRow _buildRow(HourlyForecast forecast) {
+    final now = DateTime.now();
+    final isCurrentHour =
+        forecast.time.year == now.year &&
+        forecast.time.month == now.month &&
+        forecast.time.day == now.day &&
+        forecast.time.hour == now.hour;
+
     return DataRow(
+      color: isCurrentHour
+          ? WidgetStateProperty.all(
+              ChartTheme.currentTimeLineColor.withValues(alpha: 0.15),
+            )
+          : null,
       cells: [
         // Hour
         DataCell(
@@ -194,7 +213,7 @@ class VentTableWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: ChartTheme.windGustColor(forecast.windGusts ?? 0),
+              color: ChartTheme.windGustColor(forecast.windGusts ?? 0.0),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -207,6 +226,9 @@ class VentTableWidget extends StatelessWidget {
           ),
         ),
         // Weather icon (SVG from weather_icon_data.dart)
+        DataCell(
+          _buildGustArrow(forecast.windGusts, forecast.windDirection10m),
+        ),
         DataCell(_buildWeatherIcon(forecast.weatherCode, forecast.isDay)),
         // Temperature
         DataCell(
@@ -268,6 +290,59 @@ class VentTableWidget extends StatelessWidget {
         height: 32,
         fit: BoxFit.contain,
       ),
+    );
+  }
+
+  Widget _buildGustArrow(double? windSpeed, int? windDirection) {
+    if (windSpeed == null || windDirection == null) {
+      return Icon(Icons.help_outline, size: 24, color: Colors.grey[700]);
+    }
+    final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+    final windIconPathContour =
+        "assets/google_weather_icons/v3/arrow_contour.svg";
+    return Stack(
+      children: [
+        Transform.rotate(
+          //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+          angle:
+              (135 + windDirection) *
+              (3.14159 / 180), // Convert degrees to radians
+          child: SvgPicture.asset(
+            windIconPath,
+            // width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
+            // height: 50 * (hourly.windGusts ?? 0.0) / 20,
+            // colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+            width:
+                (windSpeed ?? 0.0) * 2, // Scale size by wind speed (max 20 m/s)
+            height: (windSpeed ?? 0.0) * 2,
+            colorFilter: ColorFilter.mode(
+              ChartTheme.windGustColor(windSpeed ?? 0.0),
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+        Transform.rotate(
+          //angle: (windDirectionDegrees - 90) * (3.14159 / 180), // Convert degrees to radians
+          angle:
+              (135 + windDirection) *
+              (3.14159 / 180), // Convert degrees to radians
+          child: SvgPicture.asset(
+            windIconPathContour,
+            // width: 50 * (hourly.windGusts ?? 0.0) / 20, // Scale size by wind speed (max 20 m/s)
+            // height: 50 * (hourly.windGusts ?? 0.0) / 20,
+            // colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+            width:
+                (windSpeed ?? 0.0) * 2, // Scale size by wind speed (max 20 m/s)
+            height: (windSpeed ?? 0.0) * 2,
+            colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+            //colorFilter: const ColorFilter.mode(Colors.deepPurple, BlendMode.srcIn),
+            // colorFilter: ColorFilter.mode(
+            //   gustColor(hourly.windGusts ?? 0.0),
+            //   BlendMode.srcIn,
+            // ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -43,6 +43,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
   void initState() {
     super.initState();
     _calculateChartData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentTime();
+    });
   }
 
   @override
@@ -54,6 +57,99 @@ class _WeatherChart2State extends State<WeatherChart2> {
         widget.displayType != oldWidget.displayType) {
       _calculateChartData();
     }
+
+    // If we switched to hourly mode or loaded new hourly data, scroll to current time
+    if ((widget.displayMode == 'hourly' && oldWidget.displayMode != 'hourly') ||
+        (widget.displayMode == 'hourly' &&
+            widget.hourlyWeather != oldWidget.hourlyWeather)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToCurrentTime();
+      });
+    }
+  }
+
+  void _scrollToCurrentTime() {
+    final hourlyWeather = widget.hourlyWeather;
+    if (hourlyWeather == null || !_scrollController.hasClients) return;
+
+    // Target is now - 1 hour to show some history context on the left
+    final DateTime targetTime = DateTime.now().subtract(
+      const Duration(hours: 1),
+    );
+    _scrollToHourlyTime(targetTime);
+  }
+
+  void _scrollToHourlyTime(DateTime targetTime) {
+    if (!_scrollController.hasClients || widget.hourlyWeather == null) return;
+
+    final hourlyWeather = widget.hourlyWeather!;
+    if (hourlyWeather.hourlyForecasts.isEmpty) return;
+
+    // Calculate chart dimensions logic must match _calculateChartDimensions
+    final startTime = hourlyWeather.hourlyForecasts.first.time;
+    final endTime = hourlyWeather.hourlyForecasts.last.time.add(
+      const Duration(hours: 1),
+    );
+
+    final totalHours = endTime.difference(startTime).inHours;
+    final totalWidth = totalHours * ChartConstants.hourlyChartWidthPerHour;
+    final containerSize = Size(
+      totalWidth.toDouble(),
+      ChartConstants.hourlyChartHeight,
+    );
+
+    // Use the same method that positions elements in the chart
+    final screenPos = ChartHelpers.calculateScreenPosition2(
+      targetTime.millisecondsSinceEpoch.toDouble(),
+      _minTemp, // Y coordinate doesn't matter for X position
+      containerSize,
+      _minTemp,
+      _maxTemp,
+      startTime,
+      endTime,
+    );
+
+    // The X position from calculateScreenPosition2 already includes left axis/padding offsets
+    // relative to the chart container.
+    // However, the SingleChildScrollView is wrapping the whole chart.
+    // We need to check if calculateScreenPosition2 returns x relative to the start of the chart graphic
+    // or relative to the start of the drawing area.
+
+    // ChartHelpers.calculateScreenPosition2 returns:
+    // x = ChartConstants.leftAxisTitleSize + ChartConstants.leftAxisNameSize + (chartX - minX)/(maxX-minX)*chartWidth + borderWidth
+
+    // This seems to be the coordinate within the chart widget.
+    // The scroll view scrolls this entire widget.
+    // So targetOffset should be screenPos.dx.
+
+    // Since we want the target time to be at the left edge of the VISIBLE viewport,
+    // we scroll exactly to that position.
+
+    double targetOffset = screenPos.dx;
+
+    // We might want to subtract the left padding/titles so that the time mark is exactly at the left edge?
+    // If targetOffset is e.g. 100px (because of axis labels), scrolling to 100px will put the target time at x=0 in the viewport.
+    // But the axis labels scroll with the chart (they are part of the drawn chart in SingleChildScrollView).
+    // Wait, typically axis labels are fixed?
+    // Looking at `build`:
+    // SingleChildScrollView -> SizedBox -> _buildChart
+    // HourlyChartBuilder builds the whole thing including axes using fl_chart.
+    // So the axes SCROLL with the chart.
+    // If I scroll to `targetOffset`, the pixel at `targetOffset` will be at the left edge of the screen.
+    // This effectively hides the left part of the chart (earlier times and maybe left axis labels).
+    // If we want "now - 1h" to be at the left edge, we scroll so that the x-position of "now - 1h" becomes 0 relative to viewport.
+    // So yes, `targetOffset = screenPos.dx` seems correct, possibly minus some padding if we want a margin.
+    // Let's use `screenPos.dx` strictly for now as per plan.
+
+    // Clamp to valid scrollable range
+    final maxExtent = _scrollController.position.maxScrollExtent;
+    targetOffset = targetOffset.clamp(0.0, maxExtent);
+
+    _scrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _calculateChartData() {

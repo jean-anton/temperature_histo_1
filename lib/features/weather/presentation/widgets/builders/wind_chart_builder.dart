@@ -77,6 +77,7 @@ class WindChartBuilder {
         _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 50.0, 1.0),
         _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 100.0, 1.0),
         _buildSeparationLine(containerSize, startTime, endTime, minY, maxY, 150.0, 1.0),
+        _buildCurrentTimeLine(hourlyWeather, minY, maxY, containerSize),
         _buildXAxisLabels(
           containerSize,
           displayForecasts,
@@ -173,6 +174,38 @@ class WindChartBuilder {
         lineBarsData: [],
         backgroundColor: Colors.transparent,
         lineTouchData: const LineTouchData(enabled: false),
+      ),
+    );
+  }
+ /// Build a vertical line marking the current time
+  static Widget _buildCurrentTimeLine(
+    HourlyWeather hourlyWeather,
+    double minTemp,
+    double maxTemp,
+    Size containerSize,
+  ) {
+    // Find the index of the current time in the hourly forecasts
+    final now = DateTime.now();
+    final screenPos = ChartPositioning.calculatePosition(
+      timeMs: now.millisecondsSinceEpoch.toDouble(),
+      value: minTemp,
+      containerSize: containerSize,
+      minValue: minTemp,
+      maxValue: maxTemp,
+      startTime: hourlyWeather.hourlyForecasts.first.time,
+      endTime: hourlyWeather.hourlyForecasts.last.time,
+    );
+
+    return Positioned(
+      left: screenPos.dx,
+      top: ChartConstants.topPadding,
+      child: Container(
+        width: 2,
+        height:
+            containerSize.height -
+            ChartConstants.topPadding -
+            ChartConstants.bottomPadding,
+        color: ChartTheme.currentTimeLineColor,
       ),
     );
   }
