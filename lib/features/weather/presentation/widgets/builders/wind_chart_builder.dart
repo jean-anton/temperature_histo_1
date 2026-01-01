@@ -472,7 +472,7 @@ class WindChartBuilder {
                     ),
                   ),
                 ),
-                Text('s${windSpeed.round().toString()}\n${f.time.hour} ${f.time.day}'),
+                //Text('s${windSpeed.round().toString()}\n${f.time.hour} ${f.time.day}'),
 
               ],
             ),
@@ -649,7 +649,7 @@ class WindChartBuilder {
                 child: SizedBox(
                   width: 80,
                   child: Text(
-                    labels[labelIndex],
+                    labels[labelIndex]+'y',
                     textAlign: TextAlign.center,
                     style: ChartTheme.dateLabelStyle,
                   ),
@@ -687,11 +687,11 @@ class WindChartBuilder {
                   width: 80,
                   child: Column(
                     children: [
-                      Text(
-                        'x',
-                        textAlign: TextAlign.center,
-                        style: ChartTheme.hourLabelStyle,
-                      ),
+                      // Text(
+                      //   'x',
+                      //   textAlign: TextAlign.center,
+                      //   style: ChartTheme.hourLabelStyle,
+                      // ),
                       Text(
                         label,
                         textAlign: TextAlign.center,

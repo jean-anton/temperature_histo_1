@@ -70,7 +70,7 @@ class ChartTheme {
   );
 
   static const hourLabelStyle = TextStyle(
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: FontWeight.w600,
     color: Colors.black87,
   );

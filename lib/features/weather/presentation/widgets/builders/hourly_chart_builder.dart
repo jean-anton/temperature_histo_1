@@ -35,7 +35,7 @@ class HourlyChartBuilder {
     //     .toDouble();
     //final maxX = hourlyWeather.hourlyForecasts.last.time.subtract(Duration(days: 1)).millisecondsSinceEpoch.toDouble();
     final maxX = hourlyWeather.hourlyForecasts.last.time
-        .add(const Duration(hours: 1))
+        //.add(const Duration(hours: 1))
         .millisecondsSinceEpoch
         .toDouble();
 
@@ -565,13 +565,14 @@ class HourlyChartBuilder {
             child: SizedBox(
               width: 80,
               child: Text(
-                label,
+                label+'x',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
+                style: ChartTheme.hourLabelStyle,
+                // style: const TextStyle(
+                //   fontSize: 15,
+                //   fontWeight: FontWeight.w500,
+                //   color: Colors.black87,
+                // ),
               ),
             ),
           );

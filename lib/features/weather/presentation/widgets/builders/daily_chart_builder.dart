@@ -30,7 +30,7 @@ class DailyChartBuilder {
 
     final minX = startTime.millisecondsSinceEpoch.toDouble();
     final maxX = forecast.dailyForecasts.last.date
-        .add(const Duration(days: 1))
+      //  .add(const Duration(days: 1))
         .millisecondsSinceEpoch
         .toDouble();
     final minY = minTemp - 5;
@@ -185,6 +185,9 @@ class DailyChartBuilder {
             lineTouchData: const LineTouchData(enabled: false),
           ),
         ),
+        
+        
+        
         ..._buildWeatherIcons(
           forecast,
           deviations,
