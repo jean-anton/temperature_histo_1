@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   fill="none"
+   viewBox="0 0 49 49"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="sunny_with_snow_light.svg"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="5.3"
+     inkscape:cx="23.679245"
+     inkscape:cy="25.377358"
+     inkscape:window-width="1280"
+     inkscape:window-height="674"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g2" />
+  <g
+     clip-path="url(#a)"
+     id="g2">
+    <path
+       fill="#757575"
+       fill-rule="evenodd"
+       d="M31.927 34.147c-.13.085-.18.25-.201.404a4.586 4.586 0 0 0 0 1.298.538.538 0 0 1-.252.547l-1.102.636a.5.5 0 0 1-.379.05l-3.121-.836a.5.5 0 0 0-.613.354l-.44 1.642a.5.5 0 0 0 .354.612l2.075.556a.5.5 0 0 1 .353.612l-.556 2.075a.5.5 0 0 0 .354.612l1.642.44a.5.5 0 0 0 .612-.353l.837-3.122a.5.5 0 0 1 .233-.303l1.111-.642c.19-.11.426-.08.598.053.337.263.712.48 1.114.64a.538.538 0 0 1 .35.493v1.288a.5.5 0 0 1-.147.353l-2.285 2.285a.5.5 0 0 0 0 .707l1.202 1.202a.5.5 0 0 0 .707 0l1.519-1.518a.5.5 0 0 1 .707 0l1.519 1.518a.5.5 0 0 0 .707 0l1.202-1.202a.5.5 0 0 0 0-.707l-2.285-2.285a.5.5 0 0 1-.147-.353V39.9c0-.219.143-.41.345-.491a4.545 4.545 0 0 0 1.097-.638.538.538 0 0 1 .6-.055l1.131.654a.5.5 0 0 1 .233.303l.837 3.122a.5.5 0 0 0 .612.353l1.642-.44a.5.5 0 0 0 .354-.612l-.556-2.075a.5.5 0 0 1 .353-.612l2.075-.556a.5.5 0 0 0 .353-.612l-.44-1.642a.5.5 0 0 0-.612-.354l-3.121.837a.5.5 0 0 1-.38-.05l-1.134-.655a.538.538 0 0 1-.253-.546 4.585 4.585 0 0 0 .002-1.265.538.538 0 0 1 .252-.544l1.133-.654a.5.5 0 0 1 .38-.05l3.121.836a.5.5 0 0 0 .612-.353l.44-1.642a.5.5 0 0 0-.353-.613l-2.075-.556a.5.5 0 0 1-.353-.612l.556-2.075a.5.5 0 0 0-.354-.612l-1.642-.44a.5.5 0 0 0-.612.354L41 30.726a.5.5 0 0 1-.233.304l-1.124.65a.538.538 0 0 1-.6-.056 4.545 4.545 0 0 0-1.104-.643.538.538 0 0 1-.345-.491v-1.291a.5.5 0 0 1 .147-.354l2.285-2.285a.5.5 0 0 0 0-.707l-1.202-1.202a.5.5 0 0 0-.707 0l-1.52 1.519c-.113.113-.247.228-.264.388a2.934 2.934 0 0 0-.009.103 9.705 9.705 0 0 1-4.399 7.486Zm2.453 1.048a1.848 1.848 0 1 1 3.696 0 1.848 1.848 0 0 1-3.696 0Z"
+       clip-rule="evenodd"
+       id="path2" />
+    <ellipse
+       style="fill:#f1c100;fill-opacity:1;stroke-width:0.815854"
+       id="path5"
+       ry="16.351416"
+       rx="17.101416"
+       cy="19.049528"
+       cx="19.233492" />
+  </g>
+  <defs
+     id="defs4">
+    <radialGradient
+       id="b"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientTransform="rotate(64.537 -4.3 19.764) scale(18.2404)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset=".016"
+         stop-color="#FFBB29"
+         id="stop2" />
+      <stop
+         offset=".531"
+         stop-color="#FCB224"
+         id="stop3" />
+      <stop
+         offset=".99"
+         stop-color="#E47100"
+         id="stop4" />
+    </radialGradient>
+    <clipPath
+       id="a">
+      <path
+         fill="#fff"
+         d="M.777.141h48v48h-48z"
+         id="path4" />
+    </clipPath>
+  </defs>
+</svg>
