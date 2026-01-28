@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpDialog extends StatelessWidget {
   const HelpDialog({super.key});
@@ -37,6 +38,11 @@ class HelpDialog extends StatelessWidget {
             }
             return Markdown(
               data: snapshot.data ?? 'Aucun contenu trouvé.',
+              onTapLink: (text, href, title) {
+                if (href != null) {
+                  launchUrl(Uri.parse(href));
+                }
+              },
               styleSheet: MarkdownStyleSheet(
                 h1: GoogleFonts.outfit(
                   fontSize: 24,

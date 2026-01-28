@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:temperature_histo_1/main.dart';
 
@@ -598,6 +599,35 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      const Divider(),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: () => launchUrl(
+                          Uri.parse(
+                            'https://github.com/jean-anton/temperature_histo_1',
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.code,
+                              size: 16,
+                              color: Colors.blue,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Code Source sur GitHub',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.blue[700],
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

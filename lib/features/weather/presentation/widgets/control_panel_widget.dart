@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
 import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
 import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
@@ -369,6 +370,28 @@ class ControlPanelWidget extends StatelessWidget {
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+        ),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: () => launchUrl(
+            Uri.parse('https://github.com/jean-anton/temperature_histo_1'),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.code, size: 14, color: Colors.blue),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  'https://github.com/jean-anton/temperature_histo_1',
+                  style: GoogleFonts.outfit(
+                    fontSize: 11,
+                    color: Colors.blue[700],
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
