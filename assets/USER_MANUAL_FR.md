@@ -67,6 +67,7 @@ Dans le panneau de contrôle, vous pouvez :
 
 ## 8. Informations Techniques
 *   **Version** : Consultez le numéro de version en bas du menu.
+*   **Confidentialité** : Cette application respecte votre vie privée. Aucun cookie ni tracker n'est utilisé, et aucune donnée personnelle n'est collectée.
 *   **Wasm** : L'indicateur "Wasm: true" confirme que l'application utilise les dernières technologies de performance Web.
 
 ---
