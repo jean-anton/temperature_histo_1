@@ -40,7 +40,10 @@ class HelpDialog extends StatelessWidget {
               data: snapshot.data ?? 'Aucun contenu trouvé.',
               onTapLink: (text, href, title) {
                 if (href != null) {
-                  launchUrl(Uri.parse(href));
+                  launchUrl(
+                    Uri.parse(href),
+                    mode: LaunchMode.externalApplication,
+                  );
                 }
               },
               styleSheet: MarkdownStyleSheet(

@@ -69,50 +69,57 @@ class ControlPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.0),
-        border: Border(
-          right: BorderSide(color: Colors.white.withValues(alpha: 0.0)),
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.0),
+          border: Border(
+            right: BorderSide(color: Colors.white.withValues(alpha: 0.0)),
+          ),
         ),
-      ),
-      child: SingleChildScrollView(
-        controller: scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionHeader(
-              context,
-              'MODÈLE',
-              Icons.model_training_outlined,
-            ),
-            const SizedBox(height: 12),
-            _buildModelSelector(),
-            //const SizedBox(height: 32),
-            // _buildSectionHeader(
-            //   context,
-            //   'AFFICHAGE',
-            //   Icons.visibility_outlined,
-            // ),
-            const SizedBox(height: 16),
-            _buildDisplayModeSelector(),
-            const SizedBox(height: 20),
-            _buildDisplayTypeSelector(),
-            const SizedBox(height: 32),
-            _buildSectionHeader(context, 'LOCALISATION', Icons.place_outlined),
-            const SizedBox(height: 16),
-            _buildLocationSelector(context),
-            const SizedBox(height: 32),
-            _buildSectionHeader(context, 'PARAMÈTRES VENT', Icons.air),
-            const SizedBox(height: 16),
-            _buildWindToggles(),
-            const SizedBox(height: 20),
-            _buildWindFilters(),
-            const SizedBox(height: 48),
-            _buildFooter(context),
-          ],
+        child: SingleChildScrollView(
+          controller: scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader(
+                context,
+                'MODÈLE',
+                Icons.model_training_outlined,
+              ),
+              const SizedBox(height: 12),
+              _buildModelSelector(),
+              //const SizedBox(height: 32),
+              // _buildSectionHeader(
+              //   context,
+              //   'AFFICHAGE',
+              //   Icons.visibility_outlined,
+              // ),
+              const SizedBox(height: 16),
+              _buildDisplayModeSelector(),
+              const SizedBox(height: 20),
+              _buildDisplayTypeSelector(),
+              const SizedBox(height: 32),
+              _buildSectionHeader(
+                context,
+                'LOCALISATION',
+                Icons.place_outlined,
+              ),
+              const SizedBox(height: 16),
+              _buildLocationSelector(context),
+              const SizedBox(height: 32),
+              _buildSectionHeader(context, 'PARAMÈTRES VENT', Icons.air),
+              const SizedBox(height: 16),
+              _buildWindToggles(),
+              const SizedBox(height: 20),
+              _buildWindFilters(),
+              const SizedBox(height: 48),
+              _buildFooter(context),
+            ],
+          ),
         ),
       ),
     );
@@ -375,6 +382,7 @@ class ControlPanelWidget extends StatelessWidget {
         InkWell(
           onTap: () => launchUrl(
             Uri.parse('https://github.com/jean-anton/temperature_histo_1'),
+            mode: LaunchMode.externalApplication,
           ),
           child: Row(
             children: [

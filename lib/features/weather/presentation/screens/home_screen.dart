@@ -607,6 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Uri.parse(
                             'https://github.com/jean-anton/temperature_histo_1',
                           ),
+                          mode: LaunchMode.externalApplication,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
