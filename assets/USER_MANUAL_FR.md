@@ -1,6 +1,6 @@
-# Manuel d'Utilisateur - Température Histo
+# Manuel d'Utilisateur - AeroClim
 
-Bienvenue dans Température Histo, une application dédiée à l’analyse météorologique, permettant de comparer les de température prévisions actuelles aux normales climatiques historiques. Elle permet également d’accéder à des informations sur le vent jusqu’à 200 m d’altitude ainsi qu’aux prévisions de précipitations, d'ensoleillement et de couverture nuageuse.
+Bienvenue dans AeroClim, une application dédiée à l’analyse météorologique, permettant de comparer les de température prévisions actuelles aux normales climatiques historiques. Elle permet également d’accéder à des informations sur le vent jusqu’à 200 m d’altitude ainsi qu’aux prévisions de précipitations, d'ensoleillement et de couverture nuageuse.
 
 ⚠️ Avertissement
 Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Les informations affichées ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée..
