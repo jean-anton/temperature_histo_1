@@ -40,10 +40,7 @@ class HelpDialog extends StatelessWidget {
               data: snapshot.data ?? 'Aucun contenu trouvé.',
               onTapLink: (text, href, title) {
                 if (href != null) {
-                  launchUrl(
-                    Uri.parse(href),
-                    mode: LaunchMode.externalApplication,
-                  );
+                  launchUrl(Uri.parse(href), mode: LaunchMode.platformDefault);
                 }
               },
               styleSheet: MarkdownStyleSheet(
@@ -65,6 +62,23 @@ class HelpDialog extends StatelessWidget {
             );
           },
         ),
+        persistentFooterButtons: [
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Si les liens ne fonctionnent pas, copiez l\'URL ci-dessous :',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SelectableText(
+                  'https://github.com/jean-anton/temperature_histo_1',
+                  style: TextStyle(fontSize: 12, color: Colors.blue),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

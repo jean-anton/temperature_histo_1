@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/link.dart';
 import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
 import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
 import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
@@ -379,27 +379,38 @@ class ControlPanelWidget extends StatelessWidget {
           ).textTheme.bodySmall?.copyWith(color: Colors.grey),
         ),
         const SizedBox(height: 12),
-        InkWell(
-          onTap: () => launchUrl(
-            Uri.parse('https://github.com/jean-anton/temperature_histo_1'),
-            mode: LaunchMode.externalApplication,
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.code, size: 14, color: Colors.blue),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  'https://github.com/jean-anton/temperature_histo_1',
-                  style: GoogleFonts.outfit(
-                    fontSize: 11,
-                    color: Colors.blue[700],
-                    decoration: TextDecoration.underline,
-                  ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Link(
+              uri: Uri.parse(
+                'https://github.com/jean-anton/temperature_histo_1',
+              ),
+              target: LinkTarget.blank,
+              builder: (context, followLink) => InkWell(
+                onTap: followLink,
+                child: Row(
+                  children: [
+                    const Icon(Icons.code, size: 14, color: Colors.blue),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Code Source (GitHub)',
+                      style: GoogleFonts.outfit(
+                        fontSize: 11,
+                        color: Colors.blue[700],
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            const SelectableText(
+              'https://github.com/jean-anton/temperature_histo_1',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+            ),
+          ],
         ),
       ],
     );

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/link.dart';
 
 import 'package:temperature_histo_1/main.dart';
 
@@ -525,166 +525,181 @@ class _HomeScreenState extends State<HomeScreen> {
       return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.wb_sunny_outlined,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Bienvenue dans Température Histo',
-                  style: GoogleFonts.outfit(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.wb_sunny_outlined,
+                    size: 80,
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.orange.withValues(alpha: 0.3),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Bienvenue dans Température Histo',
+                    style: GoogleFonts.outfit(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            color: Colors.orange,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'AVERTISSEMENT',
-                            style: GoogleFonts.outfit(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange[900],
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.orange.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.orange,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Elles ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée.\n\n',
-                        style: TextStyle(fontSize: 15, height: 1.4),
-                        textAlign: TextAlign.center,
-                      ),
-                      const Divider(),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.privacy_tip_outlined,
-                            size: 16,
-                            color: Colors.blue,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Confidentialité : Aucun cookie ni tracker. Aucune donnée collectée.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.blue[900],
-                              fontWeight: FontWeight.w500,
+                            const SizedBox(width: 8),
+                            Text(
+                              'AVERTISSEMENT',
+                              style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange[900],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () => launchUrl(
-                          Uri.parse(
-                            'https://github.com/jean-anton/temperature_histo_1',
-                          ),
-                          mode: LaunchMode.externalApplication,
+                          ],
                         ),
-                        child: Row(
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Elles ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée.\n\n',
+                          style: TextStyle(fontSize: 15, height: 1.4),
+                          textAlign: TextAlign.center,
+                        ),
+                        const Divider(),
+                        const SizedBox(height: 8),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(
-                              Icons.code,
+                              Icons.privacy_tip_outlined,
                               size: 16,
                               color: Colors.blue,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Code Source sur GitHub',
+                              'Confidentialité : Aucun cookie ni tracker. Aucune donnée collectée.',
                               style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.blue[700],
-                                decoration: TextDecoration.underline,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.blue[900],
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
+                        const Divider(),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: [
+                            Link(
+                              uri: Uri.parse(
+                                'https://github.com/jean-anton/temperature_histo_1',
+                              ),
+                              target: LinkTarget.blank,
+                              builder: (context, followLink) => InkWell(
+                                onTap: followLink,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.code,
+                                      size: 16,
+                                      color: Colors.blue,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Code Source sur GitHub',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.blue[700],
+                                        decoration: TextDecoration.underline,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const SelectableText(
+                              'https://github.com/jean-anton/temperature_histo_1',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'L’auteur de l’application décline toute responsabilité quant aux décisions prises ou aux incidents survenus à la suite de l’utilisation des informations affichées.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const HelpDialog(),
+                            );
+                          },
+                          icon: const Icon(Icons.help_outline),
+                          label: const Text('Lire l\'aide'),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _isDisclaimerAccepted = true;
+                              _savePreferences();
+                              if (_weatherLocationData.isEmpty) {
+                                _showCityManagementDialog();
+                              } else {
+                                _loadData();
+                              }
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Accepter'),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'L’auteur de l’application décline toute responsabilité quant aux décisions prises ou aux incidents survenus à la suite de l’utilisation des informations affichées.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => const HelpDialog(),
-                          );
-                        },
-                        icon: const Icon(Icons.help_outline),
-                        label: const Text('Lire l\'aide'),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _isDisclaimerAccepted = true;
-                            _savePreferences();
-                            if (_weatherLocationData.isEmpty) {
-                              _showCityManagementDialog();
-                            } else {
-                              _loadData();
-                            }
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Accepter'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
