@@ -133,6 +133,7 @@ flutter:
     - assets/google_weather_icons/v3/
     - assets/google_weather_icons/v4/
     - assets/google_weather_icons/v4.a_revoir/
+    - assets/images/
     - USER_MANUAL_FR.md
 
 #

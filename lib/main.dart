@@ -12,7 +12,7 @@ import 'features/locations/data/location_repository.dart';
 import 'core/services/geolocation_service.dart';
 import 'features/weather/presentation/widgets/utils/weather_tooltip.dart';
 
-const VERSION = "1.0.6";
+const VERSION = "1.1.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/temperature_histo_1";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
@@ -74,7 +74,7 @@ class ClimaDeviationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Température histo',
+      title: 'AeroClim',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
