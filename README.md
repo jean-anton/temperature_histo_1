@@ -82,7 +82,6 @@ Dans le panneau de contrôle, vous pouvez :
 - **Typographies** : Polices Google Fonts (OFL / Apache 2.0).
 - **Licence Logicielle** : Cette application est distribuée sous licence MIT.
 - **Code Source** : [GitHub Repository](https://github.com/jean-anton/temperature_histo_1)
-- **Contact** : [jeananton@gmail.com](mailto:jeananton@gmail.com).
 
 ---
 

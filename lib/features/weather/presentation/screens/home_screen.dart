@@ -541,7 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Bienvenue dans AeroClim',
+                    'AeroClim',
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -579,10 +579,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          'Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Elles ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée.\n\n',
+                          //'Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Elles ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée.\n\n',
+                          """
+Les données sont fournies à titre informatif et peuvent différer des conditions réelles. L’auteur décline toute responsabilité quant à leur utilisation.                          """,
                           style: TextStyle(fontSize: 15, height: 1.4),
                           textAlign: TextAlign.center,
                         ),
+                        
                         const Divider(),
                         const SizedBox(height: 8),
                         Row(
@@ -594,12 +597,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.blue,
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              'Confidentialité : Aucun cookie ni tracker. Aucune donnée collectée.',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.blue[900],
-                                fontWeight: FontWeight.w500,
+                            Flexible(
+                              child: Text(
+                                'Confidentialité: Aucun cookie ni tracker. Aucune donnée collectée.',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.blue[900],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ],
@@ -650,18 +656,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'L’auteur de l’application décline toute responsabilité quant aux décisions prises ou aux incidents survenus à la suite de l’utilisation des informations affichées.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
+                  // const SizedBox(height: 24),
+                  // const Text(
+                  //   'L’auteur de l’application décline toute responsabilité quant aux décisions prises ou aux incidents survenus à la suite de l’utilisation des informations affichées.',
+                  //   textAlign: TextAlign.center,
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontStyle: FontStyle.italic,
+                  //     fontSize: 16,
+                  //     color: Colors.black,
+                  //   ),
+                  // ),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
