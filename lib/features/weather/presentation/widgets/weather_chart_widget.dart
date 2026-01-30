@@ -236,11 +236,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
       localOffset.dy,
     );
 
-    // Dismiss tooltip if tapped in the bottom 1/3 of the chart area
-    if (localOffset.dy > containerSize.height * 2 / 3) {
-      WeatherTooltip.removeTooltip();
-      return;
-    }
+    bool tooltipShown = false;
 
     if (widget.displayType == DisplayType.comparatif) {
       int? tappedIndex;
@@ -270,11 +266,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
           widget.multiModelForecast,
           widget.multiModelHourlyWeather,
         );
+        tooltipShown = true;
       }
-      return;
-    }
-
-    if ((widget.displayType == DisplayType.vent ||
+    } else if ((widget.displayType == DisplayType.vent ||
             widget.displayType == DisplayType.ventDay) &&
         widget.hourlyWeather != null) {
       final tappedIndex = ChartHelpers.getTappedIndexForHourly(
@@ -290,11 +284,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
           widget.hourlyWeather!,
           showExtendedWindInfo: widget.showExtendedWindInfo,
         );
+        tooltipShown = true;
       }
-      return;
-    }
-
-    if (widget.displayMode == 'daily' && widget.forecast != null) {
+    } else if (widget.displayMode == 'daily' && widget.forecast != null) {
       final tappedIndex = ChartHelpers.getTappedIndex(
         chartOffset,
         containerSize,
@@ -308,6 +300,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
           widget.forecast!,
           _deviations,
         );
+        tooltipShown = true;
       }
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       final tappedIndex = ChartHelpers.getTappedIndexForHourly(
@@ -323,7 +316,12 @@ class _WeatherChart2State extends State<WeatherChart2> {
           widget.hourlyWeather!,
           showExtendedWindInfo: widget.showExtendedWindInfo,
         );
+        tooltipShown = true;
       }
+    }
+
+    if (!tooltipShown) {
+      WeatherTooltip.removeTooltip();
     }
   }
 

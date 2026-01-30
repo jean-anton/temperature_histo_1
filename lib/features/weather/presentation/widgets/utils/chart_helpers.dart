@@ -389,18 +389,13 @@ class ChartHelpers {
   ) {
     final double gridLeft =
         ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize;
-    final double gridTop = ChartConstants.topPadding;
     final double gridRight = containerSize.width - ChartConstants.rightPadding;
-    final double gridBottom =
-        containerSize.height -
-        ChartConstants.bottomPadding -
-        ChartConstants.bottomTitleReservedSize;
     final double gridWidth = gridRight - gridLeft;
 
     if (localPosition.dx < gridLeft ||
         localPosition.dx > gridRight ||
-        localPosition.dy < gridTop ||
-        localPosition.dy > gridBottom) {
+        localPosition.dy < 0 ||
+        localPosition.dy > containerSize.height) {
       return null;
     }
 
@@ -423,19 +418,19 @@ class ChartHelpers {
   ) {
     final double gridLeft =
         ChartConstants.leftPadding + ChartConstants.leftTitleReservedSize;
-    final double gridTop = ChartConstants.topPadding;
+    //final double gridTop = ChartConstants.topPadding;
     final double gridRight = containerSize.width - ChartConstants.rightPadding;
-    final double gridBottom =
-        containerSize.height -
-        ChartConstants.bottomPadding -
-        ChartConstants.bottomTitleReservedSize;
+    //final double gridBottom =
+    //    containerSize.height -
+    //    ChartConstants.bottomPadding -
+    //    ChartConstants.bottomTitleReservedSize;
     final double gridWidth = gridRight - gridLeft;
 
-    // Check if tap is within chart bounds
+    // Check if tap is within chart bounds (horizontally strict, vertically permissive within container)
     if (localPosition.dx < gridLeft ||
         localPosition.dx > gridRight ||
-        localPosition.dy < gridTop ||
-        localPosition.dy > gridBottom) {
+        localPosition.dy < 0 ||
+        localPosition.dy > containerSize.height) {
       return null;
     }
 
