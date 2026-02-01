@@ -26,6 +26,7 @@ class WeatherDisplayWidget extends StatefulWidget {
   final bool showExtendedWindInfo;
   final double maxGustSpeed;
   final int maxPrecipitationProbability;
+  final double minApparentTemperature;
   final VoidCallback? onRefresh;
 
   const WeatherDisplayWidget({
@@ -44,6 +45,7 @@ class WeatherDisplayWidget extends StatefulWidget {
     required this.showExtendedWindInfo,
     required this.maxGustSpeed,
     required this.maxPrecipitationProbability,
+    required this.minApparentTemperature,
     this.onRefresh,
   });
 
@@ -305,6 +307,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
               dailyWeather: widget.forecast!,
               maxGustSpeed: widget.maxGustSpeed,
               maxPrecipitationProbability: widget.maxPrecipitationProbability,
+              minApparentTemperature: widget.minApparentTemperature,
             )
           : const Center(child: Text('Tableau Vent non disponible'));
     } else {

@@ -8,6 +8,7 @@ class LocationRepository {
 
   LocationRepository(this._geolocationService);
   static const String _kCustomCitiesKey = 'custom_weather_cities';
+  static const String _kHomeLocationKey = 'home_location_key';
 
   // Hard-coded climate locations
   final Map<String, ClimateLocationInfo> climateLocationData = {
@@ -227,5 +228,21 @@ class LocationRepository {
     }
 
     return addedCount;
+  }
+
+  /// Get the home location key from shared preferences
+  Future<String?> getHomeLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_kHomeLocationKey);
+  }
+
+  /// Set the home location key in shared preferences
+  Future<void> setHomeLocation(String? cityKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (cityKey == null) {
+      await prefs.remove(_kHomeLocationKey);
+    } else {
+      await prefs.setString(_kHomeLocationKey, cityKey);
+    }
   }
 }

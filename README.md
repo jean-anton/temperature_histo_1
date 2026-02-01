@@ -20,7 +20,8 @@ L'application ne contient aucune ville par défaut. Pour commencer :
 1.  Ouvrez le menu et cliquez sur **"Gérer les villes"**.
 2.  **Ajout par nom** : Tapez le nom d'une ville et sélectionnez-la dans la liste.
 3.  **Ajout par coordonnées** : Saisissez la latitude et la longitude directement.
-4.  **Import/Export** : Vous pouvez sauvegarder votre liste de villes ou en importer une au format JSON via les boutons dédiés.
+4.  **Définir un lieu "Home"** : Dans la liste, cochez la case à côté d'une ville pour la définir comme votre favori. Un bouton "Home" apparaîtra dans le panneau de contrôle pour un accès rapide.
+5.  **Import/Export** : Vous pouvez sauvegarder votre liste de villes ou en importer une au format JSON via les boutons dédiés.
 
 *Note : L'application sélectionne automatiquement la station climatique la plus proche de votre lieu pour garantir la pertinence des comparaisons.*
 
@@ -37,14 +38,14 @@ Basculez entre deux échelles de temps :
 Utilisez le sélecteur dans le panneau de contrôle pour changer de vue :
 *   **Graphique** : Affiche les températures prévues superposées aux normales (lignes en pointillés).
 *   **Vent** : Visualise la vitesse moyenne du vent et les rafales.
-*   **Table Vent** : Présente les conditions de vent par paliers d'altitude (utile pour les activités sensibles au vent).
+*   **Table Vent** : Présente les conditions de vent par paliers d'altitude, avec un code couleur (heatmap) pour identifier rapidement les intensités.
 *   **Comparatif** : Compare simultanément plusieurs modèles météo (ECMWF, GFS, ICON, ARPEGE) sur le même graphique.
 
 ---
 
 ## 5. Interaction avec les Graphiques
-*   **Infobulles (Tooltips)** : Appuyez dans les **2/3 supérieurs** d'un graphique pour ouvrir une infobulle détaillée. Elle affiche les températures exactes, le vent, l'humidité et les icônes météo.
-*   **Fermeture** : Pour fermer une infobulle, appuyez dans le **1/3 inférieur** du graphique ou n'importe où en dehors du graphique.
+*   **Infobulles (Tooltips)** : Appuyez dans les 2/3 supérieurs d'un graphique pour ouvrir une infobulle détaillée. Elle affiche les températures exactes, le vent, l'humidité et les icônes météo.
+*   **Fermeture** : Pour fermer une infobulle, appuyez dans le 1/3 inférieur du graphique ou n'importe où en dehors du graphique.
 *   **Navigation** : Faites défiler horizontalement pour naviguer dans le temps.
 
 ---
@@ -53,6 +54,7 @@ Utilisez le sélecteur dans le panneau de contrôle pour changer de vue :
 Vous pouvez choisir le modèle de calcul :
 *   **Best Match** : Le meilleur compromis calculé automatiquement.
 *   **ECMWF / GFS** : Modèles globaux de référence.
+*   **ICON** : Modèle global de référence DWD Allemand.
 *   **ARPEGE / AROME** : Modèles haute précision de Météo-France (particulièrement précis pour la France).
 
 ---
@@ -61,7 +63,10 @@ Vous pouvez choisir le modèle de calcul :
 Dans le panneau de contrôle, vous pouvez :
 *   Activer/Désactiver les informations de vent.
 *   Afficher le **Vent étendu** (détails par altitude).
-*   Filtrer les données pour n'afficher que les rafales dépassant un certain seuil (ex: > 30 km/h) ou les probabilités de précipitations significatives.
+*   Filtrer les données par :
+    *   **Rafales** : Masquer les valeurs inférieures à un seuil (ex: < 30 km/h).
+    *   **Précipitations** : Masquer les faibles probabilités.
+    *   **Température ressentie** : Masquer les valeurs en dessous d'un certain froid (ex: < 0°C).
 
 ---
 

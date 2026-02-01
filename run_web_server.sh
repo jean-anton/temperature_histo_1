@@ -1,1 +1,2 @@
-flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080
+flutter build web --release
+dhttpd --path build/web --host 0.0.0.0 --port 5001

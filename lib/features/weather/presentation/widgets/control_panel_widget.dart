@@ -35,6 +35,10 @@ class ControlPanelWidget extends StatelessWidget {
   final String mainFileName;
   final bool isRunningWithWasm;
   final ScrollController? scrollController;
+  final String? homeLocationKey;
+  final Function(String?)? onHomeLocationChanged;
+  final double minApparentTemperature;
+  final Function(double) onMinApparentTemperatureChanged;
 
   const ControlPanelWidget({
     super.key,
@@ -59,16 +63,21 @@ class ControlPanelWidget extends StatelessWidget {
     required this.onMaxGustSpeedChanged,
     required this.maxPrecipitationProbability,
     required this.onMaxPrecipitationProbabilityChanged,
+    required this.minApparentTemperature,
+    required this.onMinApparentTemperatureChanged,
     required this.locationService,
     required this.climateDropDownItems,
     required this.version,
     required this.mainFileName,
     required this.isRunningWithWasm,
     this.scrollController,
+    this.homeLocationKey,
+    this.onHomeLocationChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    print('### ControlPanelWidget build - homeLocationKey: $homeLocationKey');
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -115,7 +124,7 @@ class ControlPanelWidget extends StatelessWidget {
               const SizedBox(height: 16),
               _buildWindToggles(),
               const SizedBox(height: 20),
-              _buildWindFilters(),
+              _buildWindFilters(context),
               const SizedBox(height: 48),
               _buildFooter(context),
             ],
@@ -260,21 +269,42 @@ class ControlPanelWidget extends StatelessWidget {
           onChanged: onWeatherLocationChanged,
         ),
         const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => CityManagementDialog(
-                weatherLocations: weatherLocationData,
-                locationService: locationService,
-                selectedWeatherLocation: selectedWeatherLocation,
-                onLocationChanged: onWeatherLocationChanged,
-                onLocationsUpdated: onLocationsUpdated,
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => CityManagementDialog(
+                      weatherLocations: weatherLocationData,
+                      locationService: locationService,
+                      selectedWeatherLocation: selectedWeatherLocation,
+                      onLocationChanged: onWeatherLocationChanged,
+                      onLocationsUpdated: onLocationsUpdated,
+                      onHomeLocationChanged: onHomeLocationChanged,
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.settings_suggest_outlined),
+                label: const Text('Gérer les villes'),
               ),
-            );
-          },
-          icon: const Icon(Icons.settings_suggest_outlined),
-          label: const Text('Gérer les villes'),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: homeLocationKey != null
+                  ? () => onWeatherLocationChanged(homeLocationKey)
+                  : null,
+              icon: const Icon(Icons.home, size: 20),
+              label: const Text('Home'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
@@ -311,35 +341,97 @@ class ControlPanelWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildWindFilters() {
-    return Row(
+  Widget _buildWindFilters(BuildContext context) {
+    return Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start, // Aligns all children to the left
       children: [
-        Expanded(
-          child: DropdownButtonFormField<double>(
-            value: maxGustSpeed,
-            decoration: const InputDecoration(labelText: 'Rafales (km/h)'),
-            items: [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0]
-                .map(
-                  (v) => DropdownMenuItem(
-                    value: v,
-                    child: Text(v.toStringAsFixed(0)),
-                  ),
-                )
-                .toList(),
-            onChanged: (v) => v != null ? onMaxGustSpeedChanged(v) : null,
-          ),
+        //const Divider(),
+        // const SizedBox(height: 4),
+        const Text(
+          ' Filtres table vent',
+          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: DropdownButtonFormField<int>(
-            value: maxPrecipitationProbability,
-            decoration: const InputDecoration(labelText: 'Précip (%)'),
-            items: [0, 10, 20, 30, 40, 50]
-                .map((v) => DropdownMenuItem(value: v, child: Text('$v%')))
-                .toList(),
-            onChanged: (v) =>
-                v != null ? onMaxPrecipitationProbabilityChanged(v) : null,
-          ),
+        // const SizedBox(height: 4),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Rafales (km/h)',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  DropdownButtonFormField<double>(
+                    value: maxGustSpeed,
+                    isExpanded: true,
+                    items: [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0]
+                        .map(
+                          (v) => DropdownMenuItem(
+                            value: v,
+                            child: Text(v.toStringAsFixed(0)),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) =>
+                        v != null ? onMaxGustSpeedChanged(v) : null,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Précip (%)',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  DropdownButtonFormField<int>(
+                    value: maxPrecipitationProbability,
+                    isExpanded: true,
+                    items: [0, 10, 20, 30, 40, 50]
+                        .map(
+                          (v) => DropdownMenuItem(value: v, child: Text('$v%')),
+                        )
+                        .toList(),
+                    onChanged: (v) => v != null
+                        ? onMaxPrecipitationProbabilityChanged(v)
+                        : null,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Temp. ressentie min (°C)',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  DropdownButtonFormField<double>(
+                    value: minApparentTemperature,
+                    isExpanded: true,
+                    items: [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0]
+                        .map(
+                          (v) => DropdownMenuItem(
+                            value: v,
+                            child: Text(v.toStringAsFixed(0)),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) =>
+                        v != null ? onMinApparentTemperatureChanged(v) : null,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );

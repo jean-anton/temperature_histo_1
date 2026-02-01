@@ -10,6 +10,7 @@ class VentTableWidget extends StatelessWidget {
   final DailyWeather dailyWeather;
   final double maxGustSpeed;
   final int maxPrecipitationProbability;
+  final double minApparentTemperature;
 
   const VentTableWidget({
     super.key,
@@ -17,6 +18,7 @@ class VentTableWidget extends StatelessWidget {
     required this.dailyWeather,
     required this.maxGustSpeed,
     required this.maxPrecipitationProbability,
+    required this.minApparentTemperature,
   });
 
   @override
@@ -41,7 +43,8 @@ class VentTableWidget extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Rafales max: ${maxGustSpeed.toStringAsFixed(0)} km/h\n'
-                'Précipitations max: $maxPrecipitationProbability%',
+                'Précipitations max: $maxPrecipitationProbability%\n'
+                'Ressenti min: ${minApparentTemperature.toStringAsFixed(0)}°C',
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
@@ -88,7 +91,8 @@ class VentTableWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             'Filtres: Rafales < ${maxGustSpeed.toStringAsFixed(0)} km/h • '
-            'Précipitations < $maxPrecipitationProbability%',
+            'Précip < $maxPrecipitationProbability% • '
+            'Ressenti > ${minApparentTemperature.toStringAsFixed(0)}°C',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: Colors.blue[900],
@@ -462,6 +466,10 @@ class VentTableWidget extends StatelessWidget {
       // Check precipitation probability
       final precipProb = forecast.precipitationProbability ?? 0;
       if (precipProb >= maxPrecipitationProbability) return false;
+
+      // Check apparent temperature
+      final apparentTemp = forecast.apparentTemperature ?? -273.15;
+      if (apparentTemp < minApparentTemperature) return false;
 
       return true;
     }).toList();

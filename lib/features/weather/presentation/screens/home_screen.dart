@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String _kMaxGustSpeedKey = 'maxGustSpeed';
   static const String _kMaxPrecipitationProbabilityKey =
       'maxPrecipitationProbability';
+  static const String _kMinApparentTemperatureKey = 'minApparentTemperature';
   static const String _kDisclaimerAcceptedKey = 'disclaimerAccepted';
 
   final Map<String, ClimateLocationInfo> _climateLocationData = {
@@ -140,6 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showExtendedWindInfo = false;
   double _maxGustSpeed = 30.0;
   int _maxPrecipitationProbability = 20;
+  double _minApparentTemperature = 10.0;
+  String? _homeLocationKey;
 
   @override
   void initState() {
@@ -153,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _weatherLocationData = weatherLocations;
     });
+    await _loadHomeLocation();
     await _loadPreferencesAndData();
 
     // If no locations, automatically show city management after initial load
@@ -179,10 +183,18 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _weatherLocationData = weatherLocations;
           });
+          await _loadHomeLocation();
           // Auto-select first city if nothing is selected
           if (_selectedWeatherLocation == null && weatherLocations.isNotEmpty) {
             _onWeatherLocationChanged(weatherLocations.keys.first);
           }
+        },
+        onHomeLocationChanged: (homeKey) {
+          print('### Home location changed to: $homeKey');
+          setState(() {
+            _homeLocationKey = homeKey;
+          });
+          print('### _homeLocationKey is now: $_homeLocationKey');
         },
       ),
     );
@@ -219,8 +231,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _showWindInfo = prefs.getBool(_kShowWindInfoKey) ?? true;
       _showExtendedWindInfo = prefs.getBool(_kShowExtendedWindInfoKey) ?? false;
       _maxGustSpeed = prefs.getDouble(_kMaxGustSpeedKey) ?? 30.0;
-      _maxPrecipitationProbability =
+      _maxPrecipitationProbability = _maxPrecipitationProbability =
           prefs.getInt(_kMaxPrecipitationProbabilityKey) ?? 20;
+      _minApparentTemperature =
+          prefs.getDouble(_kMinApparentTemperatureKey) ?? _minApparentTemperature;
       _isDisclaimerAccepted = prefs.getBool(_kDisclaimerAcceptedKey) ?? false;
 
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {
@@ -235,6 +249,13 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         _selectedWeatherLocation = null;
       }
+    });
+  }
+
+  Future<void> _loadHomeLocation() async {
+    final homeKey = await _locationService.getHomeLocation();
+    setState(() {
+      _homeLocationKey = homeKey;
     });
   }
 
@@ -258,6 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _kMaxPrecipitationProbabilityKey,
       _maxPrecipitationProbability,
     );
+    await prefs.setDouble(_kMinApparentTemperatureKey, _minApparentTemperature);
     await prefs.setBool(_kDisclaimerAcceptedKey, _isDisclaimerAccepted);
   }
 
@@ -585,7 +607,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                           style: TextStyle(fontSize: 15, height: 1.4),
                           textAlign: TextAlign.center,
                         ),
-                        
+
                         const Divider(),
                         const SizedBox(height: 8),
                         Row(
@@ -738,6 +760,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
             showExtendedWindInfo: _showExtendedWindInfo,
             maxGustSpeed: _maxGustSpeed,
             maxPrecipitationProbability: _maxPrecipitationProbability,
+            minApparentTemperature: _minApparentTemperature,
             onRefresh: _loadData,
           )
         : _weatherLocationData.isEmpty
@@ -920,6 +943,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
         setState(() {
           _weatherLocationData = weatherLocations;
         });
+        await _loadHomeLocation();
         // Auto-select first city if nothing is selected
         if (_selectedWeatherLocation == null && weatherLocations.isNotEmpty) {
           _onWeatherLocationChanged(weatherLocations.keys.first);
@@ -963,12 +987,30 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
         });
         onStateChanged?.call();
       },
+      minApparentTemperature: _minApparentTemperature,
+      onMinApparentTemperatureChanged: (val) {
+        setState(() {
+          _minApparentTemperature = val;
+          _savePreferences();
+        });
+        onStateChanged?.call();
+      },
       locationService: _locationService,
       climateDropDownItems: _buildSortedClimateLocationItems(weatherInfo),
       version: VERSION,
       mainFileName: mainFileName,
       isRunningWithWasm: const bool.fromEnvironment('dart.tool.dart2wasm'),
       scrollController: scrollController,
+      homeLocationKey: _homeLocationKey,
+      onHomeLocationChanged: (homeKey) {
+        print(
+          '### onHomeLocationChanged called in _buildControlPanel with: $homeKey',
+        );
+        setState(() {
+          _homeLocationKey = homeKey;
+        });
+        print('### _homeLocationKey updated to: $_homeLocationKey');
+      },
     );
   }
 

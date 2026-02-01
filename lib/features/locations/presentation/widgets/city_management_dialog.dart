@@ -15,6 +15,7 @@ class CityManagementDialog extends StatefulWidget {
   final String? selectedWeatherLocation;
   final Function(String?) onLocationChanged;
   final Future<void> Function() onLocationsUpdated;
+  final Function(String?)? onHomeLocationChanged;
 
   const CityManagementDialog({
     super.key,
@@ -23,6 +24,7 @@ class CityManagementDialog extends StatefulWidget {
     required this.selectedWeatherLocation,
     required this.onLocationChanged,
     required this.onLocationsUpdated,
+    this.onHomeLocationChanged,
   });
 
   @override
@@ -36,6 +38,7 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
   bool _isLoading = false;
   Timer? _debounceTimer;
   String? _errorMessage;
+  String? _homeLocationKey;
 
   // New fields for coordinate-based entry
   bool _addByCoordinates = false;
@@ -48,6 +51,14 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
     super.initState();
     _currentLocations = Map.from(widget.weatherLocations);
     _searchController.addListener(_onSearchChanged);
+    _loadHomeLocation();
+  }
+
+  Future<void> _loadHomeLocation() async {
+    final homeKey = await widget.locationService.getHomeLocation();
+    setState(() {
+      _homeLocationKey = homeKey;
+    });
   }
 
   @override
@@ -448,9 +459,32 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                     final cityKey = _currentLocations.keys.elementAt(index);
                     final cityInfo = _currentLocations[cityKey]!;
                     final isCustom = _isCustomCity(cityKey);
+                    final isHome = _homeLocationKey == cityKey;
 
                     return ListTile(
-                      title: Text(cityInfo.formattedLocation),
+                      leading: Radio<String>(
+                        value: cityKey,
+                        groupValue: _homeLocationKey,
+                        onChanged: (value) async {
+                          await widget.locationService.setHomeLocation(value);
+                          setState(() {
+                            _homeLocationKey = value;
+                          });
+                          // Notify parent that home location changed
+                          widget.onHomeLocationChanged?.call(value);
+                        },
+                      ),
+                      title: Row(
+                        children: [
+                          Expanded(child: Text(cityInfo.formattedLocation)),
+                          if (isHome)
+                            const Icon(
+                              Icons.home,
+                              size: 16,
+                              color: Colors.blue,
+                            ),
+                        ],
+                      ),
                       subtitle: Text(
                         'Lat: ${cityInfo.lat.toStringAsFixed(4)}, Lon: ${cityInfo.lon.toStringAsFixed(4)}',
                       ),
