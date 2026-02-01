@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _errorMessage;
   bool _showWindInfo = true;
   bool _showExtendedWindInfo = false;
-  double _maxGustSpeed = 30.0;
+  double _maxGustSpeed = 10.0;
   int _maxPrecipitationProbability = 20;
   double _minApparentTemperature = 10.0;
   String? _homeLocationKey;
@@ -230,11 +230,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedModel = prefs.getString(_kSelectedModelKey) ?? _selectedModel;
       _showWindInfo = prefs.getBool(_kShowWindInfoKey) ?? true;
       _showExtendedWindInfo = prefs.getBool(_kShowExtendedWindInfoKey) ?? false;
-      _maxGustSpeed = prefs.getDouble(_kMaxGustSpeedKey) ?? 30.0;
+      _maxGustSpeed = prefs.getDouble(_kMaxGustSpeedKey) ?? 10.0;
       _maxPrecipitationProbability = _maxPrecipitationProbability =
           prefs.getInt(_kMaxPrecipitationProbabilityKey) ?? 20;
       _minApparentTemperature =
-          prefs.getDouble(_kMinApparentTemperatureKey) ?? _minApparentTemperature;
+          prefs.getDouble(_kMinApparentTemperatureKey) ??
+          _minApparentTemperature;
       _isDisclaimerAccepted = prefs.getBool(_kDisclaimerAcceptedKey) ?? false;
 
       if (!_climateLocationData.containsKey(_selectedClimateLocation)) {

@@ -187,13 +187,13 @@ class ControlPanelWidget extends StatelessWidget {
           segments: const [
             ButtonSegment(
               value: 'daily',
-              label: Text('Journalier'),
-              icon: Icon(Icons.calendar_today, size: 18),
+              label: FittedBox(child: Text('Journalier', softWrap: false)),
+              icon: Icon(Icons.calendar_today, size: 16),
             ),
             ButtonSegment(
               value: 'hourly',
-              label: Text('Horaire'),
-              icon: Icon(Icons.access_time, size: 18),
+              label: FittedBox(child: Text('Horaire', softWrap: false)),
+              icon: Icon(Icons.access_time, size: 16),
             ),
           ],
           selected: {displayMode},

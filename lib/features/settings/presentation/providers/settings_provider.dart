@@ -13,7 +13,7 @@ class SettingsProvider with ChangeNotifier {
   String _displayMode = 'daily';
   bool _showWindInfo = true;
   bool _showChart = true;
-  double _maxGustSpeed = 30.0;
+  double _maxGustSpeed = 10.0;
   int _maxPrecipitationProbability = 20;
 
   // Getters
@@ -28,7 +28,7 @@ class SettingsProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _displayMode = prefs.getString(_kDisplayModeKey) ?? 'daily';
     _showWindInfo = prefs.getBool(_kShowWindInfoKey) ?? true;
-    _maxGustSpeed = prefs.getDouble(_kMaxGustSpeedKey) ?? 30.0;
+    _maxGustSpeed = prefs.getDouble(_kMaxGustSpeedKey) ?? 10.0;
     _maxPrecipitationProbability =
         prefs.getInt(_kMaxPrecipitationProbabilityKey) ?? 20;
     notifyListeners();
