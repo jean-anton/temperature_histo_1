@@ -1,19 +1,12 @@
-// lib/services/weather_service.dart
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-// Add this import for the Random class
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import 'package:temperature_histo_1/core/constants/app_constants.dart';
 import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
 
 class WeatherRepository {
-  static const String _baseUrl = 'https://api.open-meteo.com/v1/forecast';
-
-  static const String _dailyParameters =
-      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max,wind_direction_10m_dominant,sunrise,sunset';
-
   /// Fetches a weather forecast for a single model from the Open-Meteo API.
   Future<DailyWeather> getWeatherForecast({
     required double latitude,
@@ -21,11 +14,11 @@ class WeatherRepository {
     required String model,
     required String locationName,
   }) async {
-    final url = Uri.parse(_baseUrl).replace(
+    final url = Uri.parse(AppConstants.weatherApiBaseUrl).replace(
       queryParameters: {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
-        'daily': _dailyParameters,
+        'daily': AppConstants.defaultDailyParameters,
         'timezone': 'auto',
         'forecast_days': '16',
         'models': model,
@@ -60,42 +53,14 @@ class WeatherRepository {
     required String model,
     required String locationName,
   }) async {
-    String hourlyParameters = '';
-    if (model == 'ecmwf_ifs025') {
-      hourlyParameters =
-          'temperature_2m,weather_code,apparent_temperature,'
-          'precipitation_probability,precipitation,rain,'
-          'cloud_cover,wind_speed_10m,wind_gusts_10m,'
-          'is_day,sunshine_duration,wind_direction_10m,windspeed_100m';
-    } else if (model == 'meteofrance_arome_seamless' ||
-        model == 'meteofrance_seamless') {
-      hourlyParameters =
-          'temperature_2m,weather_code,apparent_temperature,'
-          'precipitation_probability,precipitation,rain,'
-          'cloud_cover,wind_speed_10m,windgusts_10m,'
-          'is_day,sunshine_duration,wind_direction_10m,'
-          'windspeed_20m,windspeed_50m,windspeed_80m,windspeed_100m,windspeed_120m,windspeed_150m,windspeed_180m,windspeed_200m';
-    } else if (model == 'icon_seamless') {
-      hourlyParameters =
-          'temperature_2m,weather_code,apparent_temperature,'
-          'precipitation_probability,precipitation,rain,'
-          'cloud_cover,wind_speed_10m,windgusts_10m,'
-          'is_day,sunshine_duration,wind_direction_10m,'
-          'windspeed_80m,windspeed_120m,windspeed_180m';
-    } else {
-      hourlyParameters =
-          'temperature_2m,weather_code,apparent_temperature,'
-          'precipitation_probability,precipitation,rain,'
-          'cloud_cover,wind_speed_10m,windgusts_10m,'
-          'is_day,sunshine_duration,wind_direction_10m';
-    }
+    final hourlyParameters = AppConstants.getHourlyParameters(model);
 
     print("### CJG 192: hourlyParameters: $hourlyParameters");
     print("### CJG 192: latitude: $latitude longitude: $longitude");
     print("### CJG 192: locationName: $locationName");
     print("### CJG 192: model: $model");
 
-    final url = Uri.parse(_baseUrl).replace(
+    final url = Uri.parse(AppConstants.weatherApiBaseUrl).replace(
       queryParameters: {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),

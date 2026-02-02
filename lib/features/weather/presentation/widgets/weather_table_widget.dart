@@ -6,8 +6,9 @@ import 'package:temperature_histo_1/features/climate/data/climate_repository.dar
 class WeatherTable extends StatelessWidget {
   final DailyWeather forecast;
   final List<ClimateNormal> climateNormals;
+  final ClimateRepository _climateService = ClimateRepository();
 
-  const WeatherTable({
+  WeatherTable({
     super.key,
     required this.forecast,
     required this.climateNormals,
@@ -15,17 +16,12 @@ class WeatherTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final climateService = ClimateRepository();
-
-    // Note : Assurez-vous que le widget parent de ce SingleChildScrollView
-    // n'a pas de padding horizontal si vous voulez que le tableau touche le bord.
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        horizontalMargin:
-            0, // Supprime l'espace à gauche et à droite du tableau
-        columnSpacing: 0, // Supprime l'espace entre les colonnes
-        headingRowColor: MaterialStateProperty.all(Colors.grey[100]),
+        horizontalMargin: 0,
+        columnSpacing: 0,
+        headingRowColor: WidgetStateProperty.all(Colors.grey[100]),
         columns: const [
           DataColumn(
             label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -69,39 +65,23 @@ class WeatherTable extends StatelessWidget {
           ),
         ],
         rows: forecast.dailyForecasts.map((dailyForecast) {
-          final deviation = climateService.calculateDeviation(
+          final deviation = _climateService.calculateDeviation(
             dailyForecast.temperatureMax,
             dailyForecast.temperatureMin,
             dailyForecast.dayOfYear,
             climateNormals,
           );
-          // print("####CJG ${dailyForecast.temperatureMax}");
           return DataRow(
             cells: [
               DataCell(
-                // On ajoute un padding ici pour recréer un peu d'espace
-                // uniquement pour la première cellule, pour la lisibilité.
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${_getDayOfWeek(dailyForecast.date)} ${dailyForecast.formattedDate}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
-                        ),
-                      ),
-                      // Text(
-                      //   _getDayOfWeek(dailyForecast.date),
-                      //   style: TextStyle(
-                      //     fontSize: 16,
-                      //     color: Colors.grey[600],
-                      //   ),
-                      // ),
-                    ],
+                  child: Text(
+                    '${_getDayOfWeek(dailyForecast.date)} ${dailyForecast.formattedDate}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                    ),
                   ),
                 ),
               ),
@@ -116,23 +96,9 @@ class WeatherTable extends StatelessWidget {
                 ),
               ),
               DataCell(
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getDeviationColor(deviation.maxDeviation),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    deviation.maxDeviationText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                _buildDeviationBadge(
+                  deviation.maxDeviation,
+                  deviation.maxDeviationText,
                 ),
               ),
               DataCell(
@@ -146,23 +112,9 @@ class WeatherTable extends StatelessWidget {
                 ),
               ),
               DataCell(
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getDeviationColor(deviation.minDeviation),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    deviation.minDeviationText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                _buildDeviationBadge(
+                  deviation.minDeviation,
+                  deviation.minDeviationText,
                 ),
               ),
               DataCell(
@@ -182,28 +134,37 @@ class WeatherTable extends StatelessWidget {
                 ),
               ),
               DataCell(
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getDeviationColor(deviation.avgDeviation),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    deviation.avgDeviationText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
+                _buildDeviationBadge(
+                  deviation.avgDeviation,
+                  deviation.avgDeviationText,
+                  fontSize: 12,
                 ),
               ),
             ],
           );
         }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildDeviationBadge(
+    double deviation,
+    String text, {
+    double fontSize = 16,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: _getDeviationColor(deviation),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: fontSize,
+        ),
       ),
     );
   }
@@ -214,20 +175,12 @@ class WeatherTable extends StatelessWidget {
   }
 
   Color _getDeviationColor(double deviation) {
-    if (deviation > 2) {
-      return Colors.red[700]!;
-    } else if (deviation > 1) {
-      return Colors.orange[600]!;
-    } else if (deviation > 0.5) {
-      return Colors.orange[400]!;
-    } else if (deviation > -0.5) {
-      return Colors.green[600]!;
-    } else if (deviation > -1) {
-      return Colors.blue[400]!;
-    } else if (deviation > -2) {
-      return Colors.blue[600]!;
-    } else {
-      return Colors.blue[800]!;
-    }
+    if (deviation > 2) return Colors.red[700]!;
+    if (deviation > 1) return Colors.orange[600]!;
+    if (deviation > 0.5) return Colors.orange[400]!;
+    if (deviation > -0.5) return Colors.green[600]!;
+    if (deviation > -1) return Colors.blue[400]!;
+    if (deviation > -2) return Colors.blue[600]!;
+    return Colors.blue[800]!;
   }
 }

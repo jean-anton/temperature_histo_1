@@ -46,3 +46,6 @@ app.*.map.json
 
 # API keys (keep sensitive data out of version control)
 lib/api_keys.dart
+
+# Chrome data
+chrome_data/

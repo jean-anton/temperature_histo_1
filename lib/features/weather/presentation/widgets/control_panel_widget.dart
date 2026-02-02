@@ -4,8 +4,13 @@ import 'package:url_launcher/link.dart';
 import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
 import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
 import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
-import 'package:temperature_histo_1/features/locations/presentation/widgets/city_management_dialog.dart';
 import 'package:temperature_histo_1/core/widgets/help_dialog.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/model_selector.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/display_mode_selector.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/display_type_selector.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/location_selector.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/wind_settings.dart';
+import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/section_header.dart';
 
 class ControlPanelWidget extends StatelessWidget {
   final Map<String, String> models;
@@ -94,346 +99,67 @@ class ControlPanelWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionHeader(
-                context,
-                'MODÈLE',
-                Icons.model_training_outlined,
+              const SectionHeader(
+                title: 'MODÈLE',
+                icon: Icons.model_training_outlined,
               ),
               const SizedBox(height: 12),
-              _buildModelSelector(),
-              //const SizedBox(height: 32),
-              // _buildSectionHeader(
-              //   context,
-              //   'AFFICHAGE',
-              //   Icons.visibility_outlined,
-              // ),
-              const SizedBox(height: 16),
-              _buildDisplayModeSelector(),
-              const SizedBox(height: 20),
-              _buildDisplayTypeSelector(),
-              const SizedBox(height: 32),
-              _buildSectionHeader(
-                context,
-                'LOCALISATION',
-                Icons.place_outlined,
+              ModelSelector(
+                models: models,
+                selectedModel: selectedModel,
+                onModelChanged: onModelChanged,
               ),
               const SizedBox(height: 16),
-              _buildLocationSelector(context),
-              const SizedBox(height: 32),
-              _buildSectionHeader(context, 'PARAMÈTRES VENT', Icons.air),
-              const SizedBox(height: 16),
-              _buildWindToggles(),
+              DisplayModeSelector(
+                displayMode: displayMode,
+                onDisplayModeChanged: onDisplayModeChanged,
+              ),
               const SizedBox(height: 20),
-              _buildWindFilters(context),
+              DisplayTypeSelector(
+                displayType: displayType,
+                onDisplayTypeChanged: onDisplayTypeChanged,
+              ),
+              const SizedBox(height: 32),
+              const SectionHeader(
+                title: 'LOCALISATION',
+                icon: Icons.place_outlined,
+              ),
+              const SizedBox(height: 16),
+              LocationSelector(
+                weatherLocationData: weatherLocationData,
+                selectedWeatherLocation: selectedWeatherLocation,
+                onWeatherLocationChanged: onWeatherLocationChanged,
+                onLocationsUpdated: onLocationsUpdated,
+                locationService: locationService,
+                homeLocationKey: homeLocationKey,
+                onHomeLocationChanged: onHomeLocationChanged,
+                selectedClimateLocation: selectedClimateLocation,
+                onClimateLocationChanged: onClimateLocationChanged,
+                climateDropDownItems: climateDropDownItems,
+              ),
+              const SizedBox(height: 32),
+              const SectionHeader(title: 'PARAMÈTRES VENT', icon: Icons.air),
+              const SizedBox(height: 16),
+              WindSettings(
+                showWindInfo: showWindInfo,
+                onShowWindInfoChanged: onShowWindInfoChanged,
+                showExtendedWindInfo: showExtendedWindInfo,
+                onShowExtendedWindInfoChanged: onShowExtendedWindInfoChanged,
+                maxGustSpeed: maxGustSpeed,
+                onMaxGustSpeedChanged: onMaxGustSpeedChanged,
+                maxPrecipitationProbability: maxPrecipitationProbability,
+                onMaxPrecipitationProbabilityChanged:
+                    onMaxPrecipitationProbabilityChanged,
+                minApparentTemperature: minApparentTemperature,
+                onMinApparentTemperatureChanged:
+                    onMinApparentTemperatureChanged,
+              ),
               const SizedBox(height: 48),
               _buildFooter(context),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildSectionHeader(
-    BuildContext context,
-    String title,
-    IconData icon,
-  ) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 18,
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: GoogleFonts.outfit(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildModelSelector() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: models.entries.map((entry) {
-        final isSelected = selectedModel == entry.key;
-        return ChoiceChip(
-          label: Text(entry.value),
-          selected: isSelected,
-          onSelected: (selected) {
-            if (selected) onModelChanged(entry.key);
-          },
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildDisplayModeSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Mode temporel:', style: TextStyle(fontSize: 13)),
-        const SizedBox(height: 8),
-        SegmentedButton<String>(
-          segments: const [
-            ButtonSegment(
-              value: 'daily',
-              label: FittedBox(child: Text('Journalier', softWrap: false)),
-              icon: Icon(Icons.calendar_today, size: 16),
-            ),
-            ButtonSegment(
-              value: 'hourly',
-              label: FittedBox(child: Text('Horaire', softWrap: false)),
-              icon: Icon(Icons.access_time, size: 16),
-            ),
-          ],
-          selected: {displayMode},
-          onSelectionChanged: (selection) =>
-              onDisplayModeChanged(selection.first),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDisplayTypeSelector() {
-    final types = [
-      (DisplayType.graphique, 'Graph', Icons.bar_chart),
-      (DisplayType.vent, 'Vent', Icons.air),
-      (DisplayType.ventTable, 'Table Vent', Icons.table_rows),
-      (DisplayType.comparatif, 'Comp', Icons.compare_arrows),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Type de vue:', style: TextStyle(fontSize: 13)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: types.map((typeInfo) {
-            final type = typeInfo.$1;
-            final label = typeInfo.$2;
-            final icon = typeInfo.$3;
-            final isSelected = displayType == type;
-
-            return ChoiceChip(
-              avatar: Icon(
-                icon,
-                size: 16,
-                color: isSelected ? Colors.white : null,
-              ),
-              label: Text(label),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) onDisplayTypeChanged(type);
-              },
-              selectedColor: const Color(0xFF1A237E),
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : null,
-                fontSize: 13,
-              ),
-              showCheckmark: false,
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLocationSelector(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        DropdownButtonFormField<String>(
-          value: selectedWeatherLocation,
-          decoration: const InputDecoration(
-            labelText: 'Lieu de prévision',
-            prefixIcon: Icon(Icons.location_on_outlined),
-          ),
-          items: weatherLocationData.entries.map((entry) {
-            return DropdownMenuItem(
-              value: entry.key,
-              child: Text(entry.value.formattedLocation),
-            );
-          }).toList(),
-          onChanged: onWeatherLocationChanged,
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => CityManagementDialog(
-                      weatherLocations: weatherLocationData,
-                      locationService: locationService,
-                      selectedWeatherLocation: selectedWeatherLocation,
-                      onLocationChanged: onWeatherLocationChanged,
-                      onLocationsUpdated: onLocationsUpdated,
-                      onHomeLocationChanged: onHomeLocationChanged,
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.settings_suggest_outlined),
-                label: const Text('Gérer les villes'),
-              ),
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton.icon(
-              onPressed: homeLocationKey != null
-                  ? () => onWeatherLocationChanged(homeLocationKey)
-                  : null,
-              icon: const Icon(Icons.home, size: 20),
-              label: const Text('Home'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        DropdownButtonFormField<String>(
-          value: selectedClimateLocation,
-          decoration: const InputDecoration(
-            labelText: 'Station climatique',
-            prefixIcon: Icon(Icons.history_outlined),
-          ),
-          items: climateDropDownItems,
-          onChanged: onClimateLocationChanged,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWindToggles() {
-    return Column(
-      children: [
-        SwitchListTile(
-          title: const Text('Afficher le vent'),
-          subtitle: const Text('Information de base'),
-          value: showWindInfo,
-          onChanged: onShowWindInfoChanged,
-          contentPadding: EdgeInsets.zero,
-        ),
-        SwitchListTile(
-          title: const Text('Vent étendu'),
-          subtitle: const Text('Détails par altitude'),
-          value: showExtendedWindInfo,
-          onChanged: onShowExtendedWindInfoChanged,
-          contentPadding: EdgeInsets.zero,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWindFilters(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start, // Aligns all children to the left
-      children: [
-        //const Divider(),
-        // const SizedBox(height: 4),
-        const Text(
-          ' Filtres table vent',
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-        ),
-        // const SizedBox(height: 4),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rafales (km/h)',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  DropdownButtonFormField<double>(
-                    value: maxGustSpeed,
-                    isExpanded: true,
-                    items: [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 80.0, 100.0]
-                        .map(
-                          (v) => DropdownMenuItem(
-                            value: v,
-                            child: Text(v.toStringAsFixed(0)),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) =>
-                        v != null ? onMaxGustSpeedChanged(v) : null,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Précip (%)',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  DropdownButtonFormField<int>(
-                    value: maxPrecipitationProbability,
-                    isExpanded: true,
-                    items: [0, 10, 20, 30, 40, 50]
-                        .map(
-                          (v) => DropdownMenuItem(value: v, child: Text('$v%')),
-                        )
-                        .toList(),
-                    onChanged: (v) => v != null
-                        ? onMaxPrecipitationProbabilityChanged(v)
-                        : null,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Temp. ressentie min (°C)',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  DropdownButtonFormField<double>(
-                    value: minApparentTemperature,
-                    isExpanded: true,
-                    items: [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0]
-                        .map(
-                          (v) => DropdownMenuItem(
-                            value: v,
-                            child: Text(v.toStringAsFixed(0)),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) =>
-                        v != null ? onMinApparentTemperatureChanged(v) : null,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
