@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
-import 'package:temperature_histo_1/flchart_positioned/flchart_positioned.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/flchart_positioned/flchart_positioned.dart';
 import '../utils/chart_constants.dart';
 import '../utils/chart_theme.dart';
 

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/link.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
-import 'package:temperature_histo_1/core/widgets/help_dialog.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/model_selector.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/display_mode_selector.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/display_type_selector.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/location_selector.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/wind_settings.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel/section_header.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/features/locations/data/location_repository.dart';
+import 'package:aeroclim/core/widgets/help_dialog.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel/model_selector.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel/display_mode_selector.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel/display_type_selector.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel/location_selector.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel/wind_settings.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel/section_header.dart';
 
 class ControlPanelWidget extends StatelessWidget {
   final Map<String, String> models;
@@ -202,7 +202,7 @@ class ControlPanelWidget extends StatelessWidget {
           children: [
             Link(
               uri: Uri.parse(
-                'https://github.com/jean-anton/temperature_histo_1',
+                'https://github.com/jean-anton/aeroclim',
               ),
               target: LinkTarget.blank,
               builder: (context, followLink) => InkWell(
@@ -225,7 +225,7 @@ class ControlPanelWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             const SelectableText(
-              'https://github.com/jean-anton/temperature_histo_1',
+              'https://github.com/jean-anton/aeroclim',
               style: TextStyle(fontSize: 10, color: Colors.grey),
             ),
           ],

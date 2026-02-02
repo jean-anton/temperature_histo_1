@@ -8,8 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:temperature_histo_1/main.dart';
-import 'package:temperature_histo_1/features/weather/presentation/screens/home_screen.dart';
+import 'package:aeroclim/main.dart';
+import 'package:aeroclim/features/weather/presentation/screens/home_screen.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

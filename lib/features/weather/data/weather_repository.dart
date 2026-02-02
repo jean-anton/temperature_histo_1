@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import 'package:temperature_histo_1/core/constants/app_constants.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/core/constants/app_constants.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
 
 class WeatherRepository {
   /// Fetches a weather forecast for a single model from the Open-Meteo API.

@@ -72,7 +72,7 @@ class HelpDialog extends StatelessWidget {
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                 ),
                 const SelectableText(
-                  'https://github.com/jean-anton/temperature_histo_1',
+                  'https://github.com/jean-anton/aeroclim',
                   style: TextStyle(fontSize: 12, color: Colors.blue),
                 ),
               ],

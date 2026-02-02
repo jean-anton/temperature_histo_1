@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'utils/chart_constants.dart';
 import 'utils/chart_helpers.dart';
 import 'utils/weather_tooltip.dart';

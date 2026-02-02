@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
-import 'package:temperature_histo_1/core/widgets/responsive_layout.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/weather_chart_widget.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/weather_table_widget.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/vent_table_widget.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/core/widgets/responsive_layout.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/weather_chart_widget.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/weather_table_widget.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/vent_table_widget.dart';
 
-import 'package:temperature_histo_1/core/widgets/help_dialog.dart';
+import 'package:aeroclim/core/widgets/help_dialog.dart';
 
 class WeatherDisplayWidget extends StatefulWidget {
   final WeatherLocationInfo weatherInfo;

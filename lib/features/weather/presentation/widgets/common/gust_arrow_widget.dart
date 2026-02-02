@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/utils/chart_theme.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_theme.dart';
 
 class GustArrowWidget extends StatelessWidget {
   final double? windSpeed;

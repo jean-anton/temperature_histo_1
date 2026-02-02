@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/core/services/geolocation_service.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/core/services/geolocation_service.dart';
 
 class LocationRepository {
   final GeolocationService _geolocationService;

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
 //import 'weather_deviation.dart';
 import 'chart_helpers.dart';
 import 'chart_theme.dart';

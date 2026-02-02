@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
 //import 'weather_deviation.dart';
 
 /// Provides chart data for different chart types

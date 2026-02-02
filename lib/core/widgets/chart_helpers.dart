@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/utils/chart_constants.dart';
-import 'package:temperature_histo_1/widgets/utils/chart_data_provider.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_constants.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_data_provider.dart';
 import 'dart:math';
 
 import '../../data/weather_icon_data.dart';
@@ -11,8 +11,6 @@ import '../../models/weather_forecast_model.dart';
 import '../../models/weather_icon.dart';
 //import 'weather_deviation.dart';
 import 'chart_constants.dart';
-
-
 
 /// Helper class containing chart-related utility methods
 class ChartHelpers {
@@ -250,7 +248,6 @@ class ChartHelpers {
     return Offset(x, y);
   }
 
-  
   /// Get tapped index from local position
   static int? getTappedIndex(
     Offset localPosition,

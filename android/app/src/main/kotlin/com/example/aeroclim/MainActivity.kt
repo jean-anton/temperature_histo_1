@@ -1,4 +1,4 @@
-package com.example.temperature_histo_1
+package com.example.aeroclim
 
 import io.flutter.embedding.android.FlutterActivity
 

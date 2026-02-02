@@ -5,24 +5,24 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/link.dart';
 
-import 'package:temperature_histo_1/main.dart';
+import 'package:aeroclim/main.dart';
 
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/features/climate/data/climate_repository.dart';
-import 'package:temperature_histo_1/features/weather/data/weather_repository.dart';
-import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
-import 'package:temperature_histo_1/core/services/geolocation_service.dart';
-import 'package:temperature_histo_1/core/widgets/error_display_widget.dart';
-import 'package:temperature_histo_1/core/widgets/loading_indicator_widget.dart';
-import 'package:temperature_histo_1/features/weather/domain/weathercode_calculator.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/features/climate/data/climate_repository.dart';
+import 'package:aeroclim/features/weather/data/weather_repository.dart';
+import 'package:aeroclim/features/locations/data/location_repository.dart';
+import 'package:aeroclim/core/services/geolocation_service.dart';
+import 'package:aeroclim/core/widgets/error_display_widget.dart';
+import 'package:aeroclim/core/widgets/loading_indicator_widget.dart';
+import 'package:aeroclim/features/weather/domain/weathercode_calculator.dart';
 
-import 'package:temperature_histo_1/core/widgets/responsive_layout.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/control_panel_widget.dart';
-import 'package:temperature_histo_1/features/weather/presentation/widgets/weather_display_widget.dart';
-import 'package:temperature_histo_1/features/locations/presentation/widgets/city_management_dialog.dart';
-import 'package:temperature_histo_1/core/widgets/help_dialog.dart';
+import 'package:aeroclim/core/widgets/responsive_layout.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/control_panel_widget.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/weather_display_widget.dart';
+import 'package:aeroclim/features/locations/presentation/widgets/city_management_dialog.dart';
+import 'package:aeroclim/core/widgets/help_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -639,7 +639,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                           children: [
                             Link(
                               uri: Uri.parse(
-                                'https://github.com/jean-anton/temperature_histo_1',
+                                'https://github.com/jean-anton/aeroclim',
                               ),
                               target: LinkTarget.blank,
                               builder: (context, followLink) => InkWell(
@@ -668,7 +668,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                             ),
                             const SizedBox(height: 4),
                             const SelectableText(
-                              'https://github.com/jean-anton/temperature_histo_1',
+                              'https://github.com/jean-anton/aeroclim',
                               style: TextStyle(
                                 fontSize: 15,
                                 color: Colors.grey,

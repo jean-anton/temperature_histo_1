@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/features/locations/data/location_repository.dart';
 
 import 'package:web/web.dart' as web;
 import 'dart:js_interop';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
 
 class DisplayTypeSelector extends StatelessWidget {
   final DisplayType displayType;

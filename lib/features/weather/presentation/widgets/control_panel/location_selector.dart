@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/features/locations/data/location_repository.dart';
-import 'package:temperature_histo_1/features/locations/presentation/widgets/city_management_dialog.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/features/locations/data/location_repository.dart';
+import 'package:aeroclim/features/locations/presentation/widgets/city_management_dialog.dart';
 
 class LocationSelector extends StatelessWidget {
   final Map<String, WeatherLocationInfo> weatherLocationData;

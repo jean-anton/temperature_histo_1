@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
-import 'package:temperature_histo_1/features/climate/data/climate_repository.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/climate/data/climate_repository.dart';
 
 class WeatherTable extends StatelessWidget {
   final DailyWeather forecast;

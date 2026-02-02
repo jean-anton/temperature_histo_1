@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "temperature_histo_1 (chrome 8082)",
+            "name": "aeroclim (chrome 8082)",
             "request": "launch",
             "type": "dart",
             "args": [
@@ -18,13 +18,13 @@
             ]
         },
         {
-            "name": "temperature_histo_1 (profile mode)",
+            "name": "aeroclim (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "temperature_histo_1 (release mode)",
+            "name": "aeroclim (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

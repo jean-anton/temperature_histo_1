@@ -1,6 +1,6 @@
 {
-    "name": "temperature_histo_1",
-    "short_name": "temperature_histo_1",
+    "name": "AeroClim",
+    "short_name": "AeroClim",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

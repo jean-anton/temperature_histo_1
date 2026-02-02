@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:temperature_histo_1/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
 
 class ClimateRepository {
   // The hardcoded _assetPaths map has been removed from here.

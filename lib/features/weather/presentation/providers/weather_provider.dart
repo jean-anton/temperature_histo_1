@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:temperature_histo_1/features/weather/domain/weather_model.dart';
-import 'package:temperature_histo_1/features/weather/data/weather_repository.dart';
-import 'package:temperature_histo_1/features/locations/domain/location_model.dart';
-import 'package:temperature_histo_1/features/weather/domain/weathercode_calculator.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/weather/data/weather_repository.dart';
+import 'package:aeroclim/features/locations/domain/location_model.dart';
+import 'package:aeroclim/features/weather/domain/weathercode_calculator.dart';
 
 /// Provider for managing weather data state
 class WeatherProvider with ChangeNotifier {

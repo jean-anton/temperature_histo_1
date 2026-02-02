@@ -86,7 +86,7 @@ Dans le panneau de contrôle, vous pouvez :
     - Illustration "le-rechauffement-climatique.png" : Créée par [Freepik - Flaticon](https://www.flaticon.com/).
 - **Typographies** : Polices Google Fonts (OFL / Apache 2.0).
 - **Licence Logicielle** : Cette application est distribuée sous licence MIT.
-- **Code Source** : [GitHub Repository](https://github.com/jean-anton/temperature_histo_1)
+- **Code Source** : [GitHub Repository](https://github.com/jean-anton/aeroclim)
 
 ---
 
