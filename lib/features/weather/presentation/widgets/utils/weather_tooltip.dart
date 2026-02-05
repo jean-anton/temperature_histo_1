@@ -468,14 +468,22 @@ class WeatherTooltip {
                           // Weather Description
                           // Weather Description
                           if (data is DailyForecast &&
-                                  data.weatherCode != null ||
+                                  (data.weatherCodeDaytime != null ||
+                                      data.weatherCode != null) ||
                               data is HourlyForecast &&
                                   data.weatherCode != null)
                             Row(
                               children: [
                                 Expanded(
                                   child: Text(
-                                    data.weatherCode != null
+                                    data is DailyForecast
+                                        ? ChartHelpers.getDescriptionFr(
+                                                (data.weatherCodeDaytime ??
+                                                        data.weatherCode)!
+                                                    .toString(),
+                                              ) ??
+                                              ''
+                                        : data.weatherCode != null
                                         ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
                                         : "",
                                     style: const TextStyle(

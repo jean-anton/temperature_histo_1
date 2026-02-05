@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_constants.dart';
-import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_data_provider.dart';
 import 'dart:math';
+import 'package:aeroclim/features/weather/data/weather_icon_data.dart';
 
-import '../../data/weather_icon_data.dart';
-import '../../models/climate_normal_model.dart';
-import '../../models/weather_forecast_model.dart';
-import '../../models/weather_icon.dart';
-//import 'weather_deviation.dart';
-import 'chart_constants.dart';
+import 'package:aeroclim/features/climate/domain/climate_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/weather/domain/weather_icon.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_constants.dart';
 
 /// Helper class containing chart-related utility methods
 class ChartHelpers {
