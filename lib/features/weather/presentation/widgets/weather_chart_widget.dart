@@ -9,6 +9,8 @@ import 'builders/daily_chart_builder.dart';
 import 'builders/hourly_chart_builder.dart';
 import 'builders/wind_chart_builder.dart';
 import 'builders/comparison_chart_builder.dart';
+import 'builders/period_chart_builder.dart';
+import 'utils/chart_data_provider.dart';
 
 class WeatherChart2 extends StatefulWidget {
   final DailyWeather? forecast;
@@ -53,7 +55,9 @@ class _WeatherChart2State extends State<WeatherChart2> {
     _calculateChartData();
     _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCurrentTime();
+      if (widget.displayMode != 'periodes') {
+        _scrollToCurrentTime();
+      }
       _handleScroll(); // Initial position check
     });
   }
@@ -126,7 +130,10 @@ class _WeatherChart2State extends State<WeatherChart2> {
 
   void _scrollToCurrentTime() {
     final hourlyWeather = widget.hourlyWeather;
-    if (hourlyWeather == null || !_scrollController.hasClients) return;
+    if (hourlyWeather == null ||
+        !_scrollController.hasClients ||
+        widget.displayMode == 'periodes')
+      return;
 
     // Target is now - 1 hour to show some history context on the left
     final DateTime targetTime = DateTime.now().subtract(
@@ -286,6 +293,26 @@ class _WeatherChart2State extends State<WeatherChart2> {
         );
         tooltipShown = true;
       }
+    } else if (widget.displayMode == 'periodes' &&
+        widget.hourlyWeather != null) {
+      final periodForecasts = ChartDataProvider.getPeriodForecasts(
+        widget.hourlyWeather!,
+      );
+      final tappedIndex = ChartHelpers.getTappedIndex(
+        chartOffset,
+        containerSize,
+        periodForecasts.length - 1,
+      );
+      if (tappedIndex != null) {
+        WeatherTooltip.showPeriodTooltip(
+          context,
+          tappedIndex,
+          details.globalPosition,
+          periodForecasts[tappedIndex],
+          showExtendedWindInfo: widget.showExtendedWindInfo,
+        );
+        tooltipShown = true;
+      }
     } else if (widget.displayMode == 'daily' && widget.forecast != null) {
       final tappedIndex = ChartHelpers.getTappedIndex(
         chartOffset,
@@ -341,6 +368,14 @@ class _WeatherChart2State extends State<WeatherChart2> {
             widget.forecast!.dailyForecasts.length * ChartConstants.widthPerDay;
       }
       finalHeight = ChartConstants.dailyChartHeight;
+    } else if (widget.displayMode == 'periodes' &&
+        widget.hourlyWeather != null) {
+      chartWidth =
+          widget.hourlyWeather!.hourlyForecasts.last.time
+              .difference(widget.hourlyWeather!.hourlyForecasts.first.time)
+              .inHours *
+          (ChartConstants.hourlyChartWidthPerHour / 6);
+      finalHeight = ChartConstants.hourlyChartHeight;
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       chartWidth =
           widget.hourlyWeather!.hourlyForecasts.last.time
@@ -396,6 +431,18 @@ class _WeatherChart2State extends State<WeatherChart2> {
         maxTemp: _maxTemp,
         labels: _labels,
         forecast: widget.forecast,
+      );
+    } else if (widget.displayMode == 'periodes' &&
+        widget.hourlyWeather != null) {
+      return PeriodChartBuilder.build(
+        hourlyWeather: widget.hourlyWeather!,
+        forecast: widget.forecast!,
+        minTemp: _minTemp,
+        maxTemp: _maxTemp,
+        hourLabels: _labels,
+        constraints: constraints,
+        containerSize: containerSize,
+        showWindInfo: widget.showWindInfo,
       );
     }
 

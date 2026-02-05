@@ -13,28 +13,28 @@ class AppConstants {
 
   // Daily Parameters
   static const String defaultDailyParameters =
-      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,windspeed_10m_max,windgusts_10m_max,wind_direction_10m_dominant,sunrise,sunset';
+      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,snowfall_sum,precipitation_probability_max,weathercode,cloudcover_mean,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset';
 
   // Helper to get parameters for specific models
   static String getHourlyParameters(String model) {
     const baseParams =
         'temperature_2m,weather_code,apparent_temperature,'
         'precipitation_probability,precipitation,rain,'
-        'cloud_cover,wind_speed_10m,windgusts_10m,'
+        'cloud_cover,wind_speed_10m,wind_gusts_10m,'
         'is_day,sunshine_duration,wind_direction_10m';
 
     switch (model) {
       case modelEcmwfIfs025:
-        return '$baseParams,windspeed_100m';
+        return '$baseParams,wind_speed_100m';
 
       case modelMeteoFranceAromeSeamless:
       case modelMeteoFranceSeamless:
         return '$baseParams,'
-            'windspeed_20m,windspeed_50m,windspeed_80m,windspeed_100m,windspeed_120m,windspeed_150m,windspeed_180m,windspeed_200m';
+            'wind_speed_20m,wind_speed_50m,wind_speed_80m,wind_speed_100m,wind_speed_120m,wind_speed_150m,wind_speed_180m,wind_speed_200m';
 
       case modelIconSeamless:
         return '$baseParams,'
-            'windspeed_80m,windspeed_120m,windspeed_180m';
+            'wind_speed_80m,wind_speed_120m,wind_speed_180m';
 
       default:
         return baseParams;

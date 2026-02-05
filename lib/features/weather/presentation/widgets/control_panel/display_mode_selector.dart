@@ -25,6 +25,11 @@ class DisplayModeSelector extends StatelessWidget {
               icon: Icon(Icons.calendar_today, size: 16),
             ),
             ButtonSegment(
+              value: 'periodes',
+              label: FittedBox(child: Text('Aperçu', softWrap: false)),
+              icon: Icon(Icons.view_quilt, size: 16),
+            ),
+            ButtonSegment(
               value: 'hourly',
               label: FittedBox(child: Text('Horaire', softWrap: false)),
               icon: Icon(Icons.access_time, size: 16),

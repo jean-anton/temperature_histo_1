@@ -242,19 +242,25 @@ class ChartHelpers {
       allTemps = forecast.dailyForecasts
           .expand((d) => [d.temperatureMax, d.temperatureMin])
           .toList();
-    } else if (displayMode == 'hourly' && dailyWeather != null) {
+    } else if ((displayMode == 'hourly' || displayMode == 'periodes') &&
+        dailyWeather != null) {
       allTemps = dailyWeather.hourlyForecasts
-          .where((h) => h.temperature != null)
-          .map((h) => h.temperature!)
+          .expand(
+            (h) => [
+              if (h.temperature != null) h.temperature!,
+              if (h.apparentTemperature != null) h.apparentTemperature!,
+            ],
+          )
           .toList();
     } else {
       return {'min': 0, 'max': 20};
     }
 
-    return {
-      'min': allTemps.isNotEmpty ? allTemps.reduce(min) : 0,
-      'max': allTemps.isNotEmpty ? allTemps.reduce(max) : 20,
-    };
+    if (allTemps.isEmpty) {
+      return {'min': 0, 'max': 20};
+    }
+
+    return {'min': allTemps.reduce(min), 'max': allTemps.reduce(max)};
   }
 
   /// Calculate screen position from chart coordinates

@@ -74,6 +74,26 @@ class WeatherTooltip {
     );
   }
 
+  /// Show tooltip for period weather data
+  static void showPeriodTooltip(
+    BuildContext context,
+    int touchedIndex,
+    Offset position,
+    PeriodForecast period, {
+    bool showExtendedWindInfo = false,
+  }) {
+    final String formattedDate =
+        '${DateFormat('EEEE, d MMMM', 'fr_FR').format(period.time)} - ${period.name}';
+
+    _buildTooltip(
+      context,
+      position,
+      formattedDate,
+      period,
+      showExtendedWindInfo: showExtendedWindInfo,
+    );
+  }
+
   /// Show tooltip for multi-model comparison
   static void showComparisonTooltip(
     BuildContext context,
@@ -471,6 +491,8 @@ class WeatherTooltip {
                                   (data.weatherCodeDaytime != null ||
                                       data.weatherCode != null) ||
                               data is HourlyForecast &&
+                                  data.weatherCode != null ||
+                              data is PeriodForecast &&
                                   data.weatherCode != null)
                             Row(
                               children: [
@@ -483,7 +505,11 @@ class WeatherTooltip {
                                                     .toString(),
                                               ) ??
                                               ''
-                                        : data.weatherCode != null
+                                        : data is HourlyForecast &&
+                                              data.weatherCode != null
+                                        ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
+                                        : data is PeriodForecast &&
+                                              data.weatherCode != null
                                         ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
                                         : "",
                                     style: const TextStyle(
@@ -571,6 +597,17 @@ class WeatherTooltip {
                                       '${data.apparentTemperature?.toStringAsFixed(1)}°C',
                                     ),
                                   ],
+                                  if (data is PeriodForecast) ...[
+                                    buildDetailRow(
+                                      'Temp. moyenne',
+                                      '${data.avgTemperature.toStringAsFixed(1)}°C',
+                                    ),
+                                    if (data.apparentTemperature != null)
+                                      buildDetailRow(
+                                        'Ressenti',
+                                        '${data.apparentTemperature?.toStringAsFixed(1)}°C',
+                                      ),
+                                  ],
                                   // Precipitation Sum/Amount
                                   buildDetailRow(
                                     'Précipitations',
@@ -579,6 +616,10 @@ class WeatherTooltip {
                                               ? '${data.precipitationSum?.toStringAsFixed(1)} mm'
                                               : null
                                         : data is HourlyForecast
+                                        ? data.precipitation != null
+                                              ? '${data.precipitation?.toStringAsFixed(1)} mm'
+                                              : null
+                                        : data is PeriodForecast
                                         ? data.precipitation != null
                                               ? '${data.precipitation?.toStringAsFixed(1)} mm'
                                               : null
@@ -604,6 +645,10 @@ class WeatherTooltip {
                                         ? data.precipitationProbability != null
                                               ? '${data.precipitationProbability}%'
                                               : null
+                                        : data is PeriodForecast
+                                        ? data.precipitationProbability != null
+                                              ? '${data.precipitationProbability}%'
+                                              : null
                                         : null,
                                   ),
                                   // Snowfall Sum (DailyForecast only)
@@ -626,6 +671,10 @@ class WeatherTooltip {
                                         ? data.cloudCover != null
                                               ? '${data.cloudCover}%'
                                               : null
+                                        : data is PeriodForecast
+                                        ? data.cloudCover != null
+                                              ? '${data.cloudCover}%'
+                                              : null
                                         : null,
                                   ),
 
@@ -637,6 +686,8 @@ class WeatherTooltip {
                                           ? data.windSpeedMax
                                           : data is HourlyForecast
                                           ? data.windSpeed
+                                          : data is PeriodForecast
+                                          ? data.maxWindSpeed
                                           : null,
                                     ),
                                   ),
@@ -649,6 +700,8 @@ class WeatherTooltip {
                                           ? data.windGustsMax
                                           : data is HourlyForecast
                                           ? data.windGusts
+                                          : data is PeriodForecast
+                                          ? data.maxWindGusts
                                           : null,
                                     ),
                                   ),
@@ -668,6 +721,13 @@ class WeatherTooltip {
                                                     ) +
                                                     ' (${data.windDirection10m}°)'
                                               : null
+                                        : data is PeriodForecast
+                                        ? data.windDirection != null
+                                              ? ChartHelpers.getWindDirectionAbbrev(
+                                                      data.windDirection,
+                                                    ) +
+                                                    ' (${data.windDirection}°)'
+                                              : null
                                         : null,
                                   ),
 
@@ -675,7 +735,8 @@ class WeatherTooltip {
                                 ],
                               ),
                               if (showExtendedWindInfo &&
-                                  data is HourlyForecast) ...[
+                                  (data is HourlyForecast ||
+                                      data is PeriodForecast)) ...[
                                 const SizedBox(width: 24),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -684,56 +745,80 @@ class WeatherTooltip {
                                       '200m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed200m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed200m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed200m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '180m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed180m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed180m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed180m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '150m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed150m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed150m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed150m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '120m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed120m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed120m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed120m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '100m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed100m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed100m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed100m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '80m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed80m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed80m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed80m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '50m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed50m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed50m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed50m,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       '20m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed20m,
+                                        data is HourlyForecast
+                                            ? data.windSpeed20m
+                                            : (data as PeriodForecast)
+                                                  .windSpeed20m,
                                       ),
                                     ),
 
@@ -741,14 +826,20 @@ class WeatherTooltip {
                                       '10m',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windSpeed,
+                                        data is HourlyForecast
+                                            ? data.windSpeed
+                                            : (data as PeriodForecast)
+                                                  .maxWindSpeed,
                                       ),
                                     ),
                                     buildDetailRowWind(
                                       'Gusts',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
-                                        data.windGusts,
+                                        data is HourlyForecast
+                                            ? data.windGusts
+                                            : (data as PeriodForecast)
+                                                  .maxWindGusts,
                                       ),
                                     ),
                                   ],

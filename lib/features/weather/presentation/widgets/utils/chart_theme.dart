@@ -11,10 +11,14 @@ class ChartTheme {
   static const temperatureMinLineColor = Color(0xFF29B6F6);
   static const temperatureMinDotColor = Color(0xFF0288D1);
 
+  static const apparentTempLineColor = Color(
+    0xFF90A4AE,
+  ); // Blue-Grey for Ressenti
+
   //static const normalMaxLineColor = Color(0xFFEF9A9A).withValues(alpha: 0.05);
   static const normalMaxLineColor = Color.fromRGBO(248, 97, 97, 1);
- //;
-static const normalMinLineColor = Color.fromRGBO(38, 150, 241, 1);
+  //;
+  static const normalMinLineColor = Color.fromRGBO(38, 150, 241, 1);
 
   static final gridLineColor = Colors.grey.withValues(alpha: 0.05);
   static final gridLineColorLight = Colors.grey.withValues(alpha: 0.02);
@@ -130,6 +134,7 @@ static const normalMinLineColor = Color.fromRGBO(38, 150, 241, 1);
   static const double chartLineWidth = 4.0;
   static const double normalLineWidth = 2.5;
   static const int normalLineDashPattern = 6;
+  static const List<int> apparentTempDashPattern = [4, 4];
 
   static const double chartDotRadius = 6.0;
   static const double chartDotStrokeWidth = 2.0;

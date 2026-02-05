@@ -221,6 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
           DisplayType.graphique.index;
       _displayType = DisplayType
           .values[displayTypeIndex.clamp(0, DisplayType.values.length - 1)];
+
+      // Migration: if displayType was periodes, move it to displayMode
+      if (_displayType == DisplayType.periodes) {
+        _displayMode = 'periodes';
+        _displayType = DisplayType.graphique;
+      }
       _selectedClimateLocation =
           prefs.getString(_kSelectedClimateLocationKey) ??
           _selectedClimateLocation;
@@ -370,6 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       if (_displayMode == 'hourly' ||
+          _displayMode == 'periodes' ||
           _displayType == DisplayType.vent ||
           _displayType == DisplayType.ventDay ||
           _displayType == DisplayType.ventTable) {

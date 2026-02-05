@@ -3,7 +3,15 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../data/weather_repository.dart';
 
-enum DisplayType { graphique, tableau, vent, ventDay, ventTable, comparatif }
+enum DisplayType {
+  graphique,
+  tableau,
+  vent,
+  ventDay,
+  ventTable,
+  comparatif,
+  periodes,
+}
 
 class DailyWeather {
   final String locationName;
@@ -41,10 +49,16 @@ class DailyWeather {
         dailyData['precipitation_probability_max'] as List?;
     final weatherCodeList = dailyData['weathercode'] as List?;
     final cloudCoverMeanList = dailyData['cloudcover_mean'] as List?;
-    final windSpeedMaxList = dailyData['windspeed_10m_max'] as List?;
-    final windGustsMaxList = dailyData['windgusts_10m_max'] as List?;
+    final windSpeedMaxList =
+        (dailyData['wind_speed_10m_max'] ?? dailyData['windspeed_10m_max'])
+            as List?;
+    final windGustsMaxList =
+        (dailyData['wind_gusts_10m_max'] ?? dailyData['windgusts_10m_max'])
+            as List?;
     final windDirection10mDominantList =
-        dailyData['wind_direction_10m_dominant'] as List?;
+        (dailyData['wind_direction_10m_dominant'] ??
+                dailyData['wind_direction_10m_dominant'])
+            as List?; // Added for consistency, though key seems same
     final sunriseList = dailyData['sunrise'] as List?;
     final sunsetList = dailyData['sunset'] as List?;
 
@@ -230,15 +244,30 @@ class HourlyWeather {
         (hourlyData['windgusts_10m'] ?? hourlyData['wind_gusts_10m']) as List?;
     final isDayList = hourlyData['is_day'] as List?;
     final sunshineDurationList = hourlyData['sunshine_duration'] as List?;
-    final windDirectionList = hourlyData['wind_direction_10m'] as List?;
-    final windSpeed20mList = hourlyData['windspeed_20m'] as List?;
-    final windSpeed50mList = hourlyData['windspeed_50m'] as List?;
-    final windSpeed80mList = hourlyData['windspeed_80m'] as List?;
-    final windSpeed100mList = hourlyData['windspeed_100m'] as List?;
-    final windSpeed120mList = hourlyData['windspeed_120m'] as List?;
-    final windSpeed150mList = hourlyData['windspeed_150m'] as List?;
-    final windSpeed180mList = hourlyData['windspeed_180m'] as List?;
-    final windSpeed200mList = hourlyData['windspeed_200m'] as List?;
+    final windDirectionList =
+        (hourlyData['wind_direction_10m'] ?? hourlyData['wind_direction_10m'])
+            as List?;
+    final windSpeed20mList =
+        (hourlyData['wind_speed_20m'] ?? hourlyData['windspeed_20m']) as List?;
+    final windSpeed50mList =
+        (hourlyData['wind_speed_50m'] ?? hourlyData['windspeed_50m']) as List?;
+    final windSpeed80mList =
+        (hourlyData['wind_speed_80m'] ?? hourlyData['windspeed_80m']) as List?;
+    final windSpeed100mList =
+        (hourlyData['wind_speed_100m'] ?? hourlyData['windspeed_100m'])
+            as List?;
+    final windSpeed120mList =
+        (hourlyData['wind_speed_120m'] ?? hourlyData['windspeed_120m'])
+            as List?;
+    final windSpeed150mList =
+        (hourlyData['wind_speed_150m'] ?? hourlyData['windspeed_150m'])
+            as List?;
+    final windSpeed180mList =
+        (hourlyData['wind_speed_180m'] ?? hourlyData['windspeed_180m'])
+            as List?;
+    final windSpeed200mList =
+        (hourlyData['wind_speed_200m'] ?? hourlyData['windspeed_200m'])
+            as List?;
 
     final forecasts = <HourlyForecast>[];
 
@@ -370,6 +399,69 @@ class HourlyForecast {
   String toString() {
     return 'HourlyForecast(time: $formattedTime, temp: $temperature°C, feels: $apparentTemperature°C, rainProb: $precipitationProbability%, rain: $rain mm, clouds: $cloudCover%, wind: $windSpeed km/h, gusts: $windGusts km/h, isDay: $isDay, sunshine: $sunshineDuration s, windDir: $windDirection10m°)';
   }
+}
+
+class PeriodForecast {
+  final DateTime time; // Start time of the period
+  final String name; // Matin, Après-midi, Soir, Nuit
+  final double avgTemperature;
+  final int? weatherCode;
+  final double maxWindSpeed;
+  final double maxWindGusts;
+  final int? windDirection;
+  final int? isDay;
+
+  // New fields for comprehensive tooltips
+  final double? apparentTemperature;
+  final int? precipitationProbability;
+  final double? precipitation;
+  final double? rain;
+  final int? cloudCover;
+  final int? humidity;
+  final double? sunshineDuration;
+  final double? windSpeed20m;
+  final double? windSpeed50m;
+  final double? windSpeed80m;
+  final double? windSpeed100m;
+  final double? windSpeed120m;
+  final double? windSpeed150m;
+  final double? windSpeed180m;
+  final double? windSpeed200m;
+
+  PeriodForecast({
+    required this.time,
+    required this.name,
+    required this.avgTemperature,
+    this.weatherCode,
+    required this.maxWindSpeed,
+    required this.maxWindGusts,
+    this.windDirection,
+    this.isDay,
+    this.apparentTemperature,
+    this.precipitationProbability,
+    this.precipitation,
+    this.rain,
+    this.cloudCover,
+    this.humidity,
+    this.sunshineDuration,
+    this.windSpeed20m,
+    this.windSpeed50m,
+    this.windSpeed80m,
+    this.windSpeed100m,
+    this.windSpeed120m,
+    this.windSpeed150m,
+    this.windSpeed180m,
+    this.windSpeed200m,
+  });
+
+  String get formattedTime => DateFormat('HH:mm').format(time);
+}
+
+class PeriodWeather {
+  final String locationName;
+  final List<PeriodForecast> periodForecasts;
+
+  PeriodWeather({required this.locationName, required this.periodForecasts});
 }
 
 class MultiModelWeather {

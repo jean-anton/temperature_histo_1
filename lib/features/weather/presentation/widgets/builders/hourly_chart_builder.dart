@@ -95,6 +95,7 @@ class HourlyChartBuilder {
         ),
       ),
       lineBarsData: [
+        // Main temperature line
         LineChartBarData(
           isCurved: true,
           spots: spots,
@@ -122,6 +123,16 @@ class HourlyChartBuilder {
               ],
             ),
           ),
+        ),
+        // Apparent temperature dotted line
+        LineChartBarData(
+          isCurved: true,
+          spots: ChartDataProvider.getHourlyApparentTempSpots(hourlyWeather),
+          color: ChartTheme.apparentTempLineColor,
+          barWidth: 2,
+          isStrokeCapRound: true,
+          dashArray: ChartTheme.apparentTempDashPattern,
+          dotData: const FlDotData(show: false),
         ),
       ],
       backgroundColor: Colors.transparent,
