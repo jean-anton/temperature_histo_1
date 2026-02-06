@@ -292,9 +292,11 @@ class ChartDataProvider {
 
   /// Get period temperature spots for chart
   static List<FlSpot> getPeriodTempSpots(List<PeriodForecast> periodForecasts) {
-    return periodForecasts.map((period) {
+    return periodForecasts.map((PeriodForecast period) {
+      // Center the spot at 3h, 9h, 15h, 21h
+      final centeredTime = period.time.add(const Duration(hours: 3));
       return FlSpot(
-        period.time.millisecondsSinceEpoch.toDouble(),
+        centeredTime.millisecondsSinceEpoch.toDouble(),
         period.avgTemperature,
       );
     }).toList();
@@ -304,9 +306,11 @@ class ChartDataProvider {
   static List<FlSpot> getPeriodApparentTempSpots(
     List<PeriodForecast> periodForecasts,
   ) {
-    return periodForecasts.map((period) {
+    return periodForecasts.map((PeriodForecast period) {
+      // Center the spot at 3h, 9h, 15h, 21h
+      final centeredTime = period.time.add(const Duration(hours: 3));
       return FlSpot(
-        period.time.millisecondsSinceEpoch.toDouble(),
+        centeredTime.millisecondsSinceEpoch.toDouble(),
         period.apparentTemperature ?? 0,
       );
     }).toList();

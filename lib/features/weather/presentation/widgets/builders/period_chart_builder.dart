@@ -179,21 +179,21 @@ class PeriodChartBuilder {
     final chartArea = positioner.getChartArea();
 
     for (var f in periodForecasts) {
-      if (f.time.hour == 0) {
-        final pos = positioner.calculateFromTime(f.time, positioner.minY);
+      final is0h = f.time.hour == 0;
+      final pos = positioner.calculateFromTime(f.time, positioner.minY);
+      final width = is0h ? 1.5 : 0.4;
 
-        separators.add(
-          Positioned(
-            left: pos.dx - 1,
-            top: chartArea.top,
-            child: Container(
-              width: 3,
-              height: chartArea.height,
-              color: Colors.black.withValues(alpha: 0.1),
-            ),
+      separators.add(
+        Positioned(
+          left: pos.dx - (width / 2),
+          top: chartArea.top,
+          child: Container(
+            width: width,
+            height: chartArea.height,
+            color: Colors.black.withValues(alpha: 0.3),
           ),
-        );
-      }
+        ),
+      );
     }
     return Stack(children: separators);
   }
@@ -203,78 +203,46 @@ class PeriodChartBuilder {
     DailyWeather forecast,
     ChartPositioner positioner,
   ) {
-    List<Widget> nightWidgets = [];
-    final startTime = periodForecasts.first.time;
-    final endTime = periodForecasts.last.time.add(const Duration(hours: 6));
+    List<Widget> backgrounds = [];
     final chartArea = positioner.getChartArea();
 
-    // Check if chart starts during night period (before sunrise of first day)
-    if (forecast.dailyForecasts.isNotEmpty) {
-      var firstDay = forecast.dailyForecasts.first;
-      if (firstDay.sunrise != null) {
-        DateTime sunriseTime = firstDay.sunrise!;
-        if (startTime.isBefore(sunriseTime) && sunriseTime.isAfter(startTime)) {
-          final sunrisePos = positioner.calculateFromTime(
-            sunriseTime,
-            positioner.maxY,
-          );
+    for (var f in periodForecasts) {
+      final hour = f.time.hour;
+      Color? bgColor;
 
-          final left = chartArea.left;
-          final right = sunrisePos.dx.clamp(chartArea.left, chartArea.right);
-          final width = right - left;
-
-          if (width > 0) {
-            nightWidgets.add(
-              Positioned(
-                left: left,
-                top: chartArea.top,
-                width: width,
-                height: chartArea.height,
-                child: Container(color: ChartTheme.nightBackgroundColor),
-              ),
-            );
-          }
-        }
+      if (hour == 0) {
+        // Nuit (0-6h) - Darker
+        bgColor = Colors.blueGrey.withValues(alpha: 0.35);
+      } else if (hour == 18) {
+        // Soir (18-0h) - Lighter dark
+        bgColor = Colors.blueGrey.withValues(alpha: 0.18);
       }
-    }
 
-    for (var dailyForecast in forecast.dailyForecasts) {
-      if (dailyForecast.sunset != null && dailyForecast.sunrise != null) {
-        DateTime sunsetTime = dailyForecast.sunset!;
-        DateTime sunriseTime = dailyForecast.sunrise!.add(
-          const Duration(days: 1),
-        );
-
-        if (sunsetTime.isAfter(endTime) || sunriseTime.isBefore(startTime))
-          continue;
-
-        final sunsetPos = positioner.calculateFromTime(
-          sunsetTime,
-          positioner.maxY,
-        );
-        final sunrisePos = positioner.calculateFromTime(
-          sunriseTime,
+      if (bgColor != null) {
+        final startPos = positioner.calculateFromTime(f.time, positioner.maxY);
+        final endPos = positioner.calculateFromTime(
+          f.time.add(const Duration(hours: 6)),
           positioner.maxY,
         );
 
-        final left = sunsetPos.dx.clamp(chartArea.left, chartArea.right);
-        final right = sunrisePos.dx.clamp(chartArea.left, chartArea.right);
+        final left = startPos.dx.clamp(chartArea.left, chartArea.right);
+        final right = endPos.dx.clamp(chartArea.left, chartArea.right);
         final width = right - left;
 
         if (width > 0) {
-          nightWidgets.add(
+          backgrounds.add(
             Positioned(
               left: left,
               top: chartArea.top,
               width: width,
               height: chartArea.height,
-              child: Container(color: ChartTheme.nightBackgroundColor),
+              child: Container(color: bgColor),
             ),
           );
         }
       }
     }
-    return Stack(children: nightWidgets);
+    return Stack(children: backgrounds);
   }
 
   static Widget _buildPeriodIcons(
@@ -288,7 +256,7 @@ class PeriodChartBuilder {
       );
 
       final pos = positioner.calculateFromTime(
-        period.time,
+        period.time.add(const Duration(hours: 3)),
         period.avgTemperature,
       );
 
@@ -321,7 +289,10 @@ class PeriodChartBuilder {
     ChartPositioner positioner,
   ) {
     final widgets = periodForecasts.map((period) {
-      final pos = positioner.calculateFromTime(period.time, 0);
+      final pos = positioner.calculateFromTime(
+        period.time.add(const Duration(hours: 3)),
+        0,
+      );
       final isNewDay = period.time.hour == 0;
 
       String label = period.name;
@@ -358,7 +329,7 @@ class PeriodChartBuilder {
   ) {
     final widgets = periodForecasts.map((period) {
       final pos = positioner.calculateFromTime(
-        period.time,
+        period.time.add(const Duration(hours: 3)),
         period.avgTemperature,
       );
 
