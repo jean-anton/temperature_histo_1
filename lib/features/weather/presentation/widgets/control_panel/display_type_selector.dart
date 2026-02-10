@@ -18,6 +18,7 @@ class DisplayTypeSelector extends StatelessWidget {
       (DisplayType.vent, 'Vent', Icons.air),
       (DisplayType.ventTable, 'Table Vent', Icons.table_rows),
       (DisplayType.comparatif, 'Comp', Icons.compare_arrows),
+      (DisplayType.comparatifTable, 'Table Comp', Icons.grid_on),
     ];
 
     return Column(

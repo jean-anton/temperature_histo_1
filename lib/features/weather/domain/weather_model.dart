@@ -10,6 +10,7 @@ enum DisplayType {
   ventDay,
   ventTable,
   comparatif,
+  comparatifTable,
   periodes,
 }
 

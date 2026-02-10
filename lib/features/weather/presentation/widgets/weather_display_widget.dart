@@ -8,6 +8,7 @@ import 'package:aeroclim/core/widgets/responsive_layout.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/weather_chart_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/weather_table_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/vent_table_widget.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/comparison_table_widget.dart';
 
 import 'package:aeroclim/core/widgets/help_dialog.dart';
 
@@ -280,7 +281,13 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
   }
 
   Widget _buildMainContent() {
-    if (widget.displayType != DisplayType.tableau &&
+    if (widget.displayType == DisplayType.comparatifTable) {
+      return ComparisonTableWidget(
+        multiModelForecast: widget.multiModelForecast,
+        multiModelHourlyForecast: widget.multiModelHourlyForecast,
+        displayMode: widget.displayMode,
+      );
+    } else if (widget.displayType != DisplayType.tableau &&
         widget.displayType != DisplayType.ventTable) {
       return WeatherChart2(
         forecast: widget.forecast,

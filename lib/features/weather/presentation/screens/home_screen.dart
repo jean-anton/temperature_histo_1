@@ -317,7 +317,8 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
 
-      if (_displayType == DisplayType.comparatif) {
+      if (_displayType == DisplayType.comparatif ||
+          _displayType == DisplayType.comparatifTable) {
         final modelsToFetch = [
           'best_match',
           'ecmwf_ifs025',
