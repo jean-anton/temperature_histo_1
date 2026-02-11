@@ -157,14 +157,14 @@ class WeatherTooltip {
   ) {
     final modelNames = {
       'best_match': 'Best Match',
-      'ecmwf_ifs025': 'ECMWF',
+      'ecmwf_ifs': 'ECMWF IFS HRES 9km',
       'gfs_seamless': 'GFS',
       'meteofrance_seamless': 'ARPEGE',
     };
 
     final modelColors = {
       'best_match': Colors.orange,
-      'ecmwf_ifs025': Colors.blue,
+      'ecmwf_ifs': Colors.blue,
       'gfs_seamless': Colors.red,
       'meteofrance_seamless': Colors.green,
     };

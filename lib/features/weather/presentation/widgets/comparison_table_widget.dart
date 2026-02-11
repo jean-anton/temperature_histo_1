@@ -30,7 +30,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   /// Model keys in display order
   static const List<String> _modelKeys = [
     'best_match',
-    'ecmwf_ifs025',
+    'ecmwf_ifs',
     'gfs_seamless',
     'meteofrance_seamless',
   ];
@@ -38,7 +38,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   /// Human-readable model names
   static const Map<String, String> _modelNames = {
     'best_match': 'Best Match',
-    'ecmwf_ifs025': 'ECMWF',
+    'ecmwf_ifs': 'ECMWF IFS HRES',
     'gfs_seamless': 'GFS',
     'meteofrance_seamless': 'ARPEGE',
   };

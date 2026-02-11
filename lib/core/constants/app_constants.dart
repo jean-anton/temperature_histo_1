@@ -3,7 +3,7 @@ class AppConstants {
       'https://api.open-meteo.com/v1/forecast';
 
   // Weather Models
-  static const String modelEcmwfIfs025 = 'ecmwf_ifs025';
+  static const String modelEcmwfIfs = 'ecmwf_ifs';
   static const String modelMeteoFranceAromeSeamless =
       'meteofrance_arome_seamless';
   static const String modelMeteoFranceSeamless = 'meteofrance_seamless';
@@ -24,8 +24,16 @@ class AppConstants {
         'is_day,sunshine_duration,wind_direction_10m';
 
     switch (model) {
-      case modelEcmwfIfs025:
-        return '$baseParams,wind_speed_100m';
+      case modelBestMatch:
+        return '$baseParams,'
+            'wind_speed_80m,wind_speed_100m,wind_speed_120m,wind_speed_180m';
+
+      case modelGfsSeamless:
+        return '$baseParams,'
+            'wind_speed_80m,wind_speed_100m,wind_speed_120m';
+
+      case modelEcmwfIfs:
+        return '$baseParams,wind_speed_100m,wind_speed_200m';
 
       case modelMeteoFranceAromeSeamless:
       case modelMeteoFranceSeamless:

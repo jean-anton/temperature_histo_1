@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, WeatherLocationInfo> _weatherLocationData = {};
   final Map<String, String> _models = {
     'best_match': 'Best Match',
-    'ecmwf_ifs025': 'ECMWF IFS',
+    'ecmwf_ifs': 'ECMWF IFS HRES 9km',
     'gfs_seamless': 'GFS',
 
     'meteofrance_arome_seamless': 'Météo-France (AROME)',
@@ -321,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _displayType == DisplayType.comparatifTable) {
         final modelsToFetch = [
           'best_match',
-          'ecmwf_ifs025',
+          'ecmwf_ifs',
           'gfs_seamless',
           'meteofrance_seamless',
         ];
