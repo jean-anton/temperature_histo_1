@@ -26,9 +26,9 @@ class WindIndicator extends StatelessWidget {
     final Color gustColor = ChartTheme.windGustColor(gustSpeed);
 
     // Wind icon paths
-    const String windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+    const String windIconPath = "assets/google_weather_icons/v4/arrow.svg";
     const String windIconPathContour =
-        "assets/google_weather_icons/v3/arrow_contour.svg";
+        "assets/google_weather_icons/v4/arrow_contour.svg";
 
     // Calculate arrow size based on gust speed
     final double arrowSize = gustSpeed * ChartTheme.windIconSizeMultiplier;

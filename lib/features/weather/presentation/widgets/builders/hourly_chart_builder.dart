@@ -401,9 +401,9 @@ class HourlyChartBuilder {
         hourly.temperature ?? 0,
       );
 
-      final windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+      final windIconPath = "assets/google_weather_icons/v4/arrow.svg";
       final windIconPathContour =
-          "assets/google_weather_icons/v3/arrow_contour.svg";
+          "assets/google_weather_icons/v4/arrow_contour.svg";
       final windDirectionDegrees = hourly.windDirection10m ?? 0;
 
       return Positioned(

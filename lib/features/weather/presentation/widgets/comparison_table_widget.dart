@@ -402,13 +402,16 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   }
 
   Widget _buildDailyRow(_DailyRowData data) {
+    final dayLabel = DateFormat('E d', 'fr_FR').format(data.date);
     return Container(
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
+        ),
       ),
       child: Row(
         children: [
-          _buildTimeLabel(''),
+          _buildTimeLabel(dayLabel),
           ..._modelKeys.map(
             (k) => data.cells[k] == null
                 ? _buildEmptyCell()
@@ -689,7 +692,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         color: backgroundColor,
         border: Border(
           right: BorderSide(color: Colors.grey[400]!, width: 1.5),
-          bottom: BorderSide(color: Colors.grey[200]!, width: 0.5),
+          bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
         ),
       ),
       child: Text(
@@ -713,7 +716,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
       decoration: BoxDecoration(
         border: Border(
           right: BorderSide(color: Colors.grey[400]!, width: 1),
-          bottom: BorderSide(color: Colors.grey[200]!, width: 0.5),
+          bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
         ),
       ),
       child: Column(
@@ -734,7 +737,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         color: backgroundColor,
         border: Border(
           right: BorderSide(color: Colors.grey[400]!, width: 1),
-          bottom: BorderSide(color: Colors.grey[200]!, width: 0.5),
+          bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
         ),
       ),
       child: Text('—', style: TextStyle(color: Colors.grey[400])),

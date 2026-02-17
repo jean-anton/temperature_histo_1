@@ -311,31 +311,31 @@ class ChartHelpers {
   }
 
   /// Get wind direction icon path based on degrees
-  static String getWindDirectionIconPath(int? degrees) {
-    if (degrees == null) return 'assets/google_weather_icons/v3/arrow.svg';
+  // static String getWindDirectionIconPath(int? degrees) {
+  //   if (degrees == null) return 'assets/google_weather_icons/v4/arrow.svg';
 
-    // Normalize degrees to 0-360
-    final normalizedDegrees = degrees % 360;
+  //   // Normalize degrees to 0-360
+  //   final normalizedDegrees = degrees % 360;
 
-    // Map degrees to arrow directions (8 cardinal directions)
-    if (normalizedDegrees >= 337.5 || normalizedDegrees < 22.5) {
-      return 'assets/google_weather_icons/v3/arrow.svg'; // North
-    } else if (normalizedDegrees >= 22.5 && normalizedDegrees < 67.5) {
-      return 'assets/google_weather_icons/v3/arrow_2.svg'; // Northeast
-    } else if (normalizedDegrees >= 67.5 && normalizedDegrees < 112.5) {
-      return 'assets/google_weather_icons/v3/arrow_3.svg'; // East
-    } else if (normalizedDegrees >= 112.5 && normalizedDegrees < 157.5) {
-      return 'assets/google_weather_icons/v3/arrow_4.svg'; // Southeast
-    } else if (normalizedDegrees >= 157.5 && normalizedDegrees < 202.5) {
-      return 'assets/google_weather_icons/v3/arrow_5.svg'; // South
-    } else if (normalizedDegrees >= 202.5 && normalizedDegrees < 247.5) {
-      return 'assets/google_weather_icons/v3/arrow_4.svg'; // Southwest (reuse arrow_4 rotated)
-    } else if (normalizedDegrees >= 247.5 && normalizedDegrees < 292.5) {
-      return 'assets/google_weather_icons/v3/arrow_3.svg'; // West (reuse arrow_3 rotated)
-    } else {
-      return 'assets/google_weather_icons/v3/arrow_2.svg'; // Northwest (reuse arrow_2 rotated)
-    }
-  }
+  //   // Map degrees to arrow directions (8 cardinal directions)
+  //   if (normalizedDegrees >= 337.5 || normalizedDegrees < 22.5) {
+  //     return 'assets/google_weather_icons/v4/arrow.svg'; // North
+  //   } else if (normalizedDegrees >= 22.5 && normalizedDegrees < 67.5) {
+  //     return 'assets/google_weather_icons/v3/arrow_2.svg'; // Northeast
+  //   } else if (normalizedDegrees >= 67.5 && normalizedDegrees < 112.5) {
+  //     return 'assets/google_weather_icons/v3/arrow_3.svg'; // East
+  //   } else if (normalizedDegrees >= 112.5 && normalizedDegrees < 157.5) {
+  //     return 'assets/google_weather_icons/v3/arrow_4.svg'; // Southeast
+  //   } else if (normalizedDegrees >= 157.5 && normalizedDegrees < 202.5) {
+  //     return 'assets/google_weather_icons/v3/arrow_5.svg'; // South
+  //   } else if (normalizedDegrees >= 202.5 && normalizedDegrees < 247.5) {
+  //     return 'assets/google_weather_icons/v3/arrow_4.svg'; // Southwest (reuse arrow_4 rotated)
+  //   } else if (normalizedDegrees >= 247.5 && normalizedDegrees < 292.5) {
+  //     return 'assets/google_weather_icons/v3/arrow_3.svg'; // West (reuse arrow_3 rotated)
+  //   } else {
+  //     return 'assets/google_weather_icons/v3/arrow_2.svg'; // Northwest (reuse arrow_2 rotated)
+  //   }
+  // }
 
   /// Get wind direction abbreviation
   static String getWindDirectionAbbrev(int? degrees) {

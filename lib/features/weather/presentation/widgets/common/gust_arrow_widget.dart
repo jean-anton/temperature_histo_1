@@ -19,9 +19,9 @@ class GustArrowWidget extends StatelessWidget {
     if (windSpeed == null || windDirection == null) {
       return const Icon(Icons.help_outline, size: 24, color: Colors.grey);
     }
-    const windIconPath = "assets/google_weather_icons/v3/arrow.svg";
+    const windIconPath = "assets/google_weather_icons/v4/arrow.svg";
     const windIconPathContour =
-        "assets/google_weather_icons/v3/arrow_contour.svg";
+        "assets/google_weather_icons/v4/arrow_contour.svg";
 
     final size = (windSpeed ?? 0.0) * scaleFactor;
 
