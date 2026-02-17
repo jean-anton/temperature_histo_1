@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:aeroclim/features/locations/domain/location_model.dart';
 import 'package:aeroclim/features/locations/data/location_repository.dart';
 import 'package:aeroclim/features/locations/presentation/widgets/city_management_dialog.dart';
+import 'package:aeroclim/core/config/app_config.dart';
 
 class LocationSelector extends StatelessWidget {
   final Map<String, WeatherLocationInfo> weatherLocationData;
@@ -87,15 +88,16 @@ class LocationSelector extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        DropdownButtonFormField<String>(
-          value: selectedClimateLocation,
-          decoration: const InputDecoration(
-            labelText: 'Station climatique',
-            prefixIcon: Icon(Icons.history_outlined),
+        if (AppConfig.includeClimate)
+          DropdownButtonFormField<String>(
+            value: selectedClimateLocation,
+            decoration: const InputDecoration(
+              labelText: 'Station climatique',
+              prefixIcon: Icon(Icons.history_outlined),
+            ),
+            items: climateDropDownItems,
+            onChanged: onClimateLocationChanged,
           ),
-          items: climateDropDownItems,
-          onChanged: onClimateLocationChanged,
-        ),
       ],
     );
   }

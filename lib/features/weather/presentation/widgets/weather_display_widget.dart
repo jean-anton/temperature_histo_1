@@ -5,6 +5,7 @@ import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/features/locations/domain/location_model.dart';
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/core/widgets/responsive_layout.dart';
+import 'package:aeroclim/core/config/app_config.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/weather_chart_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/weather_table_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/vent_table_widget.dart';
@@ -14,7 +15,7 @@ import 'package:aeroclim/core/widgets/help_dialog.dart';
 
 class WeatherDisplayWidget extends StatefulWidget {
   final WeatherLocationInfo weatherInfo;
-  final ClimateLocationInfo climateInfo;
+  final ClimateLocationInfo? climateInfo;
   final String modelName;
   final String displayMode;
   final DisplayType displayType;
@@ -33,7 +34,7 @@ class WeatherDisplayWidget extends StatefulWidget {
   const WeatherDisplayWidget({
     super.key,
     required this.weatherInfo,
-    required this.climateInfo,
+    this.climateInfo,
     required this.modelName,
     required this.displayMode,
     required this.displayType,
@@ -74,12 +75,15 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    const distanceVal = Distance();
-    final meters = distanceVal(
-      LatLng(widget.weatherInfo.lat, widget.weatherInfo.lon),
-      LatLng(widget.climateInfo.lat, widget.climateInfo.lon),
-    );
-    final distanceInKm = (meters / 1000).toStringAsFixed(1);
+    String distanceInKm = '';
+    if (AppConfig.includeClimate && widget.climateInfo != null) {
+      const distanceVal = Distance();
+      final meters = distanceVal(
+        LatLng(widget.weatherInfo.lat, widget.weatherInfo.lon),
+        LatLng(widget.climateInfo!.lat, widget.climateInfo!.lon),
+      );
+      distanceInKm = (meters / 1000).toStringAsFixed(1);
+    }
 
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
@@ -173,14 +177,18 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
                                   ),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Text(
-                              "Climat: ${widget.climateInfo.displayName} (${widget.climateInfo.startYear}-${widget.climateInfo.endYear}) • $distanceInKm km",
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                    fontSize: 11,
-                                  ),
-                            ),
+                            if (AppConfig.includeClimate &&
+                                widget.climateInfo != null)
+                              Text(
+                                "Climat: ${widget.climateInfo!.displayName} (${widget.climateInfo!.startYear}-${widget.climateInfo!.endYear}) • $distanceInKm km",
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                      fontSize: 11,
+                                    ),
+                              ),
                           ],
                         ),
                       ),

@@ -36,7 +36,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     'meteofrance_seamless': 'ARPEGE',
   };
 
-  static const double _rowHeight = 80.0;
+  static const double _rowHeight = 90.0;
   static const double _sepHeight = 35.0;
 
   final ScrollController _scrollController = ScrollController();
@@ -446,11 +446,11 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         ),
         const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(4),
-          ),
+          // padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          // decoration: BoxDecoration(
+          //   color: Colors.white.withValues(alpha: 0.5),
+          //   borderRadius: BorderRadius.circular(4),
+          // ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -525,20 +525,43 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         ),
         const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Column(
+          // padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          // decoration: BoxDecoration(
+          //   color: Colors.white,
+          //   borderRadius: BorderRadius.circular(6),
+          //   border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          //   boxShadow: [
+          //     BoxShadow(
+          //       color: Colors.black.withValues(alpha: 0.03),
+          //       blurRadius: 2,
+          //       offset: const Offset(0, 1),
+          //     ),
+          //   ],
+          // ),
+
+          // child: Column(
+          //   children: [
+          //     Text(
+          //       '${p.avgTemperature.round()}°',
+          //       style: const TextStyle(
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 14,
+          //         color: Color(0xFF263238),
+          //       ),
+          //     ),
+          //     if (p.apparentTemperature != null)
+          //       Text(
+          //         '${p.apparentTemperature!.round()}°',
+          //         style: TextStyle(
+          //           fontSize: 13,
+          //           color: Colors.grey[600],
+          //           height: 1.2,
+          //         ),
+          //       ),
+          //   ],
+          // ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 '${p.avgTemperature.round()}°',
@@ -548,7 +571,8 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                   color: Color(0xFF263238),
                 ),
               ),
-              if (p.apparentTemperature != null)
+              if (p.apparentTemperature != null) ...[
+                const SizedBox(width: 8),
                 Text(
                   '${p.apparentTemperature!.round()}°',
                   style: TextStyle(
@@ -557,6 +581,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                     height: 1.2,
                   ),
                 ),
+              ],
             ],
           ),
         ),
@@ -611,20 +636,21 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         ),
         const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Column(
+          // padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          // decoration: BoxDecoration(
+          //   color: Colors.white,
+          //   borderRadius: BorderRadius.circular(6),
+          //   border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+          //   boxShadow: [
+          //     BoxShadow(
+          //       color: Colors.black.withValues(alpha: 0.03),
+          //       blurRadius: 2,
+          //       offset: const Offset(0, 1),
+          //     ),
+          //   ],
+          // ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 '${(h.temperature ?? 0).round()}°',
@@ -634,7 +660,8 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                   color: Color(0xFF263238),
                 ),
               ),
-              if (h.apparentTemperature != null)
+              if (h.apparentTemperature != null) ...[
+                const SizedBox(width: 8),
                 Text(
                   '${h.apparentTemperature!.round()}°',
                   style: TextStyle(
@@ -643,6 +670,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                     height: 1.2,
                   ),
                 ),
+              ],
             ],
           ),
         ),

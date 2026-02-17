@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/link.dart';
 
 import 'package:aeroclim/main.dart';
+import 'package:aeroclim/core/config/app_config.dart';
 
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
@@ -302,10 +303,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       // Check if location data is available
-      final climateInfo = _climateLocationData[_selectedClimateLocation];
+      final climateInfo = AppConfig.includeClimate
+          ? _climateLocationData[_selectedClimateLocation]
+          : null;
       final weatherInfo = _weatherLocationData[_selectedWeatherLocation];
 
-      if (climateInfo == null) {
+      if (AppConfig.includeClimate && climateInfo == null) {
         throw Exception(
           'Climate location data not found for key: $_selectedClimateLocation',
         );
@@ -326,10 +329,10 @@ class _HomeScreenState extends State<HomeScreen> {
           'meteofrance_seamless',
         ];
 
-        // 1. Load climate normals first
-        final normals = await _climateService.loadClimateNormals(
-          climateInfo.assetPath,
-        );
+        // 1. Load climate normals first (if climate feature is enabled)
+        final normals = AppConfig.includeClimate && climateInfo != null
+            ? await _climateService.loadClimateNormals(climateInfo.assetPath)
+            : <ClimateNormal>[];
 
         // 2. Fetch daily and hourly data sequentially or in small batches
         // Sequential fetching is safer against 429 errors.
@@ -382,7 +385,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _displayType == DisplayType.ventDay ||
           _displayType == DisplayType.ventTable) {
         final results = await Future.wait([
-          _climateService.loadClimateNormals(climateInfo.assetPath),
+          AppConfig.includeClimate && climateInfo != null
+              ? _climateService.loadClimateNormals(climateInfo.assetPath)
+              : Future.value(<ClimateNormal>[]),
           _weatherService.getHourlyWeatherForecast(
             latitude: weatherInfo.lat,
             longitude: weatherInfo.lon,
@@ -406,7 +411,9 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         // Fetch daily, hourly, and climate data in parallel for daytime weathercode calculation
         final results = await Future.wait([
-          _climateService.loadClimateNormals(climateInfo.assetPath),
+          AppConfig.includeClimate && climateInfo != null
+              ? _climateService.loadClimateNormals(climateInfo.assetPath)
+              : Future.value(<ClimateNormal>[]),
           _weatherService.getWeatherForecast(
             latitude: weatherInfo.lat,
             longitude: weatherInfo.lon,
@@ -502,21 +509,25 @@ class _HomeScreenState extends State<HomeScreen> {
       if (newWeatherLocationInfo == null) return;
 
       String nearestClimateKey = '';
-      double minDistance = double.infinity;
-      const distance = Distance();
-      final newWeatherLatLng = LatLng(
-        newWeatherLocationInfo.lat,
-        newWeatherLocationInfo.lon,
-      );
 
-      _climateLocationData.forEach((key, climateInfo) {
-        final climateLatLng = LatLng(climateInfo.lat, climateInfo.lon);
-        final currentDistance = distance(newWeatherLatLng, climateLatLng);
-        if (currentDistance < minDistance) {
-          minDistance = currentDistance;
-          nearestClimateKey = key;
-        }
-      });
+      // Only find nearest climate location if climate feature is enabled
+      if (AppConfig.includeClimate) {
+        double minDistance = double.infinity;
+        const distance = Distance();
+        final newWeatherLatLng = LatLng(
+          newWeatherLocationInfo.lat,
+          newWeatherLocationInfo.lon,
+        );
+
+        _climateLocationData.forEach((key, climateInfo) {
+          final climateLatLng = LatLng(climateInfo.lat, climateInfo.lon);
+          final currentDistance = distance(newWeatherLatLng, climateLatLng);
+          if (currentDistance < minDistance) {
+            minDistance = currentDistance;
+            nearestClimateKey = key;
+          }
+        });
+      }
 
       setState(() {
         _selectedWeatherLocation = newLocationKey;
@@ -747,13 +758,16 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
     }
 
     final weatherInfo = _weatherLocationData[_selectedWeatherLocation ?? ''];
-    final climateInfo = _climateLocationData[_selectedClimateLocation];
+    final climateInfo = AppConfig.includeClimate
+        ? _climateLocationData[_selectedClimateLocation]
+        : null;
 
     final mainDisplay = (_isLoading)
         ? const Center(child: LoadingIndicator())
         : (_errorMessage != null)
         ? ErrorDisplay(message: _errorMessage!)
-        : (weatherInfo != null && climateInfo != null)
+        : (weatherInfo != null &&
+              (AppConfig.includeClimate ? climateInfo != null : true))
         ? WeatherDisplayWidget(
             weatherInfo: weatherInfo,
             climateInfo: climateInfo,

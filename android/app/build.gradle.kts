@@ -30,6 +30,21 @@ android {
         versionName = flutter.versionName
     }
 
+    // Product flavors for different app variants
+    flavorDimensions += "climate"
+    productFlavors {
+        create("full") {
+            dimension = "climate"
+            applicationId = "com.example.aeroclim"
+            resValue("string", "app_name", "AeroClim")
+        }
+        create("weather") {
+            dimension = "climate"
+            applicationId = "com.example.aeroclimweather"
+            resValue("string", "app_name", "AeroClim Weather")
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.

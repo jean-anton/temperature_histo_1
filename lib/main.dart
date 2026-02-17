@@ -11,8 +11,9 @@ import 'features/locations/presentation/providers/location_provider.dart';
 import 'features/locations/data/location_repository.dart';
 import 'core/services/geolocation_service.dart';
 import 'features/weather/presentation/widgets/utils/weather_tooltip.dart';
+import 'core/config/app_config.dart';
 
-const VERSION = "1.8.1";
+const VERSION = "2.0.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/aeroclim";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
@@ -74,7 +75,7 @@ class ClimaDeviationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AeroClim',
+      title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

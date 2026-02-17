@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/core/config/app_config.dart';
 import 'utils/chart_constants.dart';
 import 'utils/chart_helpers.dart';
 import 'utils/weather_tooltip.dart';
@@ -30,7 +31,7 @@ class WeatherChart2 extends StatefulWidget {
     this.hourlyWeather,
     this.multiModelForecast,
     this.multiModelHourlyWeather,
-    required this.climateNormals,
+    this.climateNormals = const [], // Optional with empty default
     required this.displayMode,
     required this.displayType,
     this.showWindInfo = true,
@@ -225,9 +226,14 @@ class _WeatherChart2State extends State<WeatherChart2> {
     _maxTemp = range['max'] ?? 40;
 
     if (widget.displayMode == 'daily' && widget.forecast != null) {
-      _deviations = widget.forecast!.dailyForecasts.map((daily) {
-        return ChartHelpers.getDeviationForDay(daily, widget.climateNormals);
-      }).toList();
+      // Only calculate deviations if climate feature is enabled and normals are available
+      if (AppConfig.includeClimate && widget.climateNormals.isNotEmpty) {
+        _deviations = widget.forecast!.dailyForecasts.map((daily) {
+          return ChartHelpers.getDeviationForDay(daily, widget.climateNormals);
+        }).toList();
+      } else {
+        _deviations = [];
+      }
       _labels = ChartHelpers.generateDateLabels(widget.forecast);
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       _labels = ChartHelpers.generateHourLabels(widget.hourlyWeather!);
