@@ -14,6 +14,7 @@ class AppConfig {
 
   /// Application display name.
   static String get appName => includeClimate ? 'AeroClim' : 'AeroClim Weather';
+  static String get aptabaseKey => includeClimate ? 'A-EU-8453046021' : 'A-EU-5814125988';
 
   /// Application version suffix for identification.
   static String get versionSuffix => includeClimate ? '' : '-weather';

@@ -51,6 +51,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_markdown: ^0.7.7+1
   url_launcher: ^6.3.0
+  aptabase_flutter: ^0.4.1
 
 
 dev_dependencies:

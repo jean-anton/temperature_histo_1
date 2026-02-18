@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "aeroclim-v1"
-  }
+  },
+  "targets": {
+    "aeroclim-v1": {
+      "hosting": {
+        "full": [
+          "aeroclim-v1"
+        ],
+        "weather": [
+          "rc-aero-weather"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -1,3 +1,6 @@
+import 'package:aptabase_flutter/aptabase_flutter.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +16,7 @@ import 'core/services/geolocation_service.dart';
 import 'features/weather/presentation/widgets/utils/weather_tooltip.dart';
 import 'core/config/app_config.dart';
 
-const VERSION = "2.0.2";
+const VERSION = "2.1.5";
 String mainFileName = "/Users/jg/devel/projects/flutter/aeroclim";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
@@ -27,10 +30,41 @@ class AppScrollBehavior extends MaterialScrollBehavior {
 }
 
 void main() async {
-  // It's good practice to ensure widgets are initialized before running the app,
-  // especially when using async operations in main().
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Catch unhandled background errors (like Aptabase background sync being blocked)
+  // to prevent the debugger from pausing on them if possible, and to avoid crashes.
+  PlatformDispatcher.instance.onError = (error, stack) {
+    final errorStr = error.toString();
+    if (errorStr.contains('aptabase') ||
+        errorStr.contains('universal_io') ||
+        errorStr.contains('XMLHttpRequest')) {
+      debugPrint('CJG: Caught background network/analytics error: $error');
+      return true; // handled
+    }
+    return false; // let other errors through
+  };
+
+  try {
+    // Wrap initialization in another layer of safety
+    await Aptabase.init(AppConfig.aptabaseKey).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        debugPrint("Aptabase init timed out");
+      },
+    );
+    print("###### CJG Aptabase init ${AppConfig.aptabaseKey}");
+
+    // Explicitly handle errors for the unawaited tracking event
+    Aptabase.instance.trackEvent("app_launched").catchError((e) {
+      debugPrint(
+        "Aptabase trackEvent failed (likely blocked by extension): $e",
+      );
+    });
+    print("###### CJG Aptabase trackEvent called");
+  } catch (e) {
+    debugPrint("Aptabase init failed: $e");
+  }
   // Initialize date formatting for the French locale so it's available
   // throughout the app.
   await initializeDateFormatting('fr_FR', null);

@@ -138,7 +138,7 @@ class VentTableWidget extends StatelessWidget {
         ),
         DataColumn(
           label: Text(
-            'Vent\n(km/h)',
+            'Rafales\n(km/h)',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
