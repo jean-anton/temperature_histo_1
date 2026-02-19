@@ -301,11 +301,13 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
         // Reload locations
         final weatherLocations = await widget.locationService
             .loadWeatherLocations();
+        await _loadHomeLocation();
         setState(() {
           _currentLocations = weatherLocations;
           _errorMessage = null;
         });
         await widget.onLocationsUpdated();
+        widget.onHomeLocationChanged?.call(_homeLocationKey);
 
         // Show success message
         if (mounted) {

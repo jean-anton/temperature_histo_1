@@ -99,12 +99,45 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   void _resetScroll() {
     _headerNotifier.value = null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_nowKey.currentContext != null) {
-        Scrollable.ensureVisible(
-          _nowKey.currentContext!,
+      if (!_scrollController.hasClients || _flatItems.isEmpty) return;
+
+      double targetOffset = 0;
+      bool found = false;
+
+      for (final item in _flatItems) {
+        if (item is DateTime) {
+          // Check if this separator matches today (for daily mode with no isCurrent)
+          targetOffset += _sepHeight;
+        } else if (item is _DailyRowData) {
+          if (item.isCurrent) {
+            found = true;
+            break;
+          }
+          targetOffset += _rowHeight;
+        } else if (item is _PeriodRowData) {
+          if (item.isCurrent) {
+            found = true;
+            break;
+          }
+          targetOffset += _rowHeight;
+        } else if (item is _HourlyRowData) {
+          if (item.isCurrent) {
+            found = true;
+            break;
+          }
+          targetOffset += _rowHeight;
+        }
+      }
+
+      if (found) {
+        // Clamp to valid range and offset a bit so the current row
+        // isn't right at the very top
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final adjusted = (targetOffset - _rowHeight).clamp(0.0, maxScroll);
+        _scrollController.animateTo(
+          adjusted,
           duration: const Duration(milliseconds: 600),
           curve: Curves.easeInOut,
-          alignment: 0.3,
         );
       }
       _onScroll();
@@ -127,12 +160,18 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     final refModel = widget.multiModelForecast!.models['best_match'];
     if (refModel == null || refModel.dailyForecasts.isEmpty) return _noData();
 
+    final now = DateTime.now();
     _flatItems = [];
     for (final daily in refModel.dailyForecasts) {
       final dateText = DateFormat('EEEE d MMMM', 'fr_FR').format(daily.date);
+      final isCurrent =
+          daily.date.year == now.year &&
+          daily.date.month == now.month &&
+          daily.date.day == now.day;
       final rowData = _DailyRowData(
         date: daily.date,
         cells: {},
+        isCurrent: isCurrent,
         info: _TableRowInfo(title: dateText, date: daily.date),
       );
       for (final modelKey in _modelKeys) {
@@ -404,6 +443,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   Widget _buildDailyRow(_DailyRowData data) {
     final dayLabel = DateFormat('E d', 'fr_FR').format(data.date);
     return Container(
+      key: data.isCurrent ? _nowKey : null,
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
@@ -763,8 +803,14 @@ class _TableRowInfo {
 class _DailyRowData {
   final DateTime date;
   final Map<String, DailyForecast> cells;
+  final bool isCurrent;
   final _TableRowInfo info;
-  _DailyRowData({required this.date, required this.cells, required this.info});
+  _DailyRowData({
+    required this.date,
+    required this.cells,
+    this.isCurrent = false,
+    required this.info,
+  });
 }
 
 class _PeriodRowData {

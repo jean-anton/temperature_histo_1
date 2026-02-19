@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:math';
 import 'package:aeroclim/core/config/app_config.dart';
-import 'package:aptabase_flutter/aptabase_flutter.dart';
+//import 'package:aptabase_flutter/aptabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:aeroclim/core/constants/app_constants.dart';
@@ -28,11 +28,11 @@ class WeatherRepository {
       },
     );
 
-    Aptabase.instance.trackEvent("getWeatherForecast ${model}").catchError((e) {
-      debugPrint(
-        "Aptabase trackEvent failed (likely blocked by extension): $e",
-      );
-    });
+    // Aptabase.instance.trackEvent("getWeatherForecast ${model}").catchError((e) {
+    //   debugPrint(
+    //     "Aptabase trackEvent failed (likely blocked by extension): $e",
+    //   );
+    // });
     print("###### CJG 193: getWeatherForecast called ${model}");
 
     try {

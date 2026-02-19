@@ -180,12 +180,19 @@ class LocationRepository {
   Future<String> exportCustomCities() async {
     final prefs = await SharedPreferences.getInstance();
     final customCitiesJson = prefs.getStringList(_kCustomCitiesKey) ?? [];
+    final homeKey = prefs.getString(_kHomeLocationKey);
 
-    // Return as a pretty-printed JSON array
     final List<dynamic> cities = customCitiesJson
         .map((s) => jsonDecode(s))
         .toList();
-    return const JsonEncoder.withIndent('  ').convert(cities);
+
+    final exportData = {
+      'version': 1,
+      'homeLocationKey': homeKey,
+      'cities': cities,
+    };
+
+    return const JsonEncoder.withIndent('  ').convert(exportData);
   }
 
   Future<int> importCustomCities(String jsonContent) async {
@@ -193,14 +200,29 @@ class LocationRepository {
     final currentCustomCitiesJson =
         prefs.getStringList(_kCustomCitiesKey) ?? [];
 
-    final List<dynamic> importedCities = jsonDecode(jsonContent);
+    final decoded = jsonDecode(jsonContent);
+    List<dynamic> importedCities;
+    String? importedHomeKey;
+
+    if (decoded is List) {
+      importedCities = decoded;
+    } else if (decoded is Map<String, dynamic>) {
+      importedCities = decoded['cities'] as List? ?? [];
+      importedHomeKey = decoded['homeLocationKey'] as String?;
+    } else {
+      return 0;
+    }
+
     int addedCount = 0;
+    String? newHomeKey;
 
     for (var cityData in importedCities) {
       if (cityData is! Map<String, dynamic>) continue;
 
+      final originalKey = cityData['key'] as String?;
+
       // Check if this city already exists (by lat/lon)
-      bool exists = false;
+      String? existingKey;
       for (var existingJson in currentCustomCitiesJson) {
         try {
           final existingData = jsonDecode(existingJson);
@@ -208,23 +230,37 @@ class LocationRepository {
                   (cityData['lat'] as double).toStringAsFixed(4) &&
               (existingData['lon'] as double).toStringAsFixed(4) ==
                   (cityData['lon'] as double).toStringAsFixed(4)) {
-            exists = true;
+            existingKey = existingData['key'] as String?;
             break;
           }
         } catch (_) {}
       }
 
-      if (!exists) {
+      if (existingKey == null) {
         // Ensure it has a new unique key to avoid conflicts
-        cityData['key'] =
+        final key =
             'custom_${DateTime.now().millisecondsSinceEpoch}_$addedCount';
+        cityData['key'] = key;
         currentCustomCitiesJson.add(jsonEncode(cityData));
         addedCount++;
+
+        if (originalKey != null && originalKey == importedHomeKey) {
+          newHomeKey = key;
+        }
+      } else {
+        // City already exists, if it was the home city in import, update home key to existing city
+        if (originalKey != null && originalKey == importedHomeKey) {
+          newHomeKey = existingKey;
+        }
       }
     }
 
     if (addedCount > 0) {
       await prefs.setStringList(_kCustomCitiesKey, currentCustomCitiesJson);
+    }
+
+    if (newHomeKey != null) {
+      await prefs.setString(_kHomeLocationKey, newHomeKey);
     }
 
     return addedCount;

@@ -940,14 +940,16 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
           _displayType = type;
           _savePreferences();
           final needsMultiModel =
-              _displayType == DisplayType.comparatif &&
+              (_displayType == DisplayType.comparatif ||
+                  _displayType == DisplayType.comparatifTable) &&
               (_multiModelForecast == null ||
                   _multiModelHourlyForecast == null);
           final needsHourly =
               (_displayType == DisplayType.vent ||
                   _displayType == DisplayType.ventDay ||
                   _displayType == DisplayType.ventTable) &&
-              _hourlyForecast == null;
+              (_hourlyForecast == null ||
+                  _hourlyForecast!.hourlyForecasts.isEmpty);
 
           if (needsMultiModel || needsHourly) {
             _loadData();
