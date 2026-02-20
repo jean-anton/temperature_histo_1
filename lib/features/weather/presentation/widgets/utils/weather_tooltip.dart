@@ -885,7 +885,8 @@ class WeatherTooltip {
                                       ),
                                     ),
                                     buildDetailRowWind(
-                                      'Gusts',
+                                      // 'Gusts',
+                                      '${AppLocalizations.of(context)!.gusts}',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
                                         data is HourlyForecast
@@ -1617,7 +1618,8 @@ class WeatherTooltip {
                                       ),
                                     ),
                                     buildDetailRowWind(
-                                      'Gusts',
+                                      // 'Gusts',
+                                      '${AppLocalizations.of(context)!.gusts}',
                                       null,
                                       valueWidget: buildOnlyColorBlock(
                                         data is HourlyForecast
