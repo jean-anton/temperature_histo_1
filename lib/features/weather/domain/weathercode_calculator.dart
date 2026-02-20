@@ -178,6 +178,93 @@ class WeathercodeCalculator {
 
     return mostFrequentCode!;
   }
+
+  /// Calculates the daytime-average wind speeds for various heights
+  static DaytimeWindSpeedsResult calculateDaytimeWindSpeeds({
+    required List<HourlyForecast> hourlyForecasts,
+    required DateTime targetDate,
+  }) {
+    final daytimeHours = hourlyForecasts.where((forecast) {
+      final isSameDay =
+          forecast.time.year == targetDate.year &&
+          forecast.time.month == targetDate.month &&
+          forecast.time.day == targetDate.day;
+
+      final isDaytime = forecast.isDay == 1;
+      final isInHourRange =
+          forecast.time.hour >= daytimeStartHour &&
+          forecast.time.hour < daytimeEndHour;
+
+      return isSameDay && isDaytime && isInHourRange;
+    }).toList();
+
+    if (daytimeHours.isEmpty) {
+      return DaytimeWindSpeedsResult();
+    }
+
+    double sum20m = 0,
+        sum50m = 0,
+        sum80m = 0,
+        sum100m = 0,
+        sum120m = 0,
+        sum150m = 0,
+        sum180m = 0,
+        sum200m = 0;
+    int count20m = 0,
+        count50m = 0,
+        count80m = 0,
+        count100m = 0,
+        count120m = 0,
+        count150m = 0,
+        count180m = 0,
+        count200m = 0;
+
+    for (final hourly in daytimeHours) {
+      if (hourly.windSpeed20m != null) {
+        sum20m += hourly.windSpeed20m!;
+        count20m++;
+      }
+      if (hourly.windSpeed50m != null) {
+        sum50m += hourly.windSpeed50m!;
+        count50m++;
+      }
+      if (hourly.windSpeed80m != null) {
+        sum80m += hourly.windSpeed80m!;
+        count80m++;
+      }
+      if (hourly.windSpeed100m != null) {
+        sum100m += hourly.windSpeed100m!;
+        count100m++;
+      }
+      if (hourly.windSpeed120m != null) {
+        sum120m += hourly.windSpeed120m!;
+        count120m++;
+      }
+      if (hourly.windSpeed150m != null) {
+        sum150m += hourly.windSpeed150m!;
+        count150m++;
+      }
+      if (hourly.windSpeed180m != null) {
+        sum180m += hourly.windSpeed180m!;
+        count180m++;
+      }
+      if (hourly.windSpeed200m != null) {
+        sum200m += hourly.windSpeed200m!;
+        count200m++;
+      }
+    }
+
+    return DaytimeWindSpeedsResult(
+      windSpeed20m: count20m > 0 ? sum20m / count20m : null,
+      windSpeed50m: count50m > 0 ? sum50m / count50m : null,
+      windSpeed80m: count80m > 0 ? sum80m / count80m : null,
+      windSpeed100m: count100m > 0 ? sum100m / count100m : null,
+      windSpeed120m: count120m > 0 ? sum120m / count120m : null,
+      windSpeed150m: count150m > 0 ? sum150m / count150m : null,
+      windSpeed180m: count180m > 0 ? sum180m / count180m : null,
+      windSpeed200m: count200m > 0 ? sum200m / count200m : null,
+    );
+  }
 }
 
 /// Result of daytime weathercode calculation
@@ -188,5 +275,28 @@ class DaytimeWeathercodeResult {
   DaytimeWeathercodeResult({
     required this.calculatedCode,
     required this.hoursAnalyzed,
+  });
+}
+
+/// Result of daytime wind speeds calculation
+class DaytimeWindSpeedsResult {
+  final double? windSpeed20m;
+  final double? windSpeed50m;
+  final double? windSpeed80m;
+  final double? windSpeed100m;
+  final double? windSpeed120m;
+  final double? windSpeed150m;
+  final double? windSpeed180m;
+  final double? windSpeed200m;
+
+  DaytimeWindSpeedsResult({
+    this.windSpeed20m,
+    this.windSpeed50m,
+    this.windSpeed80m,
+    this.windSpeed100m,
+    this.windSpeed120m,
+    this.windSpeed150m,
+    this.windSpeed180m,
+    this.windSpeed200m,
   });
 }

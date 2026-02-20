@@ -358,11 +358,67 @@ class _HomeScreenState extends State<HomeScreen> {
           await Future.delayed(const Duration(milliseconds: 100));
         }
 
+        // Enhance each model's daily forecasts with daytime wind speed averages
+        final enhancedDailyModels = <String, DailyWeather>{};
+        for (final m in modelsToFetch) {
+          final daily = dailyModels[m];
+          final hourly = hourlyModels[m];
+          if (daily == null || hourly == null) continue;
+
+          final enhancedForecasts = daily.dailyForecasts.map((d) {
+            final weatherCodeResult =
+                WeathercodeCalculator.calculateDaytimeWeathercode(
+                  hourlyForecasts: hourly.hourlyForecasts,
+                  targetDate: d.date,
+                );
+            final windResult = WeathercodeCalculator.calculateDaytimeWindSpeeds(
+              hourlyForecasts: hourly.hourlyForecasts,
+              targetDate: d.date,
+            );
+            return DailyForecast(
+              date: d.date,
+              temperatureMax: d.temperatureMax,
+              temperatureMin: d.temperatureMin,
+              precipitationSum: d.precipitationSum,
+              precipitationHours: d.precipitationHours,
+              snowfallSum: d.snowfallSum,
+              precipitationProbabilityMax: d.precipitationProbabilityMax,
+              weatherCode: d.weatherCode,
+              weatherCodeDaytime: weatherCodeResult.calculatedCode,
+              daytimeHoursAnalyzed: weatherCodeResult.hoursAnalyzed,
+              cloudCoverMean: d.cloudCoverMean,
+              windSpeedMax: d.windSpeedMax,
+              windGustsMax: d.windGustsMax,
+              windDirection10mDominant: d.windDirection10mDominant,
+              sunrise: d.sunrise,
+              sunset: d.sunset,
+              weatherIcon: d.weatherIcon,
+              windSpeed20m: windResult.windSpeed20m,
+              windSpeed50m: windResult.windSpeed50m,
+              windSpeed80m: windResult.windSpeed80m,
+              windSpeed100m: windResult.windSpeed100m,
+              windSpeed120m: windResult.windSpeed120m,
+              windSpeed150m: windResult.windSpeed150m,
+              windSpeed180m: windResult.windSpeed180m,
+              windSpeed200m: windResult.windSpeed200m,
+            );
+          }).toList();
+
+          enhancedDailyModels[m] = DailyWeather(
+            locationName: daily.locationName,
+            model: daily.model,
+            dailyForecasts: enhancedForecasts,
+            latitude: daily.latitude,
+            longitude: daily.longitude,
+            timezone: daily.timezone,
+          );
+        }
+
         setState(() {
           _climateNormals = normals;
           _multiModelForecast = MultiModelWeather(
             locationName: weatherInfo.displayName,
-            models: dailyModels,
+            models: enhancedDailyModels,
             latitude: weatherInfo.lat,
             longitude: weatherInfo.lon,
           );
@@ -372,7 +428,7 @@ class _HomeScreenState extends State<HomeScreen> {
             latitude: weatherInfo.lat,
             longitude: weatherInfo.lon,
           );
-          _forecast = dailyModels['best_match'];
+          _forecast = enhancedDailyModels['best_match'];
           _hourlyForecast = hourlyModels['best_match'];
           _isLoading = false;
         });
@@ -439,6 +495,11 @@ class _HomeScreenState extends State<HomeScreen> {
             targetDate: daily.date,
           );
 
+          final windResult = WeathercodeCalculator.calculateDaytimeWindSpeeds(
+            hourlyForecasts: hourlyWeather.hourlyForecasts,
+            targetDate: daily.date,
+          );
+
           return DailyForecast(
             date: daily.date,
             temperatureMax: daily.temperatureMax,
@@ -457,6 +518,14 @@ class _HomeScreenState extends State<HomeScreen> {
             sunrise: daily.sunrise,
             sunset: daily.sunset,
             weatherIcon: daily.weatherIcon,
+            windSpeed20m: windResult.windSpeed20m,
+            windSpeed50m: windResult.windSpeed50m,
+            windSpeed80m: windResult.windSpeed80m,
+            windSpeed100m: windResult.windSpeed100m,
+            windSpeed120m: windResult.windSpeed120m,
+            windSpeed150m: windResult.windSpeed150m,
+            windSpeed180m: windResult.windSpeed180m,
+            windSpeed200m: windResult.windSpeed200m,
           );
         }).toList();
 

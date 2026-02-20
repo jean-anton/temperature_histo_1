@@ -4,17 +4,20 @@ import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/weather_icon_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/gust_arrow_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_data_provider.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/weather_tooltip.dart';
 
 class ComparisonTableWidget extends StatefulWidget {
   final MultiModelWeather? multiModelForecast;
   final MultiModelHourlyWeather? multiModelHourlyForecast;
   final String displayMode;
+  final bool showExtendedWindInfo;
 
   const ComparisonTableWidget({
     super.key,
     this.multiModelForecast,
     this.multiModelHourlyForecast,
     required this.displayMode,
+    this.showExtendedWindInfo = false,
   });
 
   @override
@@ -455,73 +458,84 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           ..._modelKeys.map(
             (k) => data.cells[k] == null
                 ? _buildEmptyCell()
-                : _buildDailyCell(data.cells[k]!),
+                : _buildDailyCell(data.cells[k]!, modelKey: k),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDailyCell(DailyForecast d) {
-    return _buildCellContainer(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            WeatherIconWidget(
-              code: d.weatherCodeDaytime ?? d.weatherCode,
-              isDay: 1,
-              size: 32,
-            ),
-            if (d.windGustsMax != null &&
-                d.windDirection10mDominant != null) ...[
-              const SizedBox(width: 8),
-              Opacity(
-                opacity: 0.9,
-                child: GustArrowWidget(
-                  windSpeed: d.windGustsMax,
-                  windDirection: d.windDirection10mDominant,
-                  scaleFactor: 1.3,
-                ),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 4),
-        Container(
-          // padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          // decoration: BoxDecoration(
-          //   color: Colors.white.withValues(alpha: 0.5),
-          //   borderRadius: BorderRadius.circular(4),
-          // ),
-          child: Row(
+  Widget _buildDailyCell(DailyForecast d, {String? modelKey}) {
+    return GestureDetector(
+      onTapDown: (details) {
+        WeatherTooltip.showDailyForecastTooltip(
+          context,
+          d,
+          details.globalPosition,
+          modelName: modelKey != null ? _modelNames[modelKey] : null,
+          showExtendedWindInfo: widget.showExtendedWindInfo,
+        );
+      },
+      child: _buildCellContainer(
+        children: [
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '${d.temperatureMax.round()}°',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Color(0xFFD32F2F),
+              WeatherIconWidget(
+                code: d.weatherCodeDaytime ?? d.weatherCode,
+                isDay: 1,
+                size: 32,
+              ),
+              if (d.windGustsMax != null &&
+                  d.windDirection10mDominant != null) ...[
+                const SizedBox(width: 8),
+                Opacity(
+                  opacity: 0.9,
+                  child: GustArrowWidget(
+                    windSpeed: d.windGustsMax,
+                    windDirection: d.windDirection10mDominant,
+                    scaleFactor: 1.3,
+                  ),
                 ),
-              ),
-              const Text(
-                ' / ',
-                style: TextStyle(fontSize: 10, color: Colors.grey),
-              ),
-              Text(
-                '${d.temperatureMin.round()}°',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: Color(0xFF1976D2),
-                ),
-              ),
+              ],
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Container(
+            // padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            // decoration: BoxDecoration(
+            //   color: Colors.white.withValues(alpha: 0.5),
+            //   borderRadius: BorderRadius.circular(4),
+            // ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${d.temperatureMax.round()}°',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Color(0xFFD32F2F),
+                  ),
+                ),
+                const Text(
+                  ' / ',
+                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+                Text(
+                  '${d.temperatureMin.round()}°',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Color(0xFF1976D2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -539,96 +553,72 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           ..._modelKeys.map(
             (k) => data.cells[k] == null
                 ? _buildEmptyCell(backgroundColor: color)
-                : _buildPeriodCell(data.cells[k]!),
+                : _buildPeriodCell(data.cells[k]!, modelKey: k),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPeriodCell(PeriodForecast p) {
-    return _buildCellContainer(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            WeatherIconWidget(code: p.weatherCode, isDay: p.isDay, size: 32),
-            if (p.maxWindGusts > 0 && p.windDirection != null) ...[
-              const SizedBox(width: 8),
-              Opacity(
-                opacity: 0.8,
-                child: GustArrowWidget(
-                  windSpeed: p.maxWindGusts,
-                  windDirection: p.windDirection,
-                  scaleFactor: 1.1,
-                ),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 4),
-        Container(
-          // padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          // decoration: BoxDecoration(
-          //   color: Colors.white,
-          //   borderRadius: BorderRadius.circular(6),
-          //   border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.black.withValues(alpha: 0.03),
-          //       blurRadius: 2,
-          //       offset: const Offset(0, 1),
-          //     ),
-          //   ],
-          // ),
-
-          // child: Column(
-          //   children: [
-          //     Text(
-          //       '${p.avgTemperature.round()}°',
-          //       style: const TextStyle(
-          //         fontWeight: FontWeight.bold,
-          //         fontSize: 14,
-          //         color: Color(0xFF263238),
-          //       ),
-          //     ),
-          //     if (p.apparentTemperature != null)
-          //       Text(
-          //         '${p.apparentTemperature!.round()}°',
-          //         style: TextStyle(
-          //           fontSize: 13,
-          //           color: Colors.grey[600],
-          //           height: 1.2,
-          //         ),
-          //       ),
-          //   ],
-          // ),
-          child: Row(
+  Widget _buildPeriodCell(PeriodForecast p, {String? modelKey}) {
+    return GestureDetector(
+      onTapDown: (details) {
+        WeatherTooltip.showPeriodForecastTooltip(
+          context,
+          p,
+          details.globalPosition,
+          modelName: modelKey != null ? _modelNames[modelKey] : null,
+          showExtendedWindInfo: widget.showExtendedWindInfo,
+        );
+      },
+      child: _buildCellContainer(
+        children: [
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '${p.avgTemperature.round()}°',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Color(0xFF263238),
-                ),
-              ),
-              if (p.apparentTemperature != null) ...[
+              WeatherIconWidget(code: p.weatherCode, isDay: p.isDay, size: 32),
+              if (p.maxWindGusts > 0 && p.windDirection != null) ...[
                 const SizedBox(width: 8),
-                Text(
-                  '${p.apparentTemperature!.round()}°',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                    height: 1.2,
+                Opacity(
+                  opacity: 0.8,
+                  child: GustArrowWidget(
+                    windSpeed: p.maxWindGusts,
+                    windDirection: p.windDirection,
+                    scaleFactor: 1.1,
                   ),
                 ),
               ],
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${p.avgTemperature.round()}°',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Color(0xFF263238),
+                  ),
+                ),
+                if (p.apparentTemperature != null) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '${p.apparentTemperature!.round()}°',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -650,74 +640,72 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           ..._modelKeys.map(
             (k) => data.cells[k] == null
                 ? _buildEmptyCell(backgroundColor: color)
-                : _buildHourlyCell(data.cells[k]!),
+                : _buildHourlyCell(data.cells[k]!, modelKey: k),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHourlyCell(HourlyForecast h) {
-    return _buildCellContainer(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            WeatherIconWidget(code: h.weatherCode, isDay: h.isDay, size: 32),
-            if (h.windGusts != null && h.windDirection10m != null) ...[
-              const SizedBox(width: 8),
-              Opacity(
-                opacity: 0.8,
-                child: GustArrowWidget(
-                  windSpeed: h.windGusts,
-                  windDirection: h.windDirection10m,
-                  scaleFactor: 1.1,
-                ),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 4),
-        Container(
-          // padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          // decoration: BoxDecoration(
-          //   color: Colors.white,
-          //   borderRadius: BorderRadius.circular(6),
-          //   border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.black.withValues(alpha: 0.03),
-          //       blurRadius: 2,
-          //       offset: const Offset(0, 1),
-          //     ),
-          //   ],
-          // ),
-          child: Row(
+  Widget _buildHourlyCell(HourlyForecast h, {String? modelKey}) {
+    return GestureDetector(
+      onTapDown: (details) {
+        WeatherTooltip.showHourlyForecastTooltip(
+          context,
+          h,
+          details.globalPosition,
+          modelName: modelKey != null ? _modelNames[modelKey] : null,
+          showExtendedWindInfo: widget.showExtendedWindInfo,
+        );
+      },
+      child: _buildCellContainer(
+        children: [
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '${(h.temperature ?? 0).round()}°',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: Color(0xFF263238),
-                ),
-              ),
-              if (h.apparentTemperature != null) ...[
+              WeatherIconWidget(code: h.weatherCode, isDay: h.isDay, size: 32),
+              if (h.windGusts != null && h.windDirection10m != null) ...[
                 const SizedBox(width: 8),
-                Text(
-                  '${h.apparentTemperature!.round()}°',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                    height: 1.2,
+                Opacity(
+                  opacity: 0.8,
+                  child: GustArrowWidget(
+                    windSpeed: h.windGusts,
+                    windDirection: h.windDirection10m,
+                    scaleFactor: 1.1,
                   ),
                 ),
               ],
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${(h.temperature ?? 0).round()}°',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Color(0xFF263238),
+                  ),
+                ),
+                if (h.apparentTemperature != null) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '${h.apparentTemperature!.round()}°',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

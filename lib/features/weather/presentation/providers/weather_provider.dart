@@ -116,7 +116,13 @@ class WeatherProvider with ChangeNotifier {
           targetDate: daily.date,
         );
 
-        // Create new DailyForecast with calculated weathercode
+        // Calculate daytime wind speeds using hourly data
+        final windResult = WeathercodeCalculator.calculateDaytimeWindSpeeds(
+          hourlyForecasts: hourlyWeather.hourlyForecasts,
+          targetDate: daily.date,
+        );
+
+        // Create new DailyForecast with calculated weathercode and wind speeds
         return DailyForecast(
           date: daily.date,
           temperatureMax: daily.temperatureMax,
@@ -135,6 +141,14 @@ class WeatherProvider with ChangeNotifier {
           sunrise: daily.sunrise,
           sunset: daily.sunset,
           weatherIcon: daily.weatherIcon,
+          windSpeed20m: windResult.windSpeed20m,
+          windSpeed50m: windResult.windSpeed50m,
+          windSpeed80m: windResult.windSpeed80m,
+          windSpeed100m: windResult.windSpeed100m,
+          windSpeed120m: windResult.windSpeed120m,
+          windSpeed150m: windResult.windSpeed150m,
+          windSpeed180m: windResult.windSpeed180m,
+          windSpeed200m: windResult.windSpeed200m,
         );
       }).toList();
 

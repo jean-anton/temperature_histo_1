@@ -332,6 +332,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
           details.globalPosition,
           widget.forecast!,
           _deviations,
+          showExtendedWindInfo: widget.showExtendedWindInfo,
         );
         tooltipShown = true;
       }

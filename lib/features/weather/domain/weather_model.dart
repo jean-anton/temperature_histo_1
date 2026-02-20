@@ -168,6 +168,16 @@ class DailyForecast {
   final DateTime? sunset;
   final String? weatherIcon;
 
+  // Extended wind info (daytime averages)
+  final double? windSpeed20m;
+  final double? windSpeed50m;
+  final double? windSpeed80m;
+  final double? windSpeed100m;
+  final double? windSpeed120m;
+  final double? windSpeed150m;
+  final double? windSpeed180m;
+  final double? windSpeed200m;
+
   DailyForecast({
     required this.date,
     required this.temperatureMax,
@@ -187,6 +197,14 @@ class DailyForecast {
     this.sunrise,
     this.sunset,
     this.weatherIcon,
+    this.windSpeed20m,
+    this.windSpeed50m,
+    this.windSpeed80m,
+    this.windSpeed100m,
+    this.windSpeed120m,
+    this.windSpeed150m,
+    this.windSpeed180m,
+    this.windSpeed200m,
   });
 
   // Convenience getters for use in UI
@@ -206,8 +224,11 @@ class DailyForecast {
     final codeDaytimeText = weatherCodeDaytime != null
         ? '$weatherCodeDaytime (${daytimeHoursAnalyzed}h)'
         : 'N/A';
+    final wind200Text = windSpeed200m != null
+        ? '${windSpeed200m?.toStringAsFixed(1)}'
+        : 'N/A';
 
-    return 'DailyForecast(date: $formattedDate, max: ${temperatureMax.toStringAsFixed(1)}°C, min: ${temperatureMin.toStringAsFixed(1)}°C, precip: $precipText, wind: $windText, code: $codeText, codeDaytime: $codeDaytimeText)';
+    return 'DailyForecast(date: $formattedDate, max: ${temperatureMax.toStringAsFixed(1)}°C, min: ${temperatureMin.toStringAsFixed(1)}°C, precip: $precipText, wind: $windText, code: $codeText, codeDaytime: $codeDaytimeText, wind200m: $wind200Text)';
   }
 }
 

@@ -294,6 +294,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
         multiModelForecast: widget.multiModelForecast,
         multiModelHourlyForecast: widget.multiModelHourlyForecast,
         displayMode: widget.displayMode,
+        showExtendedWindInfo: widget.showExtendedWindInfo,
       );
     } else if (widget.displayType != DisplayType.tableau &&
         widget.displayType != DisplayType.ventTable) {
