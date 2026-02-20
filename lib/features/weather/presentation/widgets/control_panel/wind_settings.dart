@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 
 class WindSettings extends StatelessWidget {
   final bool showWindInfo;
@@ -32,23 +33,23 @@ class WindSettings extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SwitchListTile(
-          title: const Text('Afficher le vent'),
-          subtitle: const Text('Information de base'),
+          title: Text(AppLocalizations.of(context)!.wind),
+          subtitle: Text(AppLocalizations.of(context)!.basicInfo),
           value: showWindInfo,
           onChanged: onShowWindInfoChanged,
           contentPadding: EdgeInsets.zero,
         ),
         SwitchListTile(
-          title: const Text('Vent étendu'),
-          subtitle: const Text('Détails par altitude'),
+          title: Text(AppLocalizations.of(context)!.extendedWind),
+          subtitle: Text(AppLocalizations.of(context)!.detailsByAltitude),
           value: showExtendedWindInfo,
           onChanged: onShowExtendedWindInfoChanged,
           contentPadding: EdgeInsets.zero,
         ),
         const SizedBox(height: 20),
-        const Text(
-          ' Filtres table vent',
-          style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
+        Text(
+          ' ${AppLocalizations.of(context)!.windTableFilters}',
+          style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,9 +57,20 @@ class WindSettings extends StatelessWidget {
             Expanded(
               child: _buildDropdown(
                 context: context,
-                label: 'Rafales (km/h)',
+                label: '${AppLocalizations.of(context)!.gusts} (km/h)',
                 value: maxGustSpeed,
-                items: [5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0],
+                items: [
+                  5.0,
+                  10.0,
+                  15.0,
+                  20.0,
+                  25.0,
+                  30.0,
+                  35.0,
+                  40.0,
+                  45.0,
+                  50.0,
+                ],
                 onChanged: onMaxGustSpeedChanged,
                 itemLabelBuilder: (v) => v.toStringAsFixed(0),
               ),
@@ -67,7 +79,7 @@ class WindSettings extends StatelessWidget {
             Expanded(
               child: _buildDropdown(
                 context: context,
-                label: 'Précip (%)',
+                label: AppLocalizations.of(context)!.precipProb,
                 value: maxPrecipitationProbability,
                 items: [0, 10, 20, 30, 40, 50],
                 onChanged: onMaxPrecipitationProbabilityChanged,
@@ -78,7 +90,7 @@ class WindSettings extends StatelessWidget {
             Expanded(
               child: _buildDropdown(
                 context: context,
-                label: 'Temp. ressentie min (°C)',
+                label: '${AppLocalizations.of(context)!.minApparentTemp} (°C)',
                 value: minApparentTemperature,
                 items: [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0],
                 onChanged: onMinApparentTemperatureChanged,

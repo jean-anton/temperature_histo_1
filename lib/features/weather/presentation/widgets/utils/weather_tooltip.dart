@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
@@ -33,9 +34,10 @@ class WeatherTooltip {
         ? deviations[touchedIndex]
         : null;
 
+    final String locale = Localizations.localeOf(context).toString();
     final String formattedDate = DateFormat(
       'EEEE, d MMMM',
-      'fr_FR',
+      locale,
     ).format(forecastData.date);
 
     _buildTooltip(
@@ -62,9 +64,10 @@ class WeatherTooltip {
     }
 
     final hourly = dailyWeather.hourlyForecasts[touchedIndex];
+    final String locale = Localizations.localeOf(context).toString();
     final String formattedDate = DateFormat(
       'EEEE, d MMMM HH:mm',
-      'fr_FR',
+      locale,
     ).format(hourly.time);
 
     _buildTooltip(
@@ -84,8 +87,25 @@ class WeatherTooltip {
     PeriodForecast period, {
     bool showExtendedWindInfo = false,
   }) {
+    final String locale = Localizations.localeOf(context).toString();
+    final localizations = AppLocalizations.of(context)!;
+    String periodName = "";
+    switch (period.name) {
+      case 'night':
+        periodName = localizations.night;
+        break;
+      case 'morning':
+        periodName = localizations.morning;
+        break;
+      case 'afternoon':
+        periodName = localizations.afternoon;
+        break;
+      case 'evening':
+        periodName = localizations.evening;
+        break;
+    }
     final String formattedDate =
-        '${DateFormat('EEEE, d MMMM', 'fr_FR').format(period.time)} - ${period.name}';
+        '${DateFormat('EEEE, d MMMM', locale).format(period.time)} - $periodName';
 
     _buildTooltip(
       context,
@@ -136,9 +156,10 @@ class WeatherTooltip {
 
     if (date == null) return;
 
+    final String locale = Localizations.localeOf(context).toString();
     final String formattedDate = DateFormat(
       isDaily ? 'EEEE, d MMMM' : 'EEEE, d MMMM HH:mm',
-      'fr_FR',
+      locale,
     ).format(date);
 
     _buildComparisonTooltip(
@@ -158,7 +179,7 @@ class WeatherTooltip {
     bool isDaily,
   ) {
     final modelNames = {
-      'best_match': 'Best Match',
+      'best_match': AppLocalizations.of(context)!.bestMatch,
       'ecmwf_ifs': 'ECMWF IFS HRES 9km',
       'gfs_seamless': 'GFS',
       'meteofrance_seamless': 'ARPEGE',
@@ -266,7 +287,7 @@ class WeatherTooltip {
                               Padding(
                                 padding: const EdgeInsets.only(left: 16),
                                 child: Text(
-                                  'Ressenti: ${data['apparent']!.toStringAsFixed(1)}°C',
+                                  '${AppLocalizations.of(context)!.apparent}: ${data['apparent']!.toStringAsFixed(1)}°C',
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.6),
                                     fontSize: 11,
@@ -300,6 +321,7 @@ class WeatherTooltip {
     WeatherDeviation? deviation,
     bool showExtendedWindInfo = false,
   }) {
+    final locale = Localizations.localeOf(context).toString();
     Widget buildDetailRow(
       String label,
       String? value, {
@@ -395,7 +417,7 @@ class WeatherTooltip {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${value.toStringAsFixed(1)} km/h ',
+            '${value.toStringAsFixed(1)} ${AppLocalizations.of(context)!.kmh} ',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
@@ -501,18 +523,21 @@ class WeatherTooltip {
                                 Expanded(
                                   child: Text(
                                     data is DailyForecast
-                                        ? ChartHelpers.getDescriptionFr(
+                                        ? ChartHelpers.getDescription(
                                                 (data.weatherCodeDaytime ??
                                                         data.weatherCode)!
                                                     .toString(),
+                                                Localizations.localeOf(
+                                                  context,
+                                                ).toString(),
                                               ) ??
                                               ''
                                         : data is HourlyForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
+                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
                                         : data is PeriodForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
+                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
                                         : "",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -532,7 +557,10 @@ class WeatherTooltip {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      DateFormat('HH:mm').format(data.sunrise!),
+                                      DateFormat(
+                                        'HH:mm',
+                                        locale,
+                                      ).format(data.sunrise!),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
@@ -548,7 +576,10 @@ class WeatherTooltip {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      DateFormat('HH:mm').format(data.sunset!),
+                                      DateFormat(
+                                        'HH:mm',
+                                        locale,
+                                      ).format(data.sunset!),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
@@ -573,7 +604,7 @@ class WeatherTooltip {
                                 children: [
                                   if (data is DailyForecast) ...[
                                     buildDetailRow(
-                                      'Temp. max.',
+                                      AppLocalizations.of(context)!.tempMax,
                                       '${data.temperatureMax.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.maxDeviationText})' : ''}',
                                       valueColor:
                                           (deviation?.maxDeviation ?? 0) > 0
@@ -581,7 +612,7 @@ class WeatherTooltip {
                                           : Colors.lightBlueAccent.shade100,
                                     ),
                                     buildDetailRow(
-                                      'Temp. min.',
+                                      AppLocalizations.of(context)!.tempMin,
                                       '${data.temperatureMin.toStringAsFixed(1)}°C ${deviation != null ? '(${deviation.minDeviationText})' : ''}',
                                       valueColor:
                                           (deviation?.minDeviation ?? 0) > 0
@@ -591,28 +622,28 @@ class WeatherTooltip {
                                   ],
                                   if (data is HourlyForecast) ...[
                                     buildDetailRow(
-                                      'Température',
+                                      AppLocalizations.of(context)!.temperature,
                                       '${data.temperature?.toStringAsFixed(1)}°C',
                                     ),
                                     buildDetailRow(
-                                      'Ressenti',
+                                      AppLocalizations.of(context)!.apparent,
                                       '${data.apparentTemperature?.toStringAsFixed(1)}°C',
                                     ),
                                   ],
                                   if (data is PeriodForecast) ...[
                                     buildDetailRow(
-                                      'Temp. moyenne',
+                                      AppLocalizations.of(context)!.tempAvg,
                                       '${data.avgTemperature.toStringAsFixed(1)}°C',
                                     ),
                                     if (data.apparentTemperature != null)
                                       buildDetailRow(
-                                        'Ressenti',
+                                        AppLocalizations.of(context)!.apparent,
                                         '${data.apparentTemperature?.toStringAsFixed(1)}°C',
                                       ),
                                   ],
                                   // Precipitation Sum/Amount
                                   buildDetailRow(
-                                    'Précipitations',
+                                    AppLocalizations.of(context)!.precipitation,
                                     data is DailyForecast
                                         ? data.precipitationSum != null
                                               ? '${data.precipitationSum?.toStringAsFixed(1)} mm'
@@ -630,14 +661,14 @@ class WeatherTooltip {
                                   // Precipitation Hours (DailyForecast only)
                                   if (data is DailyForecast)
                                     buildDetailRow(
-                                      'Heures de précip.',
+                                      AppLocalizations.of(context)!.precipHours,
                                       data.precipitationHours != null
                                           ? '${data.precipitationHours?.toStringAsFixed(1)} h'
                                           : null,
                                     ),
                                   // Precipitation Probability
                                   buildDetailRow(
-                                    'Chance de précip.',
+                                    AppLocalizations.of(context)!.precipChance,
                                     data is DailyForecast
                                         ? data.precipitationProbabilityMax !=
                                                   null
@@ -656,7 +687,7 @@ class WeatherTooltip {
                                   // Snowfall Sum (DailyForecast only)
                                   if (data is DailyForecast)
                                     buildDetailRow(
-                                      'Chute de neige',
+                                      AppLocalizations.of(context)!.snowfall,
                                       data.snowfallSum != null &&
                                               data.snowfallSum! > 0
                                           ? '${data.snowfallSum?.toStringAsFixed(1)} cm'
@@ -664,7 +695,7 @@ class WeatherTooltip {
                                     ),
                                   // Cloud Cover
                                   buildDetailRow(
-                                    'Couverture nuag.',
+                                    AppLocalizations.of(context)!.cloudCover,
                                     data is DailyForecast
                                         ? data.cloudCoverMean != null
                                               ? '${data.cloudCoverMean}%'
@@ -681,7 +712,7 @@ class WeatherTooltip {
                                   ),
 
                                   buildDetailRow(
-                                    'Vent',
+                                    AppLocalizations.of(context)!.wind,
                                     null,
                                     valueWidget: buildColorChar(
                                       data is DailyForecast
@@ -695,7 +726,7 @@ class WeatherTooltip {
                                   ),
                                   // Wind Gusts
                                   buildDetailRow(
-                                    'Rafales',
+                                    AppLocalizations.of(context)!.gusts,
                                     null,
                                     valueWidget: buildColorChar(
                                       data is DailyForecast
@@ -709,7 +740,7 @@ class WeatherTooltip {
                                   ),
                                   // Wind Direction
                                   buildDetailRow(
-                                    'Direction vent',
+                                    AppLocalizations.of(context)!.windDirection,
                                     data is DailyForecast
                                         ? data.windDirection10mDominant != null
                                               ? ChartHelpers.getWindDirectionAbbrev(
@@ -985,8 +1016,33 @@ class WeatherTooltip {
     String? modelName,
     bool showExtendedWindInfo = false,
   }) {
+    final locale = Localizations.localeOf(context).toString();
+    final l10n = AppLocalizations.of(context)!;
+    String periodName = forecast.name;
+    final lowerName = forecast.name.toLowerCase();
+    if (lowerName == 'night' ||
+        lowerName == 'nuit' ||
+        lowerName == 'nacht' ||
+        lowerName == 'noche')
+      periodName = l10n.night;
+    else if (lowerName == 'morning' ||
+        lowerName == 'matin' ||
+        lowerName == 'morgen' ||
+        lowerName == 'mañana' ||
+        lowerName == 'manana')
+      periodName = l10n.morning;
+    else if (lowerName == 'afternoon' ||
+        lowerName == 'a-m' ||
+        lowerName == 'nachmittag' ||
+        lowerName == 'tarde')
+      periodName = l10n.afternoon;
+    else if (lowerName == 'evening' ||
+        lowerName == 'soir' ||
+        lowerName == 'abend')
+      periodName = l10n.evening;
+
     final String formattedDate =
-        '${DateFormat('EEEE, d MMMM', 'fr_FR').format(forecast.time)} - ${forecast.name}';
+        '${DateFormat('EEEE, d MMMM', locale).format(forecast.time)} - $periodName';
 
     final title = modelName != null
         ? '$formattedDate - $modelName'
@@ -1009,6 +1065,7 @@ class WeatherTooltip {
     dynamic data, {
     bool showExtendedWindInfo = false,
   }) {
+    final locale = Localizations.localeOf(context).toString();
     Widget buildDetailRow(
       String label,
       String? value, {
@@ -1101,7 +1158,7 @@ class WeatherTooltip {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${value.toStringAsFixed(1)} km/h ',
+            '${value.toStringAsFixed(1)} ${AppLocalizations.of(context)!.kmh} ',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
@@ -1205,18 +1262,21 @@ class WeatherTooltip {
                                 Expanded(
                                   child: Text(
                                     data is DailyForecast
-                                        ? ChartHelpers.getDescriptionFr(
+                                        ? ChartHelpers.getDescription(
                                                 (data.weatherCodeDaytime ??
                                                         data.weatherCode)!
                                                     .toString(),
+                                                Localizations.localeOf(
+                                                  context,
+                                                ).toString(),
                                               ) ??
                                               ''
                                         : data is HourlyForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
+                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
                                         : data is PeriodForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescriptionFr(data.weatherCode!.toString())}'
+                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
                                         : "",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -1236,7 +1296,10 @@ class WeatherTooltip {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      DateFormat('HH:mm').format(data.sunrise!),
+                                      DateFormat(
+                                        'HH:mm',
+                                        locale,
+                                      ).format(data.sunrise!),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
@@ -1252,7 +1315,10 @@ class WeatherTooltip {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      DateFormat('HH:mm').format(data.sunset!),
+                                      DateFormat(
+                                        'HH:mm',
+                                        locale,
+                                      ).format(data.sunset!),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
@@ -1277,12 +1343,12 @@ class WeatherTooltip {
                                 children: [
                                   if (data is DailyForecast) ...[
                                     buildDetailRow(
-                                      'Temp. max.',
+                                      AppLocalizations.of(context)!.tempMax,
                                       '${data.temperatureMax.toStringAsFixed(1)}°C',
                                       valueColor: Colors.redAccent.shade100,
                                     ),
                                     buildDetailRow(
-                                      'Temp. min.',
+                                      AppLocalizations.of(context)!.tempMin,
                                       '${data.temperatureMin.toStringAsFixed(1)}°C',
                                       valueColor:
                                           Colors.lightBlueAccent.shade100,
@@ -1290,17 +1356,17 @@ class WeatherTooltip {
                                   ],
                                   if (data is HourlyForecast) ...[
                                     buildDetailRow(
-                                      'Température',
+                                      AppLocalizations.of(context)!.temperature,
                                       '${data.temperature?.toStringAsFixed(1)}°C',
                                     ),
                                     buildDetailRow(
-                                      'Ressenti',
+                                      AppLocalizations.of(context)!.apparent,
                                       '${data.apparentTemperature?.toStringAsFixed(1)}°C',
                                     ),
                                   ],
                                   if (data is PeriodForecast) ...[
                                     buildDetailRow(
-                                      'Temp. moyenne',
+                                      AppLocalizations.of(context)!.tempAvg,
                                       '${data.avgTemperature.toStringAsFixed(1)}°C',
                                     ),
                                     if (data.apparentTemperature != null)
@@ -1311,7 +1377,7 @@ class WeatherTooltip {
                                   ],
                                   // Precipitation
                                   buildDetailRow(
-                                    'Précipitations',
+                                    AppLocalizations.of(context)!.precipitation,
                                     data is DailyForecast
                                         ? data.precipitationSum != null
                                               ? '${data.precipitationSum?.toStringAsFixed(1)} mm'
@@ -1329,14 +1395,14 @@ class WeatherTooltip {
                                   // Precipitation Hours (DailyForecast only)
                                   if (data is DailyForecast)
                                     buildDetailRow(
-                                      'Heures de précip.',
+                                      AppLocalizations.of(context)!.precipHours,
                                       data.precipitationHours != null
                                           ? '${data.precipitationHours?.toStringAsFixed(1)} h'
                                           : null,
                                     ),
                                   // Precipitation Probability
                                   buildDetailRow(
-                                    'Chance de précip.',
+                                    AppLocalizations.of(context)!.precipChance,
                                     data is DailyForecast
                                         ? data.precipitationProbabilityMax !=
                                                   null
@@ -1355,7 +1421,7 @@ class WeatherTooltip {
                                   // Snowfall (DailyForecast only)
                                   if (data is DailyForecast)
                                     buildDetailRow(
-                                      'Chute de neige',
+                                      AppLocalizations.of(context)!.snowfall,
                                       data.snowfallSum != null &&
                                               data.snowfallSum! > 0
                                           ? '${data.snowfallSum?.toStringAsFixed(1)} cm'
@@ -1363,7 +1429,7 @@ class WeatherTooltip {
                                     ),
                                   // Cloud Cover
                                   buildDetailRow(
-                                    'Couverture nuag.',
+                                    AppLocalizations.of(context)!.cloudCover,
                                     data is DailyForecast
                                         ? data.cloudCoverMean != null
                                               ? '${data.cloudCoverMean}%'
@@ -1380,7 +1446,7 @@ class WeatherTooltip {
                                   ),
                                   // Wind Speed
                                   buildDetailRow(
-                                    'Vent',
+                                    AppLocalizations.of(context)!.wind,
                                     null,
                                     valueWidget: buildColorChar(
                                       data is DailyForecast
@@ -1394,7 +1460,7 @@ class WeatherTooltip {
                                   ),
                                   // Wind Gusts
                                   buildDetailRow(
-                                    'Rafales',
+                                    AppLocalizations.of(context)!.gusts,
                                     null,
                                     valueWidget: buildColorChar(
                                       data is DailyForecast
@@ -1408,7 +1474,7 @@ class WeatherTooltip {
                                   ),
                                   // Wind Direction
                                   buildDetailRow(
-                                    'Direction vent',
+                                    AppLocalizations.of(context)!.windDirection,
                                     data is DailyForecast
                                         ? data.windDirection10mDominant != null
                                               ? ChartHelpers.getWindDirectionAbbrev(

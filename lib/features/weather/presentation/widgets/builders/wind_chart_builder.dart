@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/flchart_positioned/flchart_positioned.dart';
 import '../utils/chart_constants.dart';
@@ -17,6 +19,8 @@ class WindChartBuilder {
     required List<String> labels,
     required double minY,
     required double maxY,
+    required BuildContext context,
+    required String locale,
   }) {
     final bool isVentDay = displayType == DisplayType.ventDay;
 
@@ -99,8 +103,10 @@ class WindChartBuilder {
           positioner,
           isVentDay,
           hourlyWeather.hourlyForecasts,
+          locale,
         ),
-        _buildAltitudes(positioner),
+        _buildAltitudes(positioner, context),
+        _buildLegend(containerSize, context),
       ],
     );
   }
@@ -484,6 +490,7 @@ class WindChartBuilder {
     ChartPositioner positioner,
     bool isVentDay,
     List<HourlyForecast> allForecasts,
+    String locale,
   ) {
     final chartArea = positioner.getChartArea();
 
@@ -562,8 +569,8 @@ class WindChartBuilder {
             String day = "";
             if (date.hour == 0) {
               style = ChartTheme.hour00LabelStyle;
-              day =
-                  '${date.day} ${['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'][date.month - 1]}';
+              final monthFormat = DateFormat.MMM(locale);
+              day = '${date.day} ${monthFormat.format(date)}';
             } else {
               style = ChartTheme.hourLabelStyle;
             }
@@ -595,7 +602,10 @@ class WindChartBuilder {
     }
   }
 
-  static Widget _buildAltitudes(ChartPositioner positioner) {
+  static Widget _buildAltitudes(
+    ChartPositioner positioner,
+    BuildContext context,
+  ) {
     final List<double> altitudes = [
       10.0,
       20.0,
@@ -626,7 +636,7 @@ class WindChartBuilder {
         left: 5,
         top: posGusts.dy - 8,
         child: Text(
-          'Gusts',
+          AppLocalizations.of(context)!.gusts,
           style: ChartTheme.axisLabelStyle.copyWith(fontSize: 14),
         ),
       ),
@@ -635,7 +645,7 @@ class WindChartBuilder {
     return Stack(children: widgets);
   }
 
-  static Widget _buildLegend(Size containerSize) {
+  static Widget _buildLegend(Size containerSize, BuildContext context) {
     return Positioned(
       bottom: 5,
       right: 10,
@@ -647,7 +657,10 @@ class WindChartBuilder {
         ),
         child: Row(
           children: [
-            const Text('Vitesse: ', style: TextStyle(fontSize: 10)),
+            Text(
+              '${AppLocalizations.of(context)!.speed}: ',
+              style: const TextStyle(fontSize: 10),
+            ),
             _legendBox(Colors.blue.withValues(alpha: 0.3), '<5'),
             _legendBox(Colors.green.withValues(alpha: 0.5), '10'),
             _legendBox(Colors.yellow.withValues(alpha: 0.7), '20'),

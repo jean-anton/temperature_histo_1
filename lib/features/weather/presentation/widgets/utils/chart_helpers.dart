@@ -12,11 +12,11 @@ import 'chart_theme.dart';
 
 /// Helper class containing chart-related utility methods
 class ChartHelpers {
-  /// Get weather description in French
-  static String? getDescriptionFr(String code) {
+  /// Get weather description based on locale
+  static String? getDescription(String code, String locale) {
     final match = weatherIcons.firstWhere(
       (icon) => icon.code == code,
-      orElse: () => WeatherIcon(
+      orElse: () => const WeatherIcon(
         code: '',
         iconPath: '',
         descriptionEn: '',
@@ -24,8 +24,12 @@ class ChartHelpers {
       ),
     );
 
-    return match.code.isEmpty ? null : match.descriptionFr;
+    if (match.code.isEmpty) return null;
+    return locale.startsWith('fr') ? match.descriptionFr : match.descriptionEn;
   }
+
+  /// Get weather description in French
+  static String? getDescriptionFr(String code) => getDescription(code, 'fr');
 
   /// Get weather icon path for a given weather code or icon name
   static String? getIconPath({int? code, String? iconName, int? isDay}) {
@@ -208,12 +212,14 @@ class ChartHelpers {
   }
 
   /// Generate hour labels for hourly chart
-  static List<String> generateHourLabels(HourlyWeather? dailyWeather) {
+  static List<String> generateHourLabels(
+    HourlyWeather? dailyWeather,
+    String locale,
+  ) {
     if (dailyWeather != null && dailyWeather.hourlyForecasts.isNotEmpty) {
       return dailyWeather.hourlyForecasts.map((hourly) {
-        //return DateFormat('HH:mm EEE', 'fr_FR').format(hourly.time);
-        final hour = DateFormat('HH', 'fr_FR').format(hourly.time);
-        final dayAbbrev = DateFormat('EEE', 'fr_FR').format(hourly.time);
+        final hour = DateFormat('HH', locale).format(hourly.time);
+        final dayAbbrev = DateFormat('EEE', locale).format(hourly.time);
         return '${hour}h $dayAbbrev';
       }).toList();
     } else {
@@ -222,11 +228,13 @@ class ChartHelpers {
   }
 
   /// Generate date labels for daily chart
-  static List<String> generateDateLabels(DailyWeather? forecast) {
+  static List<String> generateDateLabels(
+    DailyWeather? forecast,
+    String locale,
+  ) {
     if (forecast == null) return [];
     return forecast.dailyForecasts
-        //.map((daily) => DateFormat('E, d MMM', 'fr_FR').format(daily.date))
-        .map((daily) => DateFormat('E, d', 'fr_FR').format(daily.date))
+        .map((daily) => DateFormat('E, d', locale).format(daily.date))
         .toList();
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/flchart_positioned/flchart_positioned.dart';
@@ -21,6 +22,7 @@ class DailyChartBuilder {
     required List<String> dateLabels,
     required Size containerSize,
     bool showWindInfo = true,
+    required BuildContext context,
   }) {
     final List<FlSpot> spotsMaxTemp = ChartDataProvider.getMaxTempSpots(
       forecast,
@@ -86,8 +88,8 @@ class DailyChartBuilder {
         ),
         leftTitles: AxisTitles(
           axisNameSize: ChartConstants.leftAxisNameSize,
-          axisNameWidget: const Text(
-            'Température (°C)',
+          axisNameWidget: Text(
+            AppLocalizations.of(context)!.tempCelsius,
             style: ChartTheme.axisTitleStyle,
           ),
           sideTitles: SideTitles(

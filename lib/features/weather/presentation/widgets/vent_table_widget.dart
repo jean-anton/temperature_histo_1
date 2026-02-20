@@ -4,6 +4,7 @@ import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_theme.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/weather_icon_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/gust_arrow_widget.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 
 class VentTableWidget extends StatelessWidget {
   final HourlyWeather hourlyWeather;
@@ -26,10 +27,10 @@ class VentTableWidget extends StatelessWidget {
     final filteredForecasts = _filterForecasts();
 
     if (filteredForecasts.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
 
-    final groupedByDate = _groupByDate(filteredForecasts);
+    final groupedByDate = _groupByDate(context, filteredForecasts);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -39,10 +40,10 @@ class VentTableWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInfoHeader(),
+              _buildInfoHeader(context),
               const SizedBox(height: 8),
               ...groupedByDate.entries.map((entry) {
-                return _buildDateSection(entry.key, entry.value);
+                return _buildDateSection(context, entry.key, entry.value);
               }),
             ],
           ),
@@ -51,7 +52,7 @@ class VentTableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -61,15 +62,15 @@ class VentTableWidget extends StatelessWidget {
             Icon(Icons.info_outline, size: 48, color: Colors.grey[600]),
             const SizedBox(height: 16),
             Text(
-              'Aucune heure ne répond aux critères sélectionnés',
+              AppLocalizations.of(context)!.noMatchingHours,
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Rafales max: ${maxGustSpeed.toStringAsFixed(0)} km/h\n'
-              'Précipitations max: $maxPrecipitationProbability%\n'
-              'Ressenti min: ${minApparentTemperature.toStringAsFixed(0)}°C',
+              '${AppLocalizations.of(context)!.gusts} max: ${maxGustSpeed.toStringAsFixed(0)} ${AppLocalizations.of(context)!.kmh}\n'
+              '${AppLocalizations.of(context)!.precipitation} max: $maxPrecipitationProbability%\n'
+              '${AppLocalizations.of(context)!.apparent} min: ${minApparentTemperature.toStringAsFixed(0)}°C',
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
@@ -79,7 +80,7 @@ class VentTableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoHeader() {
+  Widget _buildInfoHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -92,9 +93,9 @@ class VentTableWidget extends StatelessWidget {
           Icon(Icons.filter_alt, color: Colors.blue[700]),
           const SizedBox(width: 8),
           Text(
-            'Filtres: Rafales < ${maxGustSpeed.toStringAsFixed(0)} km/h • '
-            'Précip < $maxPrecipitationProbability% • '
-            'Ressenti > ${minApparentTemperature.toStringAsFixed(0)}°C',
+            '${AppLocalizations.of(context)!.filtersLabel}: ${AppLocalizations.of(context)!.gusts} < ${maxGustSpeed.toStringAsFixed(0)} ${AppLocalizations.of(context)!.kmh} • '
+            '${AppLocalizations.of(context)!.precipitation} < $maxPrecipitationProbability% • '
+            '${AppLocalizations.of(context)!.apparent} > ${minApparentTemperature.toStringAsFixed(0)}°C',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: Colors.blue[900],
@@ -105,7 +106,11 @@ class VentTableWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDateSection(String date, List<HourlyForecast> forecasts) {
+  Widget _buildDateSection(
+    BuildContext context,
+    String date,
+    List<HourlyForecast> forecasts,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,73 +127,82 @@ class VentTableWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        _buildTable(forecasts),
+        _buildTable(context, forecasts),
       ],
     );
   }
 
-  Widget _buildTable(List<HourlyForecast> forecasts) {
+  Widget _buildTable(BuildContext context, List<HourlyForecast> forecasts) {
     return DataTable(
       headingRowColor: WidgetStateProperty.all(Colors.grey[100]),
       columnSpacing: 16,
       horizontalMargin: 8,
-      columns: const [
-        DataColumn(
-          label: Text('Heure', style: TextStyle(fontWeight: FontWeight.bold)),
-        ),
+      columns: [
         DataColumn(
           label: Text(
-            'Rafales\n(km/h)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.hour,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          numeric: true,
-        ),
-        DataColumn(
-          label: Text('Dir.', style: TextStyle(fontWeight: FontWeight.bold)),
-        ),
-        DataColumn(
-          label: Text('Météo', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         DataColumn(
           label: Text(
-            'Temp\n(°C)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.gustsLabelUnit,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
         DataColumn(
           label: Text(
-            'Ressenti\n(°C)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.directionAbbr,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        DataColumn(
+          label: Text(
+            AppLocalizations.of(context)!.weather,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        DataColumn(
+          label: Text(
+            AppLocalizations.of(context)!.tempLabelUnit,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
         DataColumn(
           label: Text(
-            'Précip\n(%)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.apparentLabelUnit,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
         DataColumn(
           label: Text(
-            'Nuages\n(%)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.precipLabelUnit,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
         DataColumn(
           label: Text(
-            'Vent par altitude (10m-200m)',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.cloudsLabelUnit,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          numeric: true,
+        ),
+        DataColumn(
+          label: Text(
+            AppLocalizations.of(context)!.windByAltitudeRange,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
       ],
-      rows: forecasts.map((forecast) => _buildRow(forecast)).toList(),
+      rows: forecasts.map((forecast) => _buildRow(context, forecast)).toList(),
     );
   }
 
-  DataRow _buildRow(HourlyForecast forecast) {
+  DataRow _buildRow(BuildContext context, HourlyForecast forecast) {
     final now = DateTime.now();
     final isCurrentHour =
         forecast.time.year == now.year &&
@@ -263,12 +277,15 @@ class VentTableWidget extends StatelessWidget {
             style: TextStyle(color: Colors.grey[700]),
           ),
         ),
-        DataCell(_buildContinuousWindHeatmap(forecast)),
+        DataCell(_buildContinuousWindHeatmap(context, forecast)),
       ],
     );
   }
 
-  Widget _buildContinuousWindHeatmap(HourlyForecast forecast) {
+  Widget _buildContinuousWindHeatmap(
+    BuildContext context,
+    HourlyForecast forecast,
+  ) {
     const int numCells = 19;
     final List<Widget> cells = [];
 
@@ -284,8 +301,11 @@ class VentTableWidget extends StatelessWidget {
 
       cells.add(
         Tooltip(
-          message:
-              '${altitudeMid.toInt()}m: ${windSpeed?.toStringAsFixed(1) ?? 'N/A'} km/h',
+          message: AppLocalizations.of(context)!.altitudeTooltip(
+            altitudeMid.toInt(),
+            (windSpeed?.toStringAsFixed(1) ?? 'N/A'),
+            AppLocalizations.of(context)!.kmh,
+          ),
           child: Container(
             width: 12,
             height: 24,
@@ -384,11 +404,15 @@ class VentTableWidget extends StatelessWidget {
   }
 
   Map<String, List<HourlyForecast>> _groupByDate(
+    BuildContext context,
     List<HourlyForecast> forecasts,
   ) {
     final Map<String, List<HourlyForecast>> grouped = {};
     for (final forecast in forecasts) {
-      final dateKey = DateFormat('EEEE d MMMM', 'fr_FR').format(forecast.time);
+      final dateKey = DateFormat(
+        'EEEE d MMMM',
+        Localizations.localeOf(context).toString(),
+      ).format(forecast.time);
       grouped.putIfAbsent(dateKey, () => []).add(forecast);
     }
     return grouped;

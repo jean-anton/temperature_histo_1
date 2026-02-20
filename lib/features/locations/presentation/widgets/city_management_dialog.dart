@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:aeroclim/features/locations/domain/location_model.dart';
@@ -110,13 +111,16 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
       );
       setState(() {
         _suggestions = suggestions;
-        _errorMessage = suggestions.isEmpty ? 'Aucune ville trouvée' : null;
+        _errorMessage = suggestions.isEmpty
+            ? AppLocalizations.of(context)!.noCityFound
+            : null;
       });
     } catch (e) {
       print('Error searching cities: $e');
       setState(() {
         _suggestions = [];
-        _errorMessage = 'Erreur lors de la recherche: ${e.toString()}';
+        _errorMessage =
+            '${AppLocalizations.of(context)!.searchError}: ${e.toString()}';
       });
     } finally {
       setState(() {
@@ -180,7 +184,9 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
     final parts = coordsStr.split(',');
 
     if (name.isEmpty || parts.length < 2) {
-      setState(() => _errorMessage = 'Veuillez remplir tous les champs');
+      setState(
+        () => _errorMessage = AppLocalizations.of(context)!.fillAllFields,
+      );
       return;
     }
 
@@ -189,7 +195,7 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
 
     if (lat == null || lon == null) {
       setState(
-        () => _errorMessage = 'Coordonnées invalides (format: lat, lon)',
+        () => _errorMessage = AppLocalizations.of(context)!.invalidCoords,
       );
       return;
     }
@@ -225,7 +231,11 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
         widget.onLocationChanged(newKey);
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Erreur lors de l\'ajout: $e');
+      setState(
+        () => _errorMessage = AppLocalizations.of(
+          context,
+        )!.failedToLoadData(e.toString()),
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -275,11 +285,16 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
         // For desktop/mobile, we could use path_provider and write to a file,
         // but let's stick to the web requirement for now.
         setState(
-          () => _errorMessage = 'Export non supporté sur cette plateforme',
+          () =>
+              _errorMessage = AppLocalizations.of(context)!.exportNotSupported,
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Erreur lors de l\'export: $e');
+      setState(
+        () => _errorMessage = AppLocalizations.of(
+          context,
+        )!.exportError(e.toString()),
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -312,19 +327,27 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
         // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$addedCount villes importées avec succès')),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.citiesImported(addedCount),
+              ),
+            ),
           );
         }
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Erreur lors de l\'import: $e');
+      setState(
+        () => _errorMessage = AppLocalizations.of(
+          context,
+        )!.importError(e.toString()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Gestion des villes'),
+      title: Text(AppLocalizations.of(context)!.manageCities),
       content: SizedBox(
         width: 450,
         child: SingleChildScrollView(
@@ -336,7 +359,7 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ChoiceChip(
-                    label: const Text('Nom'),
+                    label: Text(AppLocalizations.of(context)!.addByCityName),
                     selected: !_addByCoordinates,
                     onSelected: (selected) {
                       if (selected) setState(() => _addByCoordinates = false);
@@ -344,7 +367,7 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                   ),
                   const SizedBox(width: 12),
                   ChoiceChip(
-                    label: const Text('Coordonnées'),
+                    label: Text(AppLocalizations.of(context)!.addByCoordinates),
                     selected: _addByCoordinates,
                     onSelected: (selected) {
                       if (selected) setState(() => _addByCoordinates = true);
@@ -359,11 +382,11 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                     Expanded(
                       child: TextField(
                         controller: _searchController,
-                        decoration: const InputDecoration(
-                          labelText: 'Ajouter une ville',
-                          hintText: 'Tapez le nom d\'une ville...',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.manageCities,
+                          hintText: AppLocalizations.of(context)!.addCityHint,
+                          border: const OutlineInputBorder(),
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12,
                             vertical: 8,
                           ),
@@ -381,11 +404,13 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                   children: [
                     TextField(
                       controller: _coordsController,
-                      decoration: const InputDecoration(
-                        labelText: 'Coordonnées (lat, lon)',
-                        hintText: 'ex: 49.101, 6.793',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(
+                          context,
+                        )!.addByCoordinates,
+                        hintText: AppLocalizations.of(context)!.coordsHint,
+                        border: const OutlineInputBorder(),
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 8,
                         ),
@@ -395,11 +420,15 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: _manualNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nom du lieu',
-                        hintText: 'Entrez un nom pour ce lieu',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(
+                          context,
+                        )!.locationNameLabel,
+                        hintText: AppLocalizations.of(
+                          context,
+                        )!.enterLocationNameHint,
+                        border: const OutlineInputBorder(),
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 8,
                         ),
@@ -410,7 +439,9 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         icon: const Icon(Icons.add),
-                        label: const Text('Ajouter ce lieu'),
+                        label: Text(
+                          AppLocalizations.of(context)!.addThisLocation,
+                        ),
                         onPressed: _addManualCity,
                       ),
                     ),
@@ -447,9 +478,9 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
                 ),
               const SizedBox(height: 16),
               // List of cities
-              const Text(
-                'Villes enregistrées:',
-                style: TextStyle(fontWeight: FontWeight.w500),
+              Text(
+                AppLocalizations.of(context)!.registeredCities,
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 8),
               Container(
@@ -517,16 +548,16 @@ class _CityManagementDialogState extends State<CityManagementDialog> {
         TextButton.icon(
           onPressed: _exportLocations,
           icon: const Icon(Icons.download),
-          label: const Text('Exporter'),
+          label: Text(AppLocalizations.of(context)!.export),
         ),
         TextButton.icon(
           onPressed: _importLocations,
           icon: const Icon(Icons.upload),
-          label: const Text('Importer'),
+          label: Text(AppLocalizations.of(context)!.import),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Fermer'),
+          child: Text(AppLocalizations.of(context)!.close),
         ),
       ],
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/flchart_positioned/flchart_positioned.dart';
 import '../utils/chart_constants.dart';
@@ -21,6 +23,8 @@ class HourlyChartBuilder {
     bool showWindInfo = true,
     required Size containerSize,
     required DailyWeather forecast,
+    required String locale,
+    required BuildContext context,
   }) {
     final List<FlSpot> spots = ChartDataProvider.getHourlyTempSpots(
       hourlyWeather,
@@ -81,7 +85,10 @@ class HourlyChartBuilder {
         ),
         leftTitles: AxisTitles(
           axisNameSize: ChartConstants.leftAxisNameSize,
-          axisNameWidget: const Text('°C', style: ChartTheme.axisTitleStyle),
+          axisNameWidget: Text(
+            AppLocalizations.of(context)!.tempCelsius,
+            style: ChartTheme.axisTitleStyle,
+          ),
           sideTitles: SideTitles(
             showTitles: true,
             interval: 5,
@@ -154,7 +161,7 @@ class HourlyChartBuilder {
         //     _buildApparentTempLabels(hourlyWeather, positioner),
         // Hour labels at bottom
         (context, positioner) =>
-            _buildHourLabels(hourlyWeather, positioner, hourLabels),
+            _buildHourLabels(hourlyWeather, positioner, hourLabels, locale),
         // Current time line
         (context, positioner) =>
             _buildCurrentTimeLine(hourlyWeather, positioner),
@@ -421,7 +428,9 @@ class HourlyChartBuilder {
     HourlyWeather hourlyWeather,
     ChartPositioner positioner,
     List<String> hourLabels,
+    String locale,
   ) {
+    final monthFormat = DateFormat.MMM(locale);
     final widgets = hourlyWeather.hourlyForecasts
         .asMap()
         .entries
@@ -434,14 +443,13 @@ class HourlyChartBuilder {
           String day = "";
           if (date.hour == 0) {
             style = ChartTheme.hour00LabelStyle;
-            day =
-                '${date.day} ${['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'][date.month - 1]}';
+            day = '${date.day} ${monthFormat.format(date)}';
           } else {
             style = ChartTheme.hourLabelStyle;
           }
           final String? label =
               hourLabels.isNotEmpty && index < hourLabels.length
-              ? hourLabels[index] + "\n" + day
+              ? '${hourLabels[index]}\n$day'
               : null;
 
           if (label == null) return const SizedBox.shrink();

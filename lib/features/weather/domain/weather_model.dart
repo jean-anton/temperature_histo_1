@@ -208,8 +208,10 @@ class DailyForecast {
   });
 
   // Convenience getters for use in UI
+  // Convenience getters/methods for use in UI
   int get dayOfYear => int.parse(DateFormat('D').format(date));
-  String get formattedDate => DateFormat('EEEE d MMMM', 'fr_FR').format(date);
+  String getFormattedDate(String locale) =>
+      DateFormat('EEEE d MMMM', locale).format(date);
 
   @override
   String toString() {
@@ -228,7 +230,7 @@ class DailyForecast {
         ? '${windSpeed200m?.toStringAsFixed(1)}'
         : 'N/A';
 
-    return 'DailyForecast(date: $formattedDate, max: ${temperatureMax.toStringAsFixed(1)}°C, min: ${temperatureMin.toStringAsFixed(1)}°C, precip: $precipText, wind: $windText, code: $codeText, codeDaytime: $codeDaytimeText, wind200m: $wind200Text)';
+    return 'DailyForecast(date: ${date.toIso8601String()}, max: ${temperatureMax.toStringAsFixed(1)}°C, min: ${temperatureMin.toStringAsFixed(1)}°C, precip: $precipText, wind: $windText, code: $codeText, codeDaytime: $codeDaytimeText, wind200m: $wind200Text)';
   }
 }
 
@@ -516,7 +518,7 @@ class MultiModelHourlyWeather {
 
 // Add to the bottom of weather_forecast_model.dart
 void testDailyWeather() async {
-  await initializeDateFormatting('fr_FR', null);
+  await initializeDateFormatting('en_US', null);
 
   final weatherService = WeatherRepository();
   const locationName = 'Metz';
@@ -560,9 +562,9 @@ void main() async {
 /// A self-contained main function to test the model and service together.
 /// You can run this file directly from your IDE to verify the logic.
 void main2() async {
-  // FIX: Initialize date formatting for the 'fr_FR' locale.
+  // FIX: Initialize date formatting
   // This must be done before any locale-specific date formatting is used.
-  await initializeDateFormatting('fr_FR', null);
+  await initializeDateFormatting('en_US', null);
 
   // Setup
   final weatherService = WeatherRepository();

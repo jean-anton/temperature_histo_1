@@ -1,15 +1,15 @@
 # Manuel d'Utilisateur - AeroClim
 
-Bienvenue dans AeroClim, une application dédiée à l’analyse météorologique, permettant de comparer les de température prévisions actuelles aux normales climatiques historiques. Elle permet également d’accéder à des informations sur le vent jusqu’à 200 m d’altitude ainsi qu’aux prévisions de précipitations, d'ensoleillement et de couverture nuageuse.
+Bienvenue dans AeroClim, une application dédiée à l’analyse météorologique, permettant de comparer les prévisions actuelles de températures aux normales climatiques historiques. Elle permet également d’accéder à des informations sur le vent jusqu’à 200 m d’altitude ainsi qu’aux prévisions de précipitations, d'ensoleillement et de couverture nuageuse.
 
 ⚠️ Avertissement
-Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Les informations affichées ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée..
+Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Les informations affichées ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée.
 L’auteur de l’application décline toute responsabilité quant aux décisions prises ou aux incidents survenus à la suite de l’utilisation des informations affichées.
 ---
 
 ## 1. Vue d'Ensemble
-L'interface est divisée en deux zones principales :
-*   **Le Bandeau de Résumé (Haut)** : Affiche la ville sélectionnée, la station climatique de référence, la température actuelle et un résumé de la journée.
+L'interface est divisée en plusieurs zones principales :
+*   **Le Bandeau de Résumé (Haut)** : Affiche la ville sélectionnée, la station climatique de référence, la température actuelle, et la direction du vent via la jauge animée (Flèche de Rafale).
 *   **La Zone d'Affichage (Centre)** : Présente les données sous forme de graphiques ou de tableaux interactifs.
 *   **Le Panneau de Contrôle (Côté ou Bas)** : Permet de configurer tous les paramètres de l'application.
 
@@ -28,8 +28,9 @@ L'application ne contient aucune ville par défaut. Pour commencer :
 ---
 
 ## 3. Modes Temporels
-Basculez entre deux échelles de temps :
+Basculez entre trois échelles de temps principales :
 *   **Journalier** : Pour une vision à long terme (prévisions sur 10-15 jours).
+*   **Périodes** : Pour visualiser les prévisions agrégées (Nuit, Matin, Après-midi, Soir) sur plusieurs jours.
 *   **Horaire** : Pour un détail précis heure par heure. Le graphique démarre à "Heure actuelle - 1h" pour voir l'évolution immédiate.
 
 ---
@@ -38,22 +39,22 @@ Basculez entre deux échelles de temps :
 Utilisez le sélecteur dans le panneau de contrôle pour changer de vue :
 *   **Graphique** : Affiche les températures prévues superposées aux normales (lignes en pointillés).
 *   **Vent** : Visualise la vitesse moyenne du vent et les rafales.
-*   **Table Vent** : Présente les conditions de vent par paliers d'altitude, avec un code couleur (heatmap) pour identifier rapidement les intensités.
-*   **Comparatif** : Compare simultanément plusieurs modèles météo (ECMWF, GFS, ICON, ARPEGE) sur le même graphique.
+*   **Table Vent** : Présente les conditions de vent par paliers d'altitude, de 10 m jusqu'à 200 m, avec un code couleur pour identifier rapidement les intensités.
+*   **Comparatif** : Compare simultanément plusieurs modèles météo (ECMWF, GFS, ICON, ARPEGE) sur le même graphique ou dans un tableau comparatif détaillé.
 
 ---
 
 ## 5. Interaction avec les Graphiques
-*   **Infobulles (Tooltips)** : Appuyez dans les 2/3 supérieurs d'un graphique pour ouvrir une infobulle détaillée. Elle affiche les températures exactes, le vent, l'humidité et les icônes météo.
+*   **Infobulles (Tooltips)** : Appuyez dans les 2/3 supérieurs d'un graphique ou d'un tableau pour ouvrir une infobulle détaillée. Elle affiche les températures exactes, le vent par altitude, l'humidité et les icônes météo, ainsi que des informations additionnelles.
 *   **Fermeture** : Pour fermer une infobulle, appuyez dans le 1/3 inférieur du graphique ou n'importe où en dehors du graphique.
-*   **Navigation** : Faites défiler horizontalement pour naviguer dans le temps.
+*   **Navigation** : Faites défiler horizontalement pour naviguer dans le temps. Le tableau comparatif supporte également la synchronisation du défilement des en-têtes.
 
 ---
 
 ## 6. Modèles Météo
 Vous pouvez choisir le modèle de calcul :
 *   **Best Match** : Le meilleur compromis calculé automatiquement.
-*   **ECMWF / GFS** : Modèles globaux de référence.
+*   **ECMWF / GFS** : Modèles globaux de référence (dont le nouveau ECMWF IFS HRES).
 *   **ICON** : Modèle global de référence DWD Allemand.
 *   **ARPEGE / AROME** : Modèles haute précision de Météo-France (particulièrement précis pour la France).
 
@@ -62,32 +63,28 @@ Vous pouvez choisir le modèle de calcul :
 ## 7. Paramètres et Filtres
 Dans le panneau de contrôle, vous pouvez :
 *   Activer/Désactiver les informations de vent.
-*   Afficher le **Vent étendu** (détails par altitude).
+*   Afficher le **Vent étendu** (détails par altitude de 10 à 200 m).
 *   Filtrer les données par :
     *   **Rafales** : Masquer les valeurs inférieures à un seuil (ex: < 30 km/h).
     *   **Précipitations** : Masquer les faibles probabilités.
-    *   **Température ressentie** : Masquer les valeurs en dessous d'un certain froid (ex: < 0°C).
+    *   **Temp. ressentie min** : Limiter la vue en fonction du froid.
 
 ---
 
 ## 8. Informations Techniques
 *   **Version** : Consultez le numéro de version en bas du menu.
 *   **Confidentialité** : Cette application respecte votre vie privée. Aucun cookie ni tracker n'est utilisé, et aucune donnée personnelle n'est collectée.
-*   **Wasm** : L'indicateur "Wasm: true" confirme que l'application utilise les dernières technologies de performance Web.
+*   **Wasm** : L'indicateur "Wasm" confirme que l'application utilise les dernières technologies de performance Web.
 
 ---
- 
- ## 9. Mentions Légales & Crédits
+
+## 9. Mentions Légales & Crédits
 - **Données Météorologiques** : Fournies par [Open-Meteo.com](https://open-meteo.com/) (Licence CC BY 4.0).
 - **Données Climatologiques** : Source : [Deutscher Wetterdienst (DWD)](https://www.dwd.de/). Données de moyennes pluriannuelles (1961-1990) issues du CDC (Climate Data Center).
 - **Géolocalisation & Recherche** : Service [Photon](https://photon.komoot.io/) utilisant les données d'© [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (Licence ODbL).
 - **Iconographies** : 
-    - Icônes "v3/v4" : Ressources Google LLC (non affilié).
+    - Icônes "v4" : Ressources Google LLC (non affilié).
     - Illustration "le-rechauffement-climatique.png" : Créée par [Freepik - Flaticon](https://www.flaticon.com/).
 - **Typographies** : Polices Google Fonts (OFL / Apache 2.0).
 - **Licence Logicielle** : Cette application est distribuée sous licence MIT.
 - **Code Source** : [GitHub Repository](https://github.com/jean-anton/aeroclim)
-
----
-
-

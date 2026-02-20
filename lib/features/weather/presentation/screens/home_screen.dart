@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:latlong2/latlong.dart';
@@ -208,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       setState(() {
         _isLoading = false;
-        _errorMessage = "Aucune ville enregistrée. Veuillez en ajouter une.";
+        _errorMessage = AppLocalizations.of(context)!.noCityError;
       });
     }
   }
@@ -547,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen> {
         print('### Daytime weathercode calculation completed for daily mode:');
         for (final forecast in enhancedForecasts.take(5)) {
           print(
-            '  ${forecast.formattedDate}: Original=${forecast.weatherCode}, '
+            '  ${forecast.date.toIso8601String()}: Original=${forecast.weatherCode}, '
             'Daytime=${forecast.weatherCodeDaytime} (${forecast.daytimeHoursAnalyzed}h)',
           );
         }
@@ -555,8 +556,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       setState(() {
         print("### CJG 361: Error loading data: $e");
-        _errorMessage =
-            'Erreur lors du chargement des données: ${e.toString()}';
+        _errorMessage = AppLocalizations.of(
+          context,
+        )!.failedToLoadData(e.toString());
         _isLoading = false;
       });
     }
@@ -652,7 +654,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'AeroClim',
+                    AppLocalizations.of(context)!.appTitle,
                     style: GoogleFonts.outfit(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -680,7 +682,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'AVERTISSEMENT',
+                              AppLocalizations.of(context)!.disclaimerTitle,
                               style: GoogleFonts.outfit(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.orange[900],
@@ -689,14 +691,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          //'Les données présentées sont fournies à titre strictement informatif et peuvent différer des conditions réelles. Elles ne doivent jamais être utilisées pour la préparation ou la prise de décision concernant des activités aéronautiques avec présence humaine, telles que le parapente, le deltaplane, l’ULM, le kite, la montgolfière ou toute forme d’aviation habitée.\n\n',
-                          """
-Les données sont fournies à titre informatif et peuvent différer des conditions réelles. L’auteur décline toute responsabilité quant à leur utilisation.                          """,
-                          style: TextStyle(fontSize: 15, height: 1.4),
+                        Text(
+                          AppLocalizations.of(context)!.disclaimerMessage,
+                          style: const TextStyle(fontSize: 15, height: 1.4),
                           textAlign: TextAlign.center,
                         ),
-
                         const Divider(),
                         const SizedBox(height: 8),
                         Row(
@@ -710,7 +709,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                'Confidentialité: Aucun cookie ni tracker. Aucune donnée collectée.',
+                                AppLocalizations.of(context)!.privacyInfo,
                                 style: TextStyle(
                                   fontSize: 15,
                                   color: Colors.blue[900],
@@ -742,7 +741,9 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'Code Source sur GitHub',
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.srcCodeGitHub,
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.blue[700],
@@ -767,17 +768,6 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                       ],
                     ),
                   ),
-                  // const SizedBox(height: 24),
-                  // const Text(
-                  //   'L’auteur de l’application décline toute responsabilité quant aux décisions prises ou aux incidents survenus à la suite de l’utilisation des informations affichées.',
-                  //   textAlign: TextAlign.center,
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //     fontStyle: FontStyle.italic,
-                  //     fontSize: 16,
-                  //     color: Colors.black,
-                  //   ),
-                  // ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -790,7 +780,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                             );
                           },
                           icon: const Icon(Icons.help_outline),
-                          label: const Text('Lire l\'aide'),
+                          label: Text(AppLocalizations.of(context)!.readHelp),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -813,7 +803,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                             ).colorScheme.primary,
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text('Accepter'),
+                          child: Text(AppLocalizations.of(context)!.accept),
                         ),
                       ),
                     ],
@@ -840,7 +830,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
         ? WeatherDisplayWidget(
             weatherInfo: weatherInfo,
             climateInfo: climateInfo,
-            modelName: _models[_selectedModel] ?? '',
+            modelName: _getLocalizedModelName(context, _selectedModel),
             displayMode: _displayMode,
             displayType: _displayType,
             forecast: _forecast,
@@ -869,7 +859,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Aucune ville enregistrée',
+                  AppLocalizations.of(context)!.noCityRegisteredTitle,
                   style: GoogleFonts.outfit(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -877,15 +867,15 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Ajoutez une ville dans le menu "Gérer les villes" pour commencer.',
+                Text(
+                  AppLocalizations.of(context)!.addCityInstruction,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: _showCityManagementDialog,
                   icon: const Icon(Icons.add_location_alt),
-                  label: const Text('Gérer les villes'),
+                  label: Text(AppLocalizations.of(context)!.manageCities),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
@@ -896,7 +886,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
               ],
             ),
           )
-        : const Center(child: Text('Sélectionnez une localisation'));
+        : Center(child: Text(AppLocalizations.of(context)!.selectLocation));
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -992,7 +982,7 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
   }) {
     final weatherInfo = _weatherLocationData[_selectedWeatherLocation];
     return ControlPanelWidget(
-      models: _models,
+      models: _getLocalizedModels(context),
       selectedModel: _selectedModel,
       onModelChanged: (val) {
         _onModelChanged(val);
@@ -1149,5 +1139,21 @@ Les données sont fournies à titre informatif et peuvent différer des conditio
         ),
       );
     }).toList();
+  }
+
+  Map<String, String> _getLocalizedModels(BuildContext context) {
+    return _models.map((key, value) {
+      if (key == 'best_match') {
+        return MapEntry(key, AppLocalizations.of(context)!.bestMatch);
+      }
+      return MapEntry(key, value);
+    });
+  }
+
+  String _getLocalizedModelName(BuildContext context, String modelKey) {
+    if (modelKey == 'best_match') {
+      return AppLocalizations.of(context)!.bestMatch;
+    }
+    return _models[modelKey] ?? modelKey;
   }
 }

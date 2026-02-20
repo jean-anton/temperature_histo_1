@@ -3,17 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 
 class HelpDialog extends StatelessWidget {
   const HelpDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final String languageCode = Localizations.localeOf(
+      context,
+    ).languageCode.toUpperCase();
+    final String manualFileName = 'USER_MANUAL_$languageCode.md';
+
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Aide & Manuel d\'utilisation',
+            l10n.helpAndUserManual,
             style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
           ),
           leading: IconButton(
@@ -24,20 +31,21 @@ class HelpDialog extends StatelessWidget {
           elevation: 0,
         ),
         body: FutureBuilder<String>(
-          future: rootBundle.loadString('USER_MANUAL_FR.md'),
+          future: rootBundle.loadString(manualFileName).catchError((error) {
+            // Fallback to English if the specific language file is not found
+            return rootBundle.loadString('USER_MANUAL_EN.md');
+          }),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
               return Center(
-                child: Text(
-                  'Erreur lors du chargement de l\'aide : ${snapshot.error}',
-                ),
+                child: Text('${l10n.errorLoadingHelp}${snapshot.error}'),
               );
             }
             return Markdown(
-              data: snapshot.data ?? 'Aucun contenu trouvé.',
+              data: snapshot.data ?? l10n.noContentFound,
               onTapLink: (text, href, title) {
                 if (href != null) {
                   launchUrl(Uri.parse(href), mode: LaunchMode.platformDefault);
@@ -67,9 +75,12 @@ class HelpDialog extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Si les liens ne fonctionnent pas, copiez l\'URL ci-dessous :',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.copyUrlIfLinksDoNotWork,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SelectableText(
                   'https://github.com/jean-anton/aeroclim',

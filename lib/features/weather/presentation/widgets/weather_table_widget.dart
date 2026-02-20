@@ -3,6 +3,8 @@ import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/features/climate/data/climate_repository.dart';
 import 'package:aeroclim/core/config/app_config.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 class WeatherTable extends StatelessWidget {
   final DailyWeather forecast;
@@ -25,7 +27,7 @@ class WeatherTable extends StatelessWidget {
         horizontalMargin: 0,
         columnSpacing: 0,
         headingRowColor: WidgetStateProperty.all(Colors.grey[100]),
-        columns: _buildColumns(showClimate),
+        columns: _buildColumns(context, showClimate),
         rows: forecast.dailyForecasts.map((dailyForecast) {
           final deviation = showClimate
               ? _climateService.calculateDeviation(
@@ -36,56 +38,71 @@ class WeatherTable extends StatelessWidget {
                 )
               : null;
           return DataRow(
-            cells: _buildCells(dailyForecast, deviation, showClimate),
+            cells: _buildCells(context, dailyForecast, deviation, showClimate),
           );
         }).toList(),
       ),
     );
   }
 
-  List<DataColumn> _buildColumns(bool showClimate) {
+  List<DataColumn> _buildColumns(BuildContext context, bool showClimate) {
     final columns = [
-      const DataColumn(
-        label: Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
+      DataColumn(
+        label: Text(
+          AppLocalizations.of(context)!.date,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
-      const DataColumn(
-        label: Text('Max', style: TextStyle(fontWeight: FontWeight.bold)),
+      DataColumn(
+        label: Text(
+          AppLocalizations.of(context)!.max,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         numeric: true,
       ),
-      const DataColumn(
-        label: Text('Min', style: TextStyle(fontWeight: FontWeight.bold)),
+      DataColumn(
+        label: Text(
+          AppLocalizations.of(context)!.min,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         numeric: true,
       ),
     ];
 
     if (showClimate) {
       columns.addAll([
-        const DataColumn(
-          label: Text('DMax', style: TextStyle(fontWeight: FontWeight.bold)),
-          numeric: true,
-        ),
-        const DataColumn(
-          label: Text('DMin', style: TextStyle(fontWeight: FontWeight.bold)),
-          numeric: true,
-        ),
-        const DataColumn(
+        DataColumn(
           label: Text(
-            'Normale Max',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.dMax,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
-        const DataColumn(
+        DataColumn(
           label: Text(
-            'Normale Min',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.dMin,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
-        const DataColumn(
+        DataColumn(
           label: Text(
-            'Écart Moyen',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            AppLocalizations.of(context)!.normalMax,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          numeric: true,
+        ),
+        DataColumn(
+          label: Text(
+            AppLocalizations.of(context)!.normalMin,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          numeric: true,
+        ),
+        DataColumn(
+          label: Text(
+            AppLocalizations.of(context)!.avgDeviation,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           numeric: true,
         ),
@@ -96,6 +113,7 @@ class WeatherTable extends StatelessWidget {
   }
 
   List<DataCell> _buildCells(
+    BuildContext context,
     DailyForecast dailyForecast,
     WeatherDeviation? deviation,
     bool showClimate,
@@ -105,7 +123,7 @@ class WeatherTable extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Text(
-            '${_getDayOfWeek(dailyForecast.date)} ${dailyForecast.formattedDate}',
+            '${_getDayOfWeek(context, dailyForecast.date)} ${DateFormat('d MMMM', Localizations.localeOf(context).toString()).format(dailyForecast.date)}',
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
           ),
         ),
@@ -197,9 +215,11 @@ class WeatherTable extends StatelessWidget {
     );
   }
 
-  String _getDayOfWeek(DateTime date) {
-    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-    return days[date.weekday - 1];
+  String _getDayOfWeek(BuildContext context, DateTime date) {
+    return DateFormat(
+      'EEE',
+      Localizations.localeOf(context).toString(),
+    ).format(date);
   }
 
   Color _getDeviationColor(double deviation) {

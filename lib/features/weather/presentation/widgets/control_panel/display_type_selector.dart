@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 
 class DisplayTypeSelector extends StatelessWidget {
@@ -13,18 +14,26 @@ class DisplayTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final types = [
-      (DisplayType.graphique, 'Graph', Icons.bar_chart),
-      (DisplayType.vent, 'Vent', Icons.air),
-      (DisplayType.ventTable, 'Table Vent', Icons.table_rows),
-      (DisplayType.comparatif, 'Comp', Icons.compare_arrows),
-      (DisplayType.comparatifTable, 'Table Comp', Icons.grid_on),
+      (DisplayType.graphique, l10n.graph, Icons.bar_chart),
+      (DisplayType.vent, l10n.wind, Icons.air),
+      (DisplayType.ventTable, '${l10n.table} ${l10n.wind}', Icons.table_rows),
+      (DisplayType.comparatif, l10n.comp, Icons.compare_arrows),
+      (
+        DisplayType.comparatifTable,
+        '${l10n.table} ${l10n.comp}',
+        Icons.grid_on,
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Type de vue:', style: TextStyle(fontSize: 13)),
+        Text(
+          AppLocalizations.of(context)!.viewType,
+          style: const TextStyle(fontSize: 13),
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,

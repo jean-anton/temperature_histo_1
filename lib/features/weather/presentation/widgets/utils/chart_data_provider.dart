@@ -271,10 +271,10 @@ class ChartDataProvider {
   }
 
   static String _getPeriodName(int hour) {
-    if (hour >= 0 && hour < 6) return 'Nuit';
-    if (hour >= 6 && hour < 12) return 'Matin';
-    if (hour >= 12 && hour < 18) return 'A-M';
-    if (hour >= 18) return 'Soir';
+    if (hour >= 0 && hour < 6) return 'night';
+    if (hour >= 6 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 18) return 'afternoon';
+    if (hour >= 18) return 'evening';
     return '';
   }
 

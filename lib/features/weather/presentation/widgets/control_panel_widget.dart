@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/link.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
@@ -99,8 +100,8 @@ class ControlPanelWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionHeader(
-                title: 'MODÈLE',
+              SectionHeader(
+                title: AppLocalizations.of(context)!.model,
                 icon: Icons.model_training_outlined,
               ),
               const SizedBox(height: 12),
@@ -120,8 +121,8 @@ class ControlPanelWidget extends StatelessWidget {
                 onDisplayTypeChanged: onDisplayTypeChanged,
               ),
               const SizedBox(height: 32),
-              const SectionHeader(
-                title: 'LOCALISATION',
+              SectionHeader(
+                title: AppLocalizations.of(context)!.location,
                 icon: Icons.place_outlined,
               ),
               const SizedBox(height: 16),
@@ -138,7 +139,10 @@ class ControlPanelWidget extends StatelessWidget {
                 climateDropDownItems: climateDropDownItems,
               ),
               const SizedBox(height: 32),
-              const SectionHeader(title: 'PARAMÈTRES VENT', icon: Icons.air),
+              SectionHeader(
+                title: AppLocalizations.of(context)!.windSettings,
+                icon: Icons.air,
+              ),
               const SizedBox(height: 16),
               WindSettings(
                 showWindInfo: showWindInfo,
@@ -177,7 +181,7 @@ class ControlPanelWidget extends StatelessWidget {
             );
           },
           icon: const Icon(Icons.help_outline, size: 18),
-          label: const Text('Besoin d\'aide ?'),
+          label: Text(AppLocalizations.of(context)!.needHelp),
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             alignment: Alignment.centerLeft,
@@ -185,13 +189,13 @@ class ControlPanelWidget extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'Version: $version',
+          '${AppLocalizations.of(context)!.version}: $version',
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: Colors.grey),
         ),
         Text(
-          'Wasm: $isRunningWithWasm',
+          '${AppLocalizations.of(context)!.wasm}: $isRunningWithWasm',
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -201,9 +205,7 @@ class ControlPanelWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Link(
-              uri: Uri.parse(
-                'https://github.com/jean-anton/aeroclim',
-              ),
+              uri: Uri.parse('https://github.com/jean-anton/aeroclim'),
               target: LinkTarget.blank,
               builder: (context, followLink) => InkWell(
                 onTap: followLink,
@@ -212,7 +214,7 @@ class ControlPanelWidget extends StatelessWidget {
                     const Icon(Icons.code, size: 14, color: Colors.blue),
                     const SizedBox(width: 4),
                     Text(
-                      'Code Source (GitHub)',
+                      AppLocalizations.of(context)!.sourceCode,
                       style: GoogleFonts.outfit(
                         fontSize: 11,
                         color: Colors.blue[700],

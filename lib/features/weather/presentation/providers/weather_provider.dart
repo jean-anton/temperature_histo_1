@@ -168,7 +168,7 @@ class WeatherProvider with ChangeNotifier {
       print('### Daytime weathercode calculation completed:');
       for (final forecast in enhancedForecasts) {
         print(
-          '  ${forecast.formattedDate}: Original=${forecast.weatherCode}, Daytime=${forecast.weatherCodeDaytime} (${forecast.daytimeHoursAnalyzed}h)',
+          '  ${forecast.date.toIso8601String()}: Original=${forecast.weatherCode}, Daytime=${forecast.weatherCodeDaytime} (${forecast.daytimeHoursAnalyzed}h)',
         );
       }
     } catch (e) {

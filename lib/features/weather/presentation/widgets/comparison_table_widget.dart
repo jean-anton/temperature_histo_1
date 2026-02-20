@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/weather_icon_widget.dart';
@@ -32,8 +33,8 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     'meteofrance_seamless',
   ];
 
-  static const Map<String, String> _modelNames = {
-    'best_match': 'Best Match',
+  static Map<String, String> _getModelNames(BuildContext context) => {
+    'best_match': AppLocalizations.of(context)!.bestMatch,
     'ecmwf_ifs': 'ECMWF IFS HRES',
     'gfs_seamless': 'GFS',
     'meteofrance_seamless': 'ARPEGE',
@@ -77,7 +78,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         } else {
           // If top is exactly a separator, we might want its info too
           topInfo = _TableRowInfo(
-            title: DateFormat('EEEE d MMMM', 'fr_FR').format(item),
+            title: DateFormat(
+              'EEEE d MMMM',
+              AppLocalizations.of(context)!.localeName,
+            ).format(item),
             date: item,
           );
         }
@@ -166,7 +170,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     final now = DateTime.now();
     _flatItems = [];
     for (final daily in refModel.dailyForecasts) {
-      final dateText = DateFormat('EEEE d MMMM', 'fr_FR').format(daily.date);
+      final dateText = DateFormat(
+        'EEEE d MMMM',
+        AppLocalizations.of(context)!.localeName,
+      ).format(daily.date);
       final isCurrent =
           daily.date.year == now.year &&
           daily.date.month == now.month &&
@@ -213,7 +220,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     _flatItems = [];
     for (int i = 0; i < refPeriods.length; i++) {
       final period = refPeriods[i];
-      final dateText = DateFormat('EEEE d MMMM', 'fr_FR').format(period.time);
+      final dateText = DateFormat(
+        'EEEE d MMMM',
+        AppLocalizations.of(context)!.localeName,
+      ).format(period.time);
       if (i == 0 || period.time.day != refPeriods[i - 1].time.day) {
         _flatItems.add(period.time);
       }
@@ -247,7 +257,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     _flatItems = [];
     for (int i = 0; i < refHourly.hourlyForecasts.length; i++) {
       final hourly = refHourly.hourlyForecasts[i];
-      final dateText = DateFormat('EEEE d MMMM', 'fr_FR').format(hourly.time);
+      final dateText = DateFormat(
+        'EEEE d MMMM',
+        AppLocalizations.of(context)!.localeName,
+      ).format(hourly.time);
       if (i == 0 ||
           hourly.time.day != refHourly.hourlyForecasts[i - 1].time.day) {
         _flatItems.add(hourly.time);
@@ -304,7 +317,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                   final item = _flatItems[index];
                   if (item is DateTime) {
                     return _buildDateHeader(
-                      DateFormat('EEEE d MMMM', 'fr_FR').format(item),
+                      DateFormat(
+                        'EEEE d MMMM',
+                        AppLocalizations.of(context)!.localeName,
+                      ).format(item),
                       item,
                       isSticky: false,
                     );
@@ -330,9 +346,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     final labelWidth = screenWidth < 500 ? 65.0 : 80.0;
     final columnWidth = screenWidth < 500 ? 90.0 : 100.0;
 
+    final l10n = AppLocalizations.of(context)!;
     String leftLabel = widget.displayMode == 'hourly'
-        ? 'HEURE'
-        : (widget.displayMode == 'periodes' ? 'PÉRIODE' : '');
+        ? l10n.hour
+        : (widget.displayMode == 'periodes' ? l10n.period : '');
 
     return Container(
       decoration: const BoxDecoration(
@@ -369,7 +386,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                   border: Border(right: BorderSide(color: Colors.white24)),
                 ),
                 child: Text(
-                  _modelNames[k]!.toUpperCase(),
+                  _getModelNames(context)[k]!.toUpperCase(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -415,8 +432,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
             child: isSticky
                 ? Text(
                     widget.displayMode == 'hourly'
-                        ? 'HEURE'
-                        : (widget.displayMode == 'periodes' ? 'PÉRIODE' : ''),
+                        ? AppLocalizations.of(context)!.hour
+                        : (widget.displayMode == 'periodes'
+                              ? AppLocalizations.of(context)!.period
+                              : ''),
                     style: TextStyle(
                       fontSize: 8,
                       fontWeight: FontWeight.bold,
@@ -444,7 +463,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   }
 
   Widget _buildDailyRow(_DailyRowData data) {
-    final dayLabel = DateFormat('E d', 'fr_FR').format(data.date);
+    final dayLabel = DateFormat(
+      'E d',
+      AppLocalizations.of(context)!.localeName,
+    ).format(data.date);
     return Container(
       key: data.isCurrent ? _nowKey : null,
       decoration: BoxDecoration(
@@ -472,7 +494,9 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           context,
           d,
           details.globalPosition,
-          modelName: modelKey != null ? _modelNames[modelKey] : null,
+          modelName: modelKey != null
+              ? _getModelNames(context)[modelKey]
+              : null,
           showExtendedWindInfo: widget.showExtendedWindInfo,
         );
       },
@@ -539,7 +563,11 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   }
 
   Widget _buildPeriodRow(_PeriodRowData data, {int index = 0}) {
-    final isNight = data.periodName == 'Nuit' || data.periodName == 'Soir';
+    final isNight =
+        data.periodName.toLowerCase() == 'night' ||
+        data.periodName.toLowerCase() == 'evening' ||
+        data.periodName == 'Nuit' ||
+        data.periodName == 'Soir';
     final color = isNight
         ? const Color(0xFFE2E6EA)
         : (index.isEven ? Colors.white : const Color(0xFFFAFAFA));
@@ -566,7 +594,9 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           context,
           p,
           details.globalPosition,
-          modelName: modelKey != null ? _modelNames[modelKey] : null,
+          modelName: modelKey != null
+              ? _getModelNames(context)[modelKey]
+              : null,
           showExtendedWindInfo: widget.showExtendedWindInfo,
         );
       },
@@ -652,7 +682,9 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           context,
           h,
           details.globalPosition,
-          modelName: modelKey != null ? _modelNames[modelKey] : null,
+          modelName: modelKey != null
+              ? _getModelNames(context)[modelKey]
+              : null,
           showExtendedWindInfo: widget.showExtendedWindInfo,
         );
       },
@@ -721,7 +753,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
         ),
       ),
       child: Text(
-        text,
+        _translate(context, text),
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -769,7 +801,31 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     );
   }
 
-  Widget _noData() => const Center(child: Text('Aucune donnée disponible'));
+  Widget _noData() => Center(child: Text(AppLocalizations.of(context)!.noData));
+
+  String _translate(BuildContext context, String text) {
+    final l10n = AppLocalizations.of(context)!;
+    final lower = text.toLowerCase();
+    if (lower == 'nuit' ||
+        lower == 'night' ||
+        lower == 'nacht' ||
+        lower == 'noche')
+      return l10n.night;
+    if (lower == 'matin' ||
+        lower == 'morning' ||
+        lower == 'morgen' ||
+        lower == 'mañana' ||
+        lower == 'manana')
+      return l10n.morning;
+    if (lower == 'a-m' ||
+        lower == 'afternoon' ||
+        lower == 'nachmittag' ||
+        lower == 'tarde')
+      return l10n.afternoon;
+    if (lower == 'soir' || lower == 'evening' || lower == 'abend')
+      return l10n.evening;
+    return text;
+  }
 }
 
 class _TableRowInfo {

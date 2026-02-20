@@ -12,6 +12,8 @@ import 'package:aeroclim/features/weather/presentation/widgets/vent_table_widget
 import 'package:aeroclim/features/weather/presentation/widgets/comparison_table_widget.dart';
 
 import 'package:aeroclim/core/widgets/help_dialog.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 class WeatherDisplayWidget extends StatefulWidget {
   final WeatherLocationInfo weatherInfo;
@@ -180,7 +182,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
                             if (AppConfig.includeClimate &&
                                 widget.climateInfo != null)
                               Text(
-                                "Climat: ${widget.climateInfo!.displayName} (${widget.climateInfo!.startYear}-${widget.climateInfo!.endYear}) • $distanceInKm km",
+                                "${AppLocalizations.of(context)!.climate}: ${widget.climateInfo!.displayName} (${widget.climateInfo!.startYear}-${widget.climateInfo!.endYear}) • $distanceInKm km",
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
                                       color: Colors.white.withValues(
@@ -260,7 +262,10 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                displayedDay.formattedDate,
+                                DateFormat(
+                                  'EEEE d MMMM',
+                                  Localizations.localeOf(context).toString(),
+                                ).format(displayedDay.date),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -268,7 +273,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
                                 ),
                               ),
                               Text(
-                                "Min: ${displayedDay.temperatureMin.toStringAsFixed(1)}°",
+                                "${AppLocalizations.of(context)!.tempMin}: ${displayedDay.temperatureMin.toStringAsFixed(1)}°",
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.8),
                                   fontSize: 15,
@@ -325,14 +330,20 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
               maxPrecipitationProbability: widget.maxPrecipitationProbability,
               minApparentTemperature: widget.minApparentTemperature,
             )
-          : const Center(child: Text('Tableau Vent non disponible'));
+          : Center(
+              child: Text(AppLocalizations.of(context)!.windTableNotAvailable),
+            );
     } else {
       return widget.displayMode == 'daily' && widget.forecast != null
           ? WeatherTable(
               forecast: widget.forecast!,
               climateNormals: widget.climateNormals,
             )
-          : const Center(child: Text('Tableau horaire non implémenté'));
+          : Center(
+              child: Text(
+                AppLocalizations.of(context)!.hourlyTableNotImplemented,
+              ),
+            );
     }
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/flchart_positioned/flchart_positioned.dart';
 import '../utils/chart_constants.dart';
@@ -15,6 +17,7 @@ class ComparisonChartBuilder {
     required double maxTemp,
     required List<String> labels,
     DailyWeather? forecast,
+    required BuildContext context,
   }) {
     final bool isDaily = displayMode == 'daily';
 
@@ -35,7 +38,7 @@ class ComparisonChartBuilder {
       startTime = firstModel.hourlyForecasts.first.time;
       endTime = firstModel.hourlyForecasts.last.time;
     } else {
-      return const Center(child: Text('Pas de données pour la comparaison'));
+      return Center(child: Text(AppLocalizations.of(context)!.noData));
     }
 
     final minX = startTime.millisecondsSinceEpoch.toDouble();
@@ -191,7 +194,7 @@ class ComparisonChartBuilder {
         leftTitles: AxisTitles(
           axisNameSize: ChartConstants.leftAxisNameSize,
           axisNameWidget: Text(
-            isDaily ? 'Température (°C)' : '°C',
+            isDaily ? AppLocalizations.of(context)!.tempCelsius : '°C',
             style: ChartTheme.axisTitleStyle,
           ),
           sideTitles: SideTitles(
@@ -243,6 +246,7 @@ class ComparisonChartBuilder {
           labels,
           displayMode,
           positioner,
+          context,
         ),
         // Temperature labels for best_match
         (context, positioner) => _buildTempLabels(
@@ -407,6 +411,7 @@ class ComparisonChartBuilder {
     List<String> labels,
     String displayMode,
     ChartPositioner positioner,
+    BuildContext context,
   ) {
     if (labels.isEmpty) return const SizedBox.shrink();
 
@@ -425,8 +430,10 @@ class ComparisonChartBuilder {
       if (!isDaily) {
         if (time.hour == 0) {
           style = ChartTheme.hour00LabelStyle;
-          final dayStr =
-              '${time.day} ${['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'][time.month - 1]}';
+          final monthFormat = DateFormat.MMM(
+            Localizations.localeOf(context).languageCode,
+          );
+          final dayStr = '${time.day} ${monthFormat.format(time)}';
           label += "\n$dayStr";
         } else {
           style = ChartTheme.hourLabelStyle;

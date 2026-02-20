@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
 import 'package:aeroclim/core/config/app_config.dart';
@@ -53,7 +54,6 @@ class _WeatherChart2State extends State<WeatherChart2> {
   @override
   void initState() {
     super.initState();
-    _calculateChartData();
     _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.displayMode != 'periodes') {
@@ -61,6 +61,12 @@ class _WeatherChart2State extends State<WeatherChart2> {
       }
       _handleScroll(); // Initial position check
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _calculateChartData();
   }
 
   @override
@@ -234,9 +240,15 @@ class _WeatherChart2State extends State<WeatherChart2> {
       } else {
         _deviations = [];
       }
-      _labels = ChartHelpers.generateDateLabels(widget.forecast);
+      _labels = ChartHelpers.generateDateLabels(
+        widget.forecast,
+        Localizations.localeOf(context).toString(),
+      );
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
-      _labels = ChartHelpers.generateHourLabels(widget.hourlyWeather!);
+      _labels = ChartHelpers.generateHourLabels(
+        widget.hourlyWeather!,
+        Localizations.localeOf(context).toString(),
+      );
     }
   }
 
@@ -425,6 +437,8 @@ class _WeatherChart2State extends State<WeatherChart2> {
         labels: _labels,
         minY: -20.0,
         maxY: 210,
+        context: context,
+        locale: Localizations.localeOf(context).languageCode,
       );
     }
 
@@ -438,6 +452,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         maxTemp: _maxTemp,
         labels: _labels,
         forecast: widget.forecast,
+        context: context,
       );
     } else if (widget.displayMode == 'periodes' &&
         widget.hourlyWeather != null) {
@@ -450,6 +465,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         constraints: constraints,
         containerSize: containerSize,
         showWindInfo: widget.showWindInfo,
+        context: context,
       );
     }
 
@@ -462,6 +478,7 @@ class _WeatherChart2State extends State<WeatherChart2> {
         dateLabels: _labels,
         containerSize: containerSize,
         showWindInfo: widget.showWindInfo,
+        context: context,
       );
     } else if (widget.displayMode == 'hourly' && widget.hourlyWeather != null) {
       return HourlyChartBuilder.build(
@@ -473,13 +490,15 @@ class _WeatherChart2State extends State<WeatherChart2> {
         constraints: constraints,
         containerSize: containerSize,
         showWindInfo: widget.showWindInfo,
+        context: context,
+        locale: Localizations.localeOf(context).toString(),
       );
     }
 
-    return const Center(
+    return Center(
       child: Text(
-        'Aucune donnée disponible',
-        style: TextStyle(fontSize: 16, color: Colors.grey),
+        AppLocalizations.of(context)!.noData,
+        style: const TextStyle(fontSize: 16, color: Colors.grey),
       ),
     );
   }

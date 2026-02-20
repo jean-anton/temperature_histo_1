@@ -1,111 +1,104 @@
 Analyzing temperature_histo_1...                                
 
    info • Don't invoke 'print' in production code • lib/core/services/geolocation_service.dart:65:5 • avoid_print
+   info • The variable name 'getTappedIndex_old' isn't a lowerCamelCase identifier • lib/core/widgets/chart_helpers.dart:281:15 • non_constant_identifier_names
    info • Don't invoke 'print' in production code • lib/features/climate/data/climate_repository.dart:38:9 • avoid_print
    info • Unnecessary braces in a string interpolation • lib/features/climate/domain/climate_model.dart:47:13 • unnecessary_brace_in_string_interps
    info • Unnecessary braces in a string interpolation • lib/features/climate/domain/climate_model.dart:52:13 • unnecessary_brace_in_string_interps
    info • Unnecessary braces in a string interpolation • lib/features/climate/domain/climate_model.dart:57:13 • unnecessary_brace_in_string_interps
-   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:105:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:160:7 • avoid_print
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/locations/presentation/widgets/city_management_dialog.dart:463:60 • deprecated_member_use
-warning • Unused import: 'dart:developer' • lib/features/weather/data/weather_repository.dart:5:8 • unused_import
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:38:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:94:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:95:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:96:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:97:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:109:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:139:9 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:167:5 • avoid_print
-warning • The declaration '_mapIconToCode1' isn't referenced • lib/features/weather/domain/meteo_france_mapper.dart:107:14 • unused_element
-   info • Statements in an if should be enclosed in a block • lib/features/weather/domain/meteo_france_mapper.dart:111:7 • curly_braces_in_flow_control_structures
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:412:3 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:422:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:423:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:427:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:428:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:429:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:430:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:431:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:434:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:462:3 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:476:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:477:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:481:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:483:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:484:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:485:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:486:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:489:5 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/presentation/providers/weather_provider.dart:154:7 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/presentation/providers/weather_provider.dart:156:9 • avoid_print
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/screens/home_screen.dart:166:24 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/screens/home_screen.dart:196:24 • prefer_interpolation_to_compose_strings
-   info • An uninitialized variable should have an explicit type annotation • lib/features/weather/presentation/screens/home_screen.dart:301:20 • prefer_typing_uninitialized_variables
-   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:423:9 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:425:11 • avoid_print
-   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:433:9 • avoid_print
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/builders/comparison_chart_builder.dart:95:28 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/builders/comparison_chart_builder.dart:390:60 • deprecated_member_use
-warning • The declaration '_buildApparentTempLabels' isn't referenced • lib/features/weather/presentation/widgets/builders/hourly_chart_builder.dart:322:17 • unused_element
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/builders/hourly_chart_builder.dart:447:17 • prefer_interpolation_to_compose_strings
-warning • The declaration '_buildLegend' isn't referenced • lib/features/weather/presentation/widgets/builders/wind_chart_builder.dart:638:17 • unused_element
-   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel_widget.dart:202:11 • deprecated_member_use
-   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel_widget.dart:234:11 • deprecated_member_use
-   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel_widget.dart:272:13 • deprecated_member_use
-   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel_widget.dart:288:13 • deprecated_member_use
-warning • The declaration '_getMeteoFranceIconPath1' isn't referenced • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:51:18 • unused_element
-   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:54:7 • curly_braces_in_flow_control_structures
-   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:56:7 • curly_braces_in_flow_control_structures
-   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:61:7 • curly_braces_in_flow_control_structures
-warning • The declaration '_getMeteoFranceIconPath' isn't referenced • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:67:17 • unused_element
-warning • The value of the local variable 'isNight' isn't used • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:72:11 • unused_local_variable
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:90:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:102:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:105:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:108:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:111:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:114:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:117:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:125:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:127:16 • prefer_interpolation_to_compose_strings
+   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:119:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/locations/presentation/widgets/city_management_dialog.dart:175:7 • avoid_print
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre • lib/features/locations/presentation/widgets/city_management_dialog.dart:500:25 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre • lib/features/locations/presentation/widgets/city_management_dialog.dart:501:25 • deprecated_member_use
+warning • Unused import: 'dart:developer' • lib/features/weather/data/weather_repository.dart:3:8 • unused_import
+warning • Unused import: 'package:aeroclim/core/config/app_config.dart' • lib/features/weather/data/weather_repository.dart:5:8 • unused_import
+warning • Unused import: 'package:flutter/material.dart' • lib/features/weather/data/weather_repository.dart:7:8 • unused_import
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:36:5 • avoid_print
+   info • Unnecessary braces in a string interpolation • lib/features/weather/data/weather_repository.dart:36:54 • unnecessary_brace_in_string_interps
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:40:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:68:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:69:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:70:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:71:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:83:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/data/weather_repository.dart:113:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:528:3 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:538:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:539:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:543:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:544:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:545:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:546:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:547:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:550:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:578:3 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:592:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:593:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:597:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:599:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:600:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:601:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:602:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/domain/weather_model.dart:605:5 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/providers/weather_provider.dart:168:7 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/providers/weather_provider.dart:170:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:195:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:199:11 • avoid_print
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/screens/home_screen.dart:222:24 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/screens/home_screen.dart:274:24 • prefer_interpolation_to_compose_strings
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:548:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:550:11 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:558:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:1090:9 • avoid_print
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/screens/home_screen.dart:1096:9 • avoid_print
+warning • The declaration '_buildApparentTempLabels' isn't referenced • lib/features/weather/presentation/widgets/builders/hourly_chart_builder.dart:366:17 • unused_element
+   info • The 'if' statement could be replaced by a null-aware assignment • lib/features/weather/presentation/widgets/builders/period_chart_builder.dart:417:9 • prefer_conditional_assignment
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/comparison_table_widget.dart:197:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/comparison_table_widget.dart:211:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/comparison_table_widget.dart:243:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/comparison_table_widget.dart:254:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/comparison_table_widget.dart:282:11 • curly_braces_in_flow_control_structures
+   info • Unnecessary instance of 'Container' • lib/features/weather/presentation/widgets/comparison_table_widget.dart:527:11 • avoid_unnecessary_containers
+   info • Unnecessary instance of 'Container' • lib/features/weather/presentation/widgets/comparison_table_widget.dart:622:11 • avoid_unnecessary_containers
+   info • Unnecessary instance of 'Container' • lib/features/weather/presentation/widgets/comparison_table_widget.dart:710:11 • avoid_unnecessary_containers
+   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel/location_selector.dart:39:11 • deprecated_member_use
+   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel/location_selector.dart:93:13 • deprecated_member_use
+   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/weather/presentation/widgets/control_panel/wind_settings.dart:119:11 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/features/weather/presentation/widgets/control_panel_widget.dart:86:5 • avoid_print
+   info • The local variable '_avgWind' starts with an underscore • lib/features/weather/presentation/widgets/utils/chart_data_provider.dart:212:13 • no_leading_underscores_for_local_identifiers
+warning • The declaration '_getMeteoFranceIconPath1' isn't referenced • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:55:18 • unused_element
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:58:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:60:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:65:7 • curly_braces_in_flow_control_structures
+warning • The declaration '_getMeteoFranceIconPath' isn't referenced • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:71:17 • unused_element
+warning • The value of the local variable 'isNight' isn't used • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:76:11 • unused_local_variable
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:94:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:106:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:109:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:112:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:115:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:118:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:121:16 • prefer_interpolation_to_compose_strings
    info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:129:16 • prefer_interpolation_to_compose_strings
    info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:131:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:140:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:143:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:146:16 • prefer_interpolation_to_compose_strings
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:149:16 • prefer_interpolation_to_compose_strings
-   info • The variable name 'getTappedIndex_old' isn't a lowerCamelCase identifier • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:481:15 • non_constant_identifier_names
-   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:155:7 • curly_braces_in_flow_control_structures
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:172:44 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:173:44 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:180:37 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:243:53 • deprecated_member_use
-   info • Unnecessary use of 'toList' in a spread • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:252:20 • unnecessary_to_list_in_spreads
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:422:44 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:423:44 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:430:37 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:435:39 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:515:45 • deprecated_member_use
-warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:528:57 • invalid_null_aware_operator
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:528:137 • dead_null_aware_expression
-warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:535:57 • invalid_null_aware_operator
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:535:137 • dead_null_aware_expression
-   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:642:45 • prefer_interpolation_to_compose_strings
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:746:45 • deprecated_member_use
-   info • 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/features/weather/presentation/widgets/vent_table_widget.dart:126:24 • deprecated_member_use
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/vent_table_widget.dart:316:31 • dead_null_aware_expression
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/vent_table_widget.dart:317:35 • dead_null_aware_expression
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/vent_table_widget.dart:319:53 • dead_null_aware_expression
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/vent_table_widget.dart:335:31 • dead_null_aware_expression
-warning • The left operand can't be null, so the right operand is never executed • lib/features/weather/presentation/widgets/vent_table_widget.dart:336:35 • dead_null_aware_expression
-   info • 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/features/weather/presentation/widgets/weather_table_widget.dart:27:26 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/flchart_positioned/example_main.dart:133:35 • deprecated_member_use
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:133:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:135:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:144:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:147:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:150:16 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:153:16 • prefer_interpolation_to_compose_strings
+   info • The variable name 'getTappedIndex_old' isn't a lowerCamelCase identifier • lib/features/weather/presentation/widgets/utils/chart_helpers.dart:490:15 • non_constant_identifier_names
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:201:7 • curly_braces_in_flow_control_structures
+   info • Unnecessary use of 'toList' in a spread • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:301:24 • unnecessary_to_list_in_spreads
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:745:49 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:752:49 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:1447:49 • prefer_interpolation_to_compose_strings
+   info • Use interpolation to compose strings and values • lib/features/weather/presentation/widgets/utils/weather_tooltip.dart:1454:49 • prefer_interpolation_to_compose_strings
+   info • Statements in an if should be enclosed in a block • lib/features/weather/presentation/widgets/weather_chart_widget.dart:138:7 • curly_braces_in_flow_control_structures
    info • Library names are not necessary • lib/flchart_positioned/flchart_positioned.dart:5:9 • unnecessary_library_name
-   info • The constant name 'VERSION' isn't a lowerCamelCase identifier • lib/main.dart:13:7 • constant_identifier_names
-   info • Don't invoke 'print' in production code • lib/main.dart:35:3 • avoid_print
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/main.dart:101:52 • deprecated_member_use
-   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/main.dart:103:51 • deprecated_member_use
+   info • The import of 'package:flutter/gestures.dart' is unnecessary because all of the used elements are also provided by the import of 'dart:ui' • lib/main.dart:4:8 • unnecessary_import
+   info • The constant name 'VERSION' isn't a lowerCamelCase identifier • lib/main.dart:21:7 • constant_identifier_names
+   info • Don't invoke 'print' in production code • lib/main.dart:74:3 • avoid_print
 warning • Unused import: 'package:flutter/material.dart' • test/widget_test.dart:8:8 • unused_import
 
-107 issues found. (ran in 3.6s)
+100 issues found. (ran in 1.7s)

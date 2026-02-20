@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,6 +23,7 @@ class PeriodChartBuilder {
     bool showWindInfo = true,
     required Size containerSize,
     required DailyWeather forecast,
+    required BuildContext context,
   }) {
     final List<PeriodForecast> periodForecasts =
         ChartDataProvider.getPeriodForecasts(hourlyWeather);
@@ -31,7 +33,7 @@ class PeriodChartBuilder {
     );
 
     if (periodForecasts.isEmpty) {
-      return const Center(child: Text('Aucune donnée de période'));
+      return Center(child: Text(AppLocalizations.of(context)!.noData));
     }
 
     final startTime = periodForecasts.first.time;
@@ -85,7 +87,10 @@ class PeriodChartBuilder {
         ),
         leftTitles: AxisTitles(
           axisNameSize: ChartConstants.leftAxisNameSize,
-          axisNameWidget: const Text('°C', style: ChartTheme.axisTitleStyle),
+          axisNameWidget: Text(
+            AppLocalizations.of(context)!.tempCelsius,
+            style: ChartTheme.axisTitleStyle,
+          ),
           sideTitles: SideTitles(
             showTitles: true,
             interval: 5,
@@ -163,10 +168,10 @@ class PeriodChartBuilder {
         (context, positioner) => _buildPeriodIcons(periodForecasts, positioner),
         // Day labels at top (12h)
         (context, positioner) =>
-            _buildTopDayLabels(periodForecasts, positioner),
+            _buildTopDayLabels(periodForecasts, positioner, context),
         // Period labels at bottom
         (context, positioner) =>
-            _buildPeriodLabels(periodForecasts, positioner),
+            _buildPeriodLabels(periodForecasts, positioner, context),
       ],
     );
   }
@@ -287,6 +292,7 @@ class PeriodChartBuilder {
   static Widget _buildPeriodLabels(
     List<PeriodForecast> periodForecasts,
     ChartPositioner positioner,
+    BuildContext context,
   ) {
     final widgets = periodForecasts.map((period) {
       final pos = positioner.calculateFromTime(
@@ -295,9 +301,25 @@ class PeriodChartBuilder {
       );
       final isNewDay = period.time.hour == 0;
 
-      String label = period.name;
+      final locale = Localizations.localeOf(context).languageCode;
+      final localizations = AppLocalizations.of(context)!;
+      String label = "";
+      switch (period.name) {
+        case 'night':
+          label = localizations.night;
+          break;
+        case 'morning':
+          label = localizations.morning;
+          break;
+        case 'afternoon':
+          label = localizations.afternoon;
+          break;
+        case 'evening':
+          label = localizations.evening;
+          break;
+      }
       if (isNewDay) {
-        label = '${DateFormat('E d', 'fr_FR').format(period.time)}\n$label';
+        label = '${DateFormat('E d', locale).format(period.time)}\n$label';
       }
 
       return Positioned(
@@ -408,6 +430,7 @@ class PeriodChartBuilder {
   static Widget _buildTopDayLabels(
     List<PeriodForecast> periodForecasts,
     ChartPositioner positioner,
+    BuildContext context,
   ) {
     final widgets = periodForecasts
         .where((period) => period.time.hour == 12)
@@ -427,7 +450,10 @@ class PeriodChartBuilder {
             child: SizedBox(
               width: 80,
               child: Text(
-                DateFormat('EEEE d', 'fr_FR').format(period.time),
+                DateFormat(
+                  'EEEE d',
+                  Localizations.localeOf(context).languageCode,
+                ).format(period.time),
                 textAlign: TextAlign.center,
                 style: ChartTheme.hour00LabelStyle.copyWith(
                   color: isWeekend

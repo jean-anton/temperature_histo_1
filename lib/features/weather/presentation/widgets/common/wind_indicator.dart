@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import '../utils/chart_theme.dart';
 import 'gust_arrow_widget.dart';
 
@@ -33,7 +34,7 @@ class WindIndicator extends StatelessWidget {
         children: [
           // Wind speed label
           Text(
-            '${windSpeed.round()} km/h',
+            '${windSpeed.round()} ${AppLocalizations.of(context)!.kmh}',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 12,

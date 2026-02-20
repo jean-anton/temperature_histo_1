@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +18,7 @@ import 'core/services/geolocation_service.dart';
 import 'features/weather/presentation/widgets/utils/weather_tooltip.dart';
 import 'core/config/app_config.dart';
 
-const VERSION = "2.1.8";
+const VERSION = "3.0.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/aeroclim";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
@@ -65,9 +67,13 @@ void main() async {
   // } catch (e) {
   //   debugPrint("Aptabase init failed: $e");
   // }
-  // Initialize date formatting for the French locale so it's available
-  // throughout the app.
-  await initializeDateFormatting('fr_FR', null);
+  // Initialize date formatting for supported locales
+  await Future.wait([
+    initializeDateFormatting('en', null),
+    initializeDateFormatting('fr', null),
+    initializeDateFormatting('de', null),
+    initializeDateFormatting('es', null),
+  ]);
   const isRunningWithWasm = bool.fromEnvironment('dart.tool.dart2wasm');
   print('###### CJG Running with Wasm: $isRunningWithWasm');
 
@@ -111,6 +117,18 @@ class ClimaDeviationApp extends StatelessWidget {
     return MaterialApp(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('fr'),
+        Locale('de'),
+        Locale('es'),
+      ],
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

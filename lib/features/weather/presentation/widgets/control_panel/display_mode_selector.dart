@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
 
 class DisplayModeSelector extends StatelessWidget {
   final String displayMode;
@@ -15,23 +16,41 @@ class DisplayModeSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Mode temporel:', style: TextStyle(fontSize: 13)),
+        Text(
+          AppLocalizations.of(context)!.timeMode,
+          style: const TextStyle(fontSize: 13),
+        ),
         const SizedBox(height: 8),
         SegmentedButton<String>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: 'daily',
-              label: FittedBox(child: Text('Journalier', softWrap: false)),
+              label: FittedBox(
+                child: Text(
+                  AppLocalizations.of(context)!.dailyLabel,
+                  softWrap: false,
+                ),
+              ),
               icon: Icon(Icons.calendar_today, size: 16),
             ),
             ButtonSegment(
               value: 'periodes',
-              label: FittedBox(child: Text('Aperçu', softWrap: false)),
+              label: FittedBox(
+                child: Text(
+                  AppLocalizations.of(context)!.previewLabel,
+                  softWrap: false,
+                ),
+              ),
               icon: Icon(Icons.view_quilt, size: 16),
             ),
             ButtonSegment(
               value: 'hourly',
-              label: FittedBox(child: Text('Horaire', softWrap: false)),
+              label: FittedBox(
+                child: Text(
+                  AppLocalizations.of(context)!.hourly,
+                  softWrap: false,
+                ),
+              ),
               icon: Icon(Icons.access_time, size: 16),
             ),
           ],
