@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_helpers.dart';
+import '../../domain/weather_model.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_theme.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/weather_icon_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/gust_arrow_widget.dart';
@@ -409,10 +410,10 @@ class VentTableWidget extends StatelessWidget {
   ) {
     final Map<String, List<HourlyForecast>> grouped = {};
     for (final forecast in forecasts) {
-      final dateKey = DateFormat(
-        'EEEE d MMMM',
+      final dateKey = ChartHelpers.formatLocalizedDate(
+        forecast.time,
         Localizations.localeOf(context).toString(),
-      ).format(forecast.time);
+      );
       grouped.putIfAbsent(dateKey, () => []).add(forecast);
     }
     return grouped;

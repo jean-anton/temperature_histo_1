@@ -803,6 +803,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'If links do not work, copy the URL below:'**
   String get copyUrlIfLinksDoNotWork;
+
+  /// No description provided for @weatherDesc0.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky'**
+  String get weatherDesc0;
+
+  /// No description provided for @weatherDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Mainly clear'**
+  String get weatherDesc1;
+
+  /// No description provided for @weatherDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get weatherDesc2;
+
+  /// No description provided for @weatherDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weatherDesc3;
+
+  /// No description provided for @weatherDesc45.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get weatherDesc45;
+
+  /// No description provided for @weatherDesc48.
+  ///
+  /// In en, this message translates to:
+  /// **'Depositing rime fog'**
+  String get weatherDesc48;
+
+  /// No description provided for @weatherDesc51.
+  ///
+  /// In en, this message translates to:
+  /// **'Light drizzle'**
+  String get weatherDesc51;
+
+  /// No description provided for @weatherDesc53.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate drizzle'**
+  String get weatherDesc53;
+
+  /// No description provided for @weatherDesc55.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense drizzle'**
+  String get weatherDesc55;
+
+  /// No description provided for @weatherDesc56.
+  ///
+  /// In en, this message translates to:
+  /// **'Light freezing drizzle'**
+  String get weatherDesc56;
+
+  /// No description provided for @weatherDesc57.
+  ///
+  /// In en, this message translates to:
+  /// **'Dense freezing drizzle'**
+  String get weatherDesc57;
+
+  /// No description provided for @weatherDesc61.
+  ///
+  /// In en, this message translates to:
+  /// **'Slight rain'**
+  String get weatherDesc61;
+
+  /// No description provided for @weatherDesc63.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate rain'**
+  String get weatherDesc63;
+
+  /// No description provided for @weatherDesc65.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain'**
+  String get weatherDesc65;
+
+  /// No description provided for @weatherDesc66.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing rain'**
+  String get weatherDesc66;
+
+  /// No description provided for @weatherDesc67.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy freezing rain'**
+  String get weatherDesc67;
+
+  /// No description provided for @weatherDesc71.
+  ///
+  /// In en, this message translates to:
+  /// **'Slight snow fall'**
+  String get weatherDesc71;
+
+  /// No description provided for @weatherDesc73.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate snow fall'**
+  String get weatherDesc73;
+
+  /// No description provided for @weatherDesc75.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy snow fall'**
+  String get weatherDesc75;
+
+  /// No description provided for @weatherDesc77.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow grains'**
+  String get weatherDesc77;
+
+  /// No description provided for @weatherDesc80.
+  ///
+  /// In en, this message translates to:
+  /// **'Slight rain showers'**
+  String get weatherDesc80;
+
+  /// No description provided for @weatherDesc81.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate rain showers'**
+  String get weatherDesc81;
+
+  /// No description provided for @weatherDesc82.
+  ///
+  /// In en, this message translates to:
+  /// **'Violent rain showers'**
+  String get weatherDesc82;
+
+  /// No description provided for @weatherDesc85.
+  ///
+  /// In en, this message translates to:
+  /// **'Slight snow showers'**
+  String get weatherDesc85;
+
+  /// No description provided for @weatherDesc86.
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy snow showers'**
+  String get weatherDesc86;
+
+  /// No description provided for @weatherDesc95.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get weatherDesc95;
+
+  /// No description provided for @weatherDesc96.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with slight hail'**
+  String get weatherDesc96;
+
+  /// No description provided for @weatherDesc99.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with severe hail'**
+  String get weatherDesc99;
 }
 
 class _AppLocalizationsDelegate

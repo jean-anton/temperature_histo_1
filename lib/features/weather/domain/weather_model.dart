@@ -210,8 +210,15 @@ class DailyForecast {
   // Convenience getters for use in UI
   // Convenience getters/methods for use in UI
   int get dayOfYear => int.parse(DateFormat('D').format(date));
-  String getFormattedDate(String locale) =>
-      DateFormat('EEEE d MMMM', locale).format(date);
+  String getFormattedDate(String locale) {
+    String formatted = DateFormat.yMMMMEEEEd(locale).format(date);
+    if (locale.startsWith('fr') && date.day == 1) {
+      formatted = formatted.replaceFirst(' 1 ', ' 1er ');
+    }
+    return formatted.isNotEmpty
+        ? formatted[0].toUpperCase() + formatted.substring(1)
+        : formatted;
+  }
 
   @override
   String toString() {

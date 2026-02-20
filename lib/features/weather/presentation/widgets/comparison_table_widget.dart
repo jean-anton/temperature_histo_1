@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:aeroclim/features/weather/domain/weather_model.dart';
-import 'package:aeroclim/features/weather/presentation/widgets/common/weather_icon_widget.dart';
+import 'package:aeroclim/l10n/app_localizations.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_helpers.dart';
+import '../../domain/weather_model.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/common/gust_arrow_widget.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_data_provider.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/utils/weather_tooltip.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/common/weather_icon_widget.dart';
 
 class ComparisonTableWidget extends StatefulWidget {
   final MultiModelWeather? multiModelForecast;
@@ -77,11 +78,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           topInfo = item.info;
         } else {
           // If top is exactly a separator, we might want its info too
+          final locale = Localizations.localeOf(context).toString();
+          final formattedDate = ChartHelpers.formatLocalizedDate(item, locale);
           topInfo = _TableRowInfo(
-            title: DateFormat(
-              'EEEE d MMMM',
-              AppLocalizations.of(context)!.localeName,
-            ).format(item),
+            title: formattedDate[0].toUpperCase() + formattedDate.substring(1),
             date: item,
           );
         }
@@ -170,10 +170,8 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     final now = DateTime.now();
     _flatItems = [];
     for (final daily in refModel.dailyForecasts) {
-      final dateText = DateFormat(
-        'EEEE d MMMM',
-        AppLocalizations.of(context)!.localeName,
-      ).format(daily.date);
+      final String locale = AppLocalizations.of(context)!.localeName;
+      final dateText = ChartHelpers.formatLocalizedDate(daily.date, locale);
       final isCurrent =
           daily.date.year == now.year &&
           daily.date.month == now.month &&
@@ -220,10 +218,8 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     _flatItems = [];
     for (int i = 0; i < refPeriods.length; i++) {
       final period = refPeriods[i];
-      final dateText = DateFormat(
-        'EEEE d MMMM',
-        AppLocalizations.of(context)!.localeName,
-      ).format(period.time);
+      final String locale = AppLocalizations.of(context)!.localeName;
+      final dateText = ChartHelpers.formatLocalizedDate(period.time, locale);
       if (i == 0 || period.time.day != refPeriods[i - 1].time.day) {
         _flatItems.add(period.time);
       }
@@ -257,10 +253,8 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
     _flatItems = [];
     for (int i = 0; i < refHourly.hourlyForecasts.length; i++) {
       final hourly = refHourly.hourlyForecasts[i];
-      final dateText = DateFormat(
-        'EEEE d MMMM',
-        AppLocalizations.of(context)!.localeName,
-      ).format(hourly.time);
+      final String locale = AppLocalizations.of(context)!.localeName;
+      final dateText = ChartHelpers.formatLocalizedDate(hourly.time, locale);
       if (i == 0 ||
           hourly.time.day != refHourly.hourlyForecasts[i - 1].time.day) {
         _flatItems.add(hourly.time);
@@ -316,11 +310,14 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                 itemBuilder: (context, index) {
                   final item = _flatItems[index];
                   if (item is DateTime) {
+                    final locale = AppLocalizations.of(context)!.localeName;
+                    final formattedDate = ChartHelpers.formatLocalizedDate(
+                      item,
+                      locale,
+                    );
                     return _buildDateHeader(
-                      DateFormat(
-                        'EEEE d MMMM',
-                        AppLocalizations.of(context)!.localeName,
-                      ).format(item),
+                      formattedDate[0].toUpperCase() +
+                          formattedDate.substring(1),
                       item,
                       isSticky: false,
                     );

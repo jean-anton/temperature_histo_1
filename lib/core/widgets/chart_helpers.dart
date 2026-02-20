@@ -1,28 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
+import 'package:aeroclim/l10n/app_localizations.dart';
 import 'package:aeroclim/features/weather/data/weather_icon_data.dart';
 
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
-import 'package:aeroclim/features/weather/domain/weather_icon.dart';
 import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_constants.dart';
 
 /// Helper class containing chart-related utility methods
 class ChartHelpers {
-  /// Get weather description in French
-  static String? getDescriptionFr(String code) {
-    final match = weatherIcons.firstWhere(
-      (icon) => icon.code == code,
-      orElse: () => WeatherIcon(
-        code: '',
-        iconPath: '',
-        descriptionEn: '',
-        descriptionFr: '',
-      ),
-    );
+  /// Get localized weather description
+  static String? getDescription(BuildContext context, String code) {
+    if (code.isEmpty) return null;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return null;
 
-    return match.code.isEmpty ? null : match.descriptionFr;
+    switch (code) {
+      case '0':
+        return l10n.weatherDesc0;
+      case '1':
+        return l10n.weatherDesc1;
+      case '2':
+        return l10n.weatherDesc2;
+      case '3':
+        return l10n.weatherDesc3;
+      case '45':
+        return l10n.weatherDesc45;
+      case '48':
+        return l10n.weatherDesc48;
+      case '51':
+        return l10n.weatherDesc51;
+      case '53':
+        return l10n.weatherDesc53;
+      case '55':
+        return l10n.weatherDesc55;
+      case '56':
+        return l10n.weatherDesc56;
+      case '57':
+        return l10n.weatherDesc57;
+      case '61':
+        return l10n.weatherDesc61;
+      case '63':
+        return l10n.weatherDesc63;
+      case '65':
+        return l10n.weatherDesc65;
+      case '66':
+        return l10n.weatherDesc66;
+      case '67':
+        return l10n.weatherDesc67;
+      case '71':
+        return l10n.weatherDesc71;
+      case '73':
+        return l10n.weatherDesc73;
+      case '75':
+        return l10n.weatherDesc75;
+      case '77':
+        return l10n.weatherDesc77;
+      case '80':
+        return l10n.weatherDesc80;
+      case '81':
+        return l10n.weatherDesc81;
+      case '82':
+        return l10n.weatherDesc82;
+      case '85':
+        return l10n.weatherDesc85;
+      case '86':
+        return l10n.weatherDesc86;
+      case '95':
+        return l10n.weatherDesc95;
+      case '96':
+        return l10n.weatherDesc96;
+      case '99':
+        return l10n.weatherDesc99;
+      default:
+        return null;
+    }
   }
 
   /// Get weather icon path for a given weather code

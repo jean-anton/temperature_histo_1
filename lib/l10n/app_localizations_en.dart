@@ -372,4 +372,88 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get copyUrlIfLinksDoNotWork =>
       'If links do not work, copy the URL below:';
+
+  @override
+  String get weatherDesc0 => 'Clear sky';
+
+  @override
+  String get weatherDesc1 => 'Mainly clear';
+
+  @override
+  String get weatherDesc2 => 'Partly cloudy';
+
+  @override
+  String get weatherDesc3 => 'Overcast';
+
+  @override
+  String get weatherDesc45 => 'Fog';
+
+  @override
+  String get weatherDesc48 => 'Depositing rime fog';
+
+  @override
+  String get weatherDesc51 => 'Light drizzle';
+
+  @override
+  String get weatherDesc53 => 'Moderate drizzle';
+
+  @override
+  String get weatherDesc55 => 'Dense drizzle';
+
+  @override
+  String get weatherDesc56 => 'Light freezing drizzle';
+
+  @override
+  String get weatherDesc57 => 'Dense freezing drizzle';
+
+  @override
+  String get weatherDesc61 => 'Slight rain';
+
+  @override
+  String get weatherDesc63 => 'Moderate rain';
+
+  @override
+  String get weatherDesc65 => 'Heavy rain';
+
+  @override
+  String get weatherDesc66 => 'Freezing rain';
+
+  @override
+  String get weatherDesc67 => 'Heavy freezing rain';
+
+  @override
+  String get weatherDesc71 => 'Slight snow fall';
+
+  @override
+  String get weatherDesc73 => 'Moderate snow fall';
+
+  @override
+  String get weatherDesc75 => 'Heavy snow fall';
+
+  @override
+  String get weatherDesc77 => 'Snow grains';
+
+  @override
+  String get weatherDesc80 => 'Slight rain showers';
+
+  @override
+  String get weatherDesc81 => 'Moderate rain showers';
+
+  @override
+  String get weatherDesc82 => 'Violent rain showers';
+
+  @override
+  String get weatherDesc85 => 'Slight snow showers';
+
+  @override
+  String get weatherDesc86 => 'Heavy snow showers';
+
+  @override
+  String get weatherDesc95 => 'Thunderstorm';
+
+  @override
+  String get weatherDesc96 => 'Thunderstorm with slight hail';
+
+  @override
+  String get weatherDesc99 => 'Thunderstorm with severe hail';
 }

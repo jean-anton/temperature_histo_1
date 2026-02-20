@@ -35,10 +35,10 @@ class WeatherTooltip {
         : null;
 
     final String locale = Localizations.localeOf(context).toString();
-    final String formattedDate = DateFormat(
-      'EEEE, d MMMM',
+    final String formattedDate = ChartHelpers.formatLocalizedDate(
+      forecastData.date,
       locale,
-    ).format(forecastData.date);
+    );
 
     _buildTooltip(
       context,
@@ -65,10 +65,11 @@ class WeatherTooltip {
 
     final hourly = dailyWeather.hourlyForecasts[touchedIndex];
     final String locale = Localizations.localeOf(context).toString();
-    final String formattedDate = DateFormat(
-      'EEEE, d MMMM HH:mm',
+    final String formattedDate = ChartHelpers.formatLocalizedDate(
+      hourly.time,
       locale,
-    ).format(hourly.time);
+      includeTime: true,
+    );
 
     _buildTooltip(
       context,
@@ -105,7 +106,7 @@ class WeatherTooltip {
         break;
     }
     final String formattedDate =
-        '${DateFormat('EEEE, d MMMM', locale).format(period.time)} - $periodName';
+        '${ChartHelpers.formatLocalizedDate(period.time, locale)} - $periodName';
 
     _buildTooltip(
       context,
@@ -157,10 +158,11 @@ class WeatherTooltip {
     if (date == null) return;
 
     final String locale = Localizations.localeOf(context).toString();
-    final String formattedDate = DateFormat(
-      isDaily ? 'EEEE, d MMMM' : 'EEEE, d MMMM HH:mm',
+    final String formattedDate = ChartHelpers.formatLocalizedDate(
+      date,
       locale,
-    ).format(date);
+      includeTime: !isDaily,
+    );
 
     _buildComparisonTooltip(
       context,
@@ -524,20 +526,18 @@ class WeatherTooltip {
                                   child: Text(
                                     data is DailyForecast
                                         ? ChartHelpers.getDescription(
+                                                context,
                                                 (data.weatherCodeDaytime ??
                                                         data.weatherCode)!
                                                     .toString(),
-                                                Localizations.localeOf(
-                                                  context,
-                                                ).toString(),
                                               ) ??
                                               ''
                                         : data is HourlyForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
+                                        ? '${ChartHelpers.getDescription(context, data.weatherCode!.toString())}'
                                         : data is PeriodForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
+                                        ? '${ChartHelpers.getDescription(context, data.weatherCode!.toString())}'
                                         : "",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -964,10 +964,11 @@ class WeatherTooltip {
     String? modelName,
     bool showExtendedWindInfo = false,
   }) {
-    final String formattedDate = DateFormat(
-      'EEEE, d MMMM',
-      'fr_FR',
-    ).format(forecast.date);
+    final locale = Localizations.localeOf(context).toString();
+    final String formattedDate = ChartHelpers.formatLocalizedDate(
+      forecast.date,
+      locale,
+    );
 
     final title = modelName != null
         ? '$formattedDate - $modelName'
@@ -990,10 +991,12 @@ class WeatherTooltip {
     String? modelName,
     bool showExtendedWindInfo = false,
   }) {
-    final String formattedDate = DateFormat(
-      'EEEE, d MMMM HH:mm',
-      'fr_FR',
-    ).format(forecast.time);
+    final locale = Localizations.localeOf(context).toString();
+    final String formattedDate = ChartHelpers.formatLocalizedDate(
+      forecast.time,
+      locale,
+      includeTime: true,
+    );
 
     final title = modelName != null
         ? '$formattedDate - $modelName'
@@ -1042,7 +1045,7 @@ class WeatherTooltip {
       periodName = l10n.evening;
 
     final String formattedDate =
-        '${DateFormat('EEEE, d MMMM', locale).format(forecast.time)} - $periodName';
+        '${ChartHelpers.formatLocalizedDate(forecast.time, locale)} - $periodName';
 
     final title = modelName != null
         ? '$formattedDate - $modelName'
@@ -1263,20 +1266,18 @@ class WeatherTooltip {
                                   child: Text(
                                     data is DailyForecast
                                         ? ChartHelpers.getDescription(
+                                                context,
                                                 (data.weatherCodeDaytime ??
                                                         data.weatherCode)!
                                                     .toString(),
-                                                Localizations.localeOf(
-                                                  context,
-                                                ).toString(),
                                               ) ??
                                               ''
                                         : data is HourlyForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
+                                        ? '${ChartHelpers.getDescription(context, data.weatherCode!.toString())}'
                                         : data is PeriodForecast &&
                                               data.weatherCode != null
-                                        ? '${ChartHelpers.getDescription(data.weatherCode!.toString(), Localizations.localeOf(context).toString())}'
+                                        ? '${ChartHelpers.getDescription(context, data.weatherCode!.toString())}'
                                         : "",
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,

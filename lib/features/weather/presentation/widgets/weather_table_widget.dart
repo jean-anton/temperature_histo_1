@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:aeroclim/features/climate/domain/climate_model.dart';
 import 'package:aeroclim/features/weather/domain/weather_model.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_helpers.dart';
 import 'package:aeroclim/features/climate/data/climate_repository.dart';
 import 'package:aeroclim/core/config/app_config.dart';
 import 'package:aeroclim/l10n/app_localizations.dart';
@@ -123,7 +124,7 @@ class WeatherTable extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Text(
-            '${_getDayOfWeek(context, dailyForecast.date)} ${DateFormat('d MMMM', Localizations.localeOf(context).toString()).format(dailyForecast.date)}',
+            '${ChartHelpers.formatLocalizedDate(dailyForecast.date, Localizations.localeOf(context).toString())}',
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
           ),
         ),
@@ -213,13 +214,6 @@ class WeatherTable extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getDayOfWeek(BuildContext context, DateTime date) {
-    return DateFormat(
-      'EEE',
-      Localizations.localeOf(context).toString(),
-    ).format(date);
   }
 
   Color _getDeviationColor(double deviation) {

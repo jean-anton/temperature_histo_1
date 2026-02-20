@@ -377,4 +377,88 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get copyUrlIfLinksDoNotWork =>
       'Wenn Links nicht funktionieren, kopieren Sie die folgende URL:';
+
+  @override
+  String get weatherDesc0 => 'Klarer Himmel';
+
+  @override
+  String get weatherDesc1 => 'Überwiegend klar';
+
+  @override
+  String get weatherDesc2 => 'Teilweise bewölkt';
+
+  @override
+  String get weatherDesc3 => 'Bedeckt';
+
+  @override
+  String get weatherDesc45 => 'Nebel';
+
+  @override
+  String get weatherDesc48 => 'Raureifnebel';
+
+  @override
+  String get weatherDesc51 => 'Leichter Nieselregen';
+
+  @override
+  String get weatherDesc53 => 'Mäßiger Nieselregen';
+
+  @override
+  String get weatherDesc55 => 'Dichter Nieselregen';
+
+  @override
+  String get weatherDesc56 => 'Leichter gefrierender Nieselregen';
+
+  @override
+  String get weatherDesc57 => 'Dichter gefrierender Nieselregen';
+
+  @override
+  String get weatherDesc61 => 'Leichter Regen';
+
+  @override
+  String get weatherDesc63 => 'Mäßiger Regen';
+
+  @override
+  String get weatherDesc65 => 'Starker Regen';
+
+  @override
+  String get weatherDesc66 => 'Gefrierender Regen';
+
+  @override
+  String get weatherDesc67 => 'Starker gefrierender Regen';
+
+  @override
+  String get weatherDesc71 => 'Leichter Schneefall';
+
+  @override
+  String get weatherDesc73 => 'Mäßiger Schneefall';
+
+  @override
+  String get weatherDesc75 => 'Starker Schneefall';
+
+  @override
+  String get weatherDesc77 => 'Schneegriesel';
+
+  @override
+  String get weatherDesc80 => 'Leichte Regenschauer';
+
+  @override
+  String get weatherDesc81 => 'Mäßige Regenschauer';
+
+  @override
+  String get weatherDesc82 => 'Heftige Regenschauer';
+
+  @override
+  String get weatherDesc85 => 'Leichte Schneeschauer';
+
+  @override
+  String get weatherDesc86 => 'Starke Schneeschauer';
+
+  @override
+  String get weatherDesc95 => 'Gewitter';
+
+  @override
+  String get weatherDesc96 => 'Gewitter mit leichtem Hagel';
+
+  @override
+  String get weatherDesc99 => 'Gewitter mit starkem Hagel';
 }

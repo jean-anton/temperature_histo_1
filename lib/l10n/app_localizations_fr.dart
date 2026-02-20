@@ -374,4 +374,88 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get copyUrlIfLinksDoNotWork =>
       'Si les liens ne fonctionnent pas, copiez l\'URL ci-dessous :';
+
+  @override
+  String get weatherDesc0 => 'Ciel clair';
+
+  @override
+  String get weatherDesc1 => 'Principalement clair';
+
+  @override
+  String get weatherDesc2 => 'Partiellement nuageux';
+
+  @override
+  String get weatherDesc3 => 'Couvert';
+
+  @override
+  String get weatherDesc45 => 'Brouillard';
+
+  @override
+  String get weatherDesc48 => 'Brouillard givrant';
+
+  @override
+  String get weatherDesc51 => 'Bruine légère';
+
+  @override
+  String get weatherDesc53 => 'Bruine modérée';
+
+  @override
+  String get weatherDesc55 => 'Forte bruine';
+
+  @override
+  String get weatherDesc56 => 'Bruine verglaçante légère';
+
+  @override
+  String get weatherDesc57 => 'Bruine verglaçante dense';
+
+  @override
+  String get weatherDesc61 => 'Pluie faible';
+
+  @override
+  String get weatherDesc63 => 'Pluie modérée';
+
+  @override
+  String get weatherDesc65 => 'Pluie forte';
+
+  @override
+  String get weatherDesc66 => 'Pluie verglaçante';
+
+  @override
+  String get weatherDesc67 => 'Forte pluie verglaçante';
+
+  @override
+  String get weatherDesc71 => 'Chute de neige légère';
+
+  @override
+  String get weatherDesc73 => 'Chute de neige modérée';
+
+  @override
+  String get weatherDesc75 => 'Chute de neige forte';
+
+  @override
+  String get weatherDesc77 => 'Grains de neige';
+
+  @override
+  String get weatherDesc80 => 'Averses faibles';
+
+  @override
+  String get weatherDesc81 => 'Averses modérées';
+
+  @override
+  String get weatherDesc82 => 'Averses violentes';
+
+  @override
+  String get weatherDesc85 => 'Averses de neige légères';
+
+  @override
+  String get weatherDesc86 => 'Averses de neige fortes';
+
+  @override
+  String get weatherDesc95 => 'Orage';
+
+  @override
+  String get weatherDesc96 => 'Orage avec grêle légère';
+
+  @override
+  String get weatherDesc99 => 'Orage avec grêle forte';
 }

@@ -375,4 +375,88 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get copyUrlIfLinksDoNotWork =>
       'Si los enlaces no funcionan, copie la siguiente URL:';
+
+  @override
+  String get weatherDesc0 => 'Cielo despejado';
+
+  @override
+  String get weatherDesc1 => 'Mayormente despejado';
+
+  @override
+  String get weatherDesc2 => 'Parcialmente nublado';
+
+  @override
+  String get weatherDesc3 => 'Nublado';
+
+  @override
+  String get weatherDesc45 => 'Niebla';
+
+  @override
+  String get weatherDesc48 => 'Niebla con escarcha';
+
+  @override
+  String get weatherDesc51 => 'Llovizna ligera';
+
+  @override
+  String get weatherDesc53 => 'Llovizna moderada';
+
+  @override
+  String get weatherDesc55 => 'Llovizna densa';
+
+  @override
+  String get weatherDesc56 => 'Llovizna helada ligera';
+
+  @override
+  String get weatherDesc57 => 'Llovizna helada densa';
+
+  @override
+  String get weatherDesc61 => 'Lluvia ligera';
+
+  @override
+  String get weatherDesc63 => 'Lluvia moderada';
+
+  @override
+  String get weatherDesc65 => 'Lluvia fuerte';
+
+  @override
+  String get weatherDesc66 => 'Lluvia helada';
+
+  @override
+  String get weatherDesc67 => 'Lluvia helada fuerte';
+
+  @override
+  String get weatherDesc71 => 'Nevada ligera';
+
+  @override
+  String get weatherDesc73 => 'Nevada moderada';
+
+  @override
+  String get weatherDesc75 => 'Nevada fuerte';
+
+  @override
+  String get weatherDesc77 => 'Granizo';
+
+  @override
+  String get weatherDesc80 => 'Chubascos ligeros';
+
+  @override
+  String get weatherDesc81 => 'Chubascos moderados';
+
+  @override
+  String get weatherDesc82 => 'Chubascos violentos';
+
+  @override
+  String get weatherDesc85 => 'Chubascos de nieve ligeros';
+
+  @override
+  String get weatherDesc86 => 'Chubascos de nieve fuertes';
+
+  @override
+  String get weatherDesc95 => 'Tormenta';
+
+  @override
+  String get weatherDesc96 => 'Tormenta con granizo ligero';
+
+  @override
+  String get weatherDesc99 => 'Tormenta con granizo fuerte';
 }

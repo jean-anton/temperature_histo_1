@@ -12,8 +12,8 @@ import 'package:aeroclim/features/weather/presentation/widgets/vent_table_widget
 import 'package:aeroclim/features/weather/presentation/widgets/comparison_table_widget.dart';
 
 import 'package:aeroclim/core/widgets/help_dialog.dart';
+import 'package:aeroclim/features/weather/presentation/widgets/utils/chart_helpers.dart';
 import 'package:aeroclim/l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
 
 class WeatherDisplayWidget extends StatefulWidget {
   final WeatherLocationInfo weatherInfo;
@@ -262,10 +262,17 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                DateFormat(
-                                  'EEEE d MMMM',
-                                  Localizations.localeOf(context).toString(),
-                                ).format(displayedDay.date),
+                                () {
+                                  final locale = Localizations.localeOf(
+                                    context,
+                                  ).toString();
+                                  final formattedDate =
+                                      ChartHelpers.formatLocalizedDate(
+                                        displayedDay!.date,
+                                        locale,
+                                      );
+                                  return formattedDate;
+                                }(),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
