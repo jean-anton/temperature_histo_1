@@ -229,7 +229,6 @@ class VentTableWidget extends StatelessWidget {
           GustArrowWidget(
             windSpeed: forecast.windGusts,
             windDirection: forecast.windDirection10m,
-            scaleFactor: 1.5,
           ),
         ),
         DataCell(

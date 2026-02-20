@@ -58,7 +58,7 @@ class WindSettings extends StatelessWidget {
                 context: context,
                 label: 'Rafales (km/h)',
                 value: maxGustSpeed,
-                items: [5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0],
+                items: [5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0],
                 onChanged: onMaxGustSpeedChanged,
                 itemLabelBuilder: (v) => v.toStringAsFixed(0),
               ),

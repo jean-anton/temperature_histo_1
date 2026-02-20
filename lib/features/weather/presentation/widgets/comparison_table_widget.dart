@@ -488,13 +488,12 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
               ),
               if (d.windGustsMax != null &&
                   d.windDirection10mDominant != null) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 2),
                 Opacity(
                   opacity: 0.9,
                   child: GustArrowWidget(
                     windSpeed: d.windGustsMax,
                     windDirection: d.windDirection10mDominant,
-                    scaleFactor: 1.3,
                   ),
                 ),
               ],
@@ -584,7 +583,6 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                   child: GustArrowWidget(
                     windSpeed: p.maxWindGusts,
                     windDirection: p.windDirection,
-                    scaleFactor: 1.1,
                   ),
                 ),
               ],
@@ -671,7 +669,6 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                   child: GustArrowWidget(
                     windSpeed: h.windGusts,
                     windDirection: h.windDirection10m,
-                    scaleFactor: 1.1,
                   ),
                 ),
               ],

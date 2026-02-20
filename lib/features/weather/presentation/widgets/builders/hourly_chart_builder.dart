@@ -7,6 +7,7 @@ import '../utils/chart_constants.dart';
 import '../utils/chart_helpers.dart';
 import '../utils/chart_data_provider.dart';
 import '../utils/chart_theme.dart';
+import '../common/wind_indicator.dart';
 
 /// Builder for hourly weather chart
 class HourlyChartBuilder {
@@ -401,53 +402,13 @@ class HourlyChartBuilder {
         hourly.temperature ?? 0,
       );
 
-      final windIconPath = "assets/google_weather_icons/v4/arrow.svg";
-      final windIconPathContour =
-          "assets/google_weather_icons/v4/arrow_contour.svg";
-      final windDirectionDegrees = hourly.windDirection10m ?? 0;
-
       return Positioned(
-        left: pos.dx - 100,
+        left: pos.dx - ChartTheme.windInfoContainerOffset,
         top: pos.dy + 10,
-        child: SizedBox(
-          width: 200,
-          child: Column(
-            children: [
-              Text(
-                '${hourly.windSpeed!.round()} km/h',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue,
-                ),
-              ),
-              Stack(
-                children: [
-                  Transform.rotate(
-                    angle: (135 + windDirectionDegrees) * (3.14159 / 180),
-                    child: SvgPicture.asset(
-                      windIconPath,
-                      width: (hourly.windGusts ?? 0.0) * 2,
-                      height: (hourly.windGusts ?? 0.0) * 2,
-                      colorFilter: ColorFilter.mode(
-                        ChartTheme.windGustColor(hourly.windGusts ?? 0.0),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                  Transform.rotate(
-                    angle: (135 + windDirectionDegrees) * (3.14159 / 180),
-                    child: SvgPicture.asset(
-                      windIconPathContour,
-                      width: (hourly.windGusts ?? 0.0) * 2,
-                      height: (hourly.windGusts ?? 0.0) * 2,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        child: WindIndicator(
+          windSpeed: hourly.windSpeed!,
+          windGusts: hourly.windGusts,
+          windDirection: hourly.windDirection10m ?? 0,
         ),
       );
     }).toList();

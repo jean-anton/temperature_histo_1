@@ -11,7 +11,7 @@ class GustArrowWidget extends StatelessWidget {
     super.key,
     required this.windSpeed,
     required this.windDirection,
-    this.scaleFactor = 2.0,
+    this.scaleFactor = ChartTheme.windIconSizeMultiplier,
   });
 
   @override
@@ -33,6 +33,7 @@ class GustArrowWidget extends StatelessWidget {
             windIconPath,
             width: size,
             height: size,
+            fit: BoxFit.contain,
             colorFilter: ColorFilter.mode(
               ChartTheme.windGustColor(windSpeed ?? 0.0),
               BlendMode.srcIn,
@@ -45,6 +46,8 @@ class GustArrowWidget extends StatelessWidget {
             windIconPathContour,
             width: size,
             height: size,
+            fit: BoxFit.contain,
+            // colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
             colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
         ),

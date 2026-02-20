@@ -126,7 +126,7 @@ class ChartTheme {
   static const double hourLabelWidth = 60.0;
 
   static const double windIconMaxSize = 50.0;
-  static const double windIconSizeMultiplier = 2.0;
+  static const double windIconSizeMultiplier = 1.6;
   static const double windInfoContainerWidth = 200.0;
   static const double windInfoContainerOffset = 100.0;
 
