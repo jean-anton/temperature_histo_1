@@ -763,6 +763,19 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
   Widget _buildCellContainer({required List<Widget> children}) {
     final screenWidth = MediaQuery.of(context).size.width;
     final double columnWidth = screenWidth < 500 ? 90.0 : 100.0;
+
+    // 1. Flatten the list: if the first item is a Row, extract its children.
+    // This turns [Row(A, B), Container, Widget] into [A, B, Container, Widget].
+    List<Widget> flattenedChildren = [];
+    if (children.isNotEmpty) {
+      if (children[0] is Row) {
+        flattenedChildren.addAll((children[0] as Row).children);
+        flattenedChildren.addAll(children.skip(1));
+      } else {
+        flattenedChildren = children;
+      }
+    }
+
     return Container(
       width: columnWidth,
       height: _rowHeight,
@@ -773,12 +786,88 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
           bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: children,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: flattenedChildren.asMap().entries.map((entry) {
+          int index = entry.key;
+          Widget child = entry.value;
+          //print('### CJG : index: $index');
+          double top = 0;
+          double left = 0;
+
+          // 2. Map coordinates based on the new flattened indices
+          if (index == 0) { // weather icon
+            // First item of the original Row
+            top = 0;
+            left = 5;
+          } else if (index == 1) { // container
+            // Second item of the original Row
+            top = -30; // Per your specific requirement
+            left = 50;
+          } else if (index == 2) { // wind speed
+            // The original Container() that was at index 1
+            top = -10;
+            left = 40;
+          } else if (index == 3) { // container
+            // The original Container() that was at index 1
+            top = 50;
+            left = 0;
+          } else if (index == 4) { // temperature
+            // The original Container() that was at index 1
+            top = 50;
+            left = 10;
+          }
+
+          return Positioned(top: top, left: left, child: index == 3 || index == 1 ? Container(color: Colors.red, width: 0, height: 0) : child);
+        }).toList(),
       ),
     );
   }
+
+  // Widget _buildCellContainer({required List<Widget> children}) {
+  //   final screenWidth = MediaQuery.of(context).size.width;
+  //   final double columnWidth = screenWidth < 500 ? 90.0 : 100.0;
+  //   return Container(
+  //     width: columnWidth,
+  //     height: _rowHeight,
+  //     padding: const EdgeInsets.symmetric(vertical: 8),
+  //     decoration: BoxDecoration(
+  //       border: Border(
+  //         right: BorderSide(color: Colors.grey[400]!, width: 1),
+  //         bottom: BorderSide(color: Colors.grey[400]!, width: 1.0),
+  //       ),
+  //     ),
+  //     //CJG  child: Column(
+  //     child: Stack(
+  //       clipBehavior: Clip.none,
+  //       children: children.asMap().entries.map((entry) {
+  //         int index = entry.key;
+  //         print('### CJG : index: $index');
+
+  //         // Position 1: top -10, left 0
+  //         // Position 2: top -10, left 50
+  //         // Position 3: top 50, left 0
+  //         double top = 0;
+  //         double left = 0;
+
+  //         if (index == 0) {
+  //           top = -10;
+  //           left = 0;
+  //         }
+  //         if (index == 1) {
+  //           top = -30;
+  //           left = 50;
+  //         }
+  //         if (index == 2) {
+  //           top = 50;
+  //           left = 0;
+  //         }
+
+  //         return Positioned(top: top, left: left, child: index == 1 ? entry.value : Container());
+  //       }).toList(),
+  //     ),
+  //   );
+  // }
 
   Widget _buildEmptyCell({Color? backgroundColor}) {
     final screenWidth = MediaQuery.of(context).size.width;

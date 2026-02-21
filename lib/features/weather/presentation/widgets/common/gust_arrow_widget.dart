@@ -23,7 +23,20 @@ class GustArrowWidget extends StatelessWidget {
     const windIconPathContour =
         "assets/google_weather_icons/v4/arrow_contour.svg";
 
-    final size = (windSpeed ?? 0.0) * scaleFactor;
+    // Adjust arrow size: keep constant for low gusts, up to 3x for high gusts
+    const double minGust = 5.0; // km/h
+    const double maxGust = 75.0; // km/h
+    final double baseSize = scaleFactor;
+    double sizeFactor;
+    if (windSpeed! < minGust) {
+      sizeFactor = 1.0;
+    } else if (windSpeed! > maxGust) {
+      sizeFactor = 3.0;
+    } else {
+      // Linear interpolation between 1.0 and 3.0
+      sizeFactor = 1.0 + ((windSpeed! - minGust) / (maxGust - minGust)) * 2.0;
+    }
+    final size = baseSize * sizeFactor * 20;
 
     return Stack(
       children: [
@@ -51,6 +64,7 @@ class GustArrowWidget extends StatelessWidget {
             colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           ),
         ),
+        //Text("${windSpeed.toString()} $size", style: const TextStyle(fontSize: 12)),
       ],
     );
   }

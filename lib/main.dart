@@ -18,7 +18,7 @@ import 'core/services/geolocation_service.dart';
 import 'features/weather/presentation/widgets/utils/weather_tooltip.dart';
 import 'core/config/app_config.dart';
 
-const VERSION = "3.0.2";
+const VERSION = "3.1.0";
 String mainFileName = "/Users/jg/devel/projects/flutter/aeroclim";
 
 // This custom scroll behavior enables touch-based scrolling on web platforms,
