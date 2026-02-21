@@ -38,34 +38,44 @@ class GustArrowWidget extends StatelessWidget {
     }
     final size = baseSize * sizeFactor * 20;
 
-    return Stack(
-      children: [
-        Transform.rotate(
-          angle: (135 + windDirection!) * (3.14159 / 180),
-          child: SvgPicture.asset(
-            windIconPath,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            colorFilter: ColorFilter.mode(
-              ChartTheme.windGustColor(windSpeed ?? 0.0),
-              BlendMode.srcIn,
+    return SizedBox(
+      width: size,
+      height: size,
+      child: OverflowBox(
+        alignment: Alignment.center,
+        child: Stack(
+          children: [
+            Transform.rotate(
+              angle: (135 + windDirection!) * (3.14159 / 180),
+              child: SvgPicture.asset(
+                windIconPath,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+                colorFilter: ColorFilter.mode(
+                  ChartTheme.windGustColor(windSpeed ?? 0.0),
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
-          ),
+            Transform.rotate(
+              angle: (135 + windDirection!) * (3.14159 / 180),
+              child: SvgPicture.asset(
+                windIconPathContour,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+                // colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(
+                  Colors.black,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+            //Text("${windSpeed.toString()} $size", style: const TextStyle(fontSize: 12)),
+            ],
         ),
-        Transform.rotate(
-          angle: (135 + windDirection!) * (3.14159 / 180),
-          child: SvgPicture.asset(
-            windIconPathContour,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            // colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-          ),
-        ),
-        //Text("${windSpeed.toString()} $size", style: const TextStyle(fontSize: 12)),
-      ],
+      ),
     );
   }
 }

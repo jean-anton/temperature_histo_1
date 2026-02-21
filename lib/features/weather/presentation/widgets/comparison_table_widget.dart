@@ -1,3 +1,4 @@
+import 'package:aeroclim/features/weather/presentation/widgets/common/wind_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:aeroclim/l10n/app_localizations.dart';
@@ -516,6 +517,10 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                     windSpeed: d.windGustsMax,
                     windDirection: d.windDirection10mDominant,
                   ),
+                  // child: WindIndicator(
+                  //   windSpeed: d.windGustsMax!,
+                  //   windDirection: d.windDirection10mDominant!,
+                  // ),
                 ),
               ],
             ],
@@ -631,7 +636,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                 if (p.apparentTemperature != null) ...[
                   const SizedBox(width: 8),
                   Text(
-                    '${p.apparentTemperature!.round()}°',
+                    '(${p.apparentTemperature!.round()}°)',
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey[600],
@@ -719,7 +724,7 @@ class _ComparisonTableWidgetState extends State<ComparisonTableWidget> {
                 if (h.apparentTemperature != null) ...[
                   const SizedBox(width: 8),
                   Text(
-                    '${h.apparentTemperature!.round()}°',
+                    '(${h.apparentTemperature!.round()}°)',
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey[600],
